@@ -1,0 +1,20 @@
+{
+  "$comment": "Exemplo para backend Go. Copie o que faltar para o settings.json gerado pelo /sdd-init.",
+  "permissions": {
+    "allow": [
+      "Read", "Glob", "Grep", "Write", "Edit",
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go run:*)",
+      "Bash(go mod:*)",
+      "Bash(go vet:*)",
+      "Bash(gofmt:*)",
+      "Bash(golangci-lint:*)",
+      "Bash(migrate:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git add:*)", "Bash(git commit:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)", "Bash(git push:*)", "Bash(git reset --hard:*)", "Bash(sudo:*)"
+    ]
+  }
+}

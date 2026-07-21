@@ -1,0 +1,22 @@
+{
+  "$comment": "Exemplo para backend Python. Copie o que faltar para o settings.json gerado pelo /sdd-init. Ajuste ao gerenciador real (pip, poetry, uv) e ao runner (pytest, tox).",
+  "permissions": {
+    "allow": [
+      "Read", "Glob", "Grep", "Write", "Edit",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pip install:*)",
+      "Bash(pip3 install:*)",
+      "Bash(poetry:*)",
+      "Bash(uv:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(alembic:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git add:*)", "Bash(git commit:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)", "Bash(git push:*)", "Bash(git reset --hard:*)", "Bash(sudo:*)"
+    ]
+  }
+}

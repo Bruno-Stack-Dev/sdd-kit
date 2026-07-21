@@ -1,0 +1,40 @@
+{
+  "$comment": "Genérico e portátil. As permissões abaixo são o piso comum (ler/editar/rodar node e gerenciadores). Rode /sdd-init para gerar um settings.json ajustado à stack deste projeto — ele adiciona os comandos reais da config seção 2 (ex.: pytest, go test, cargo) ao allowlist. Veja settings.example.python.json e settings.example.go.json.",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(npm ci:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm:*)",
+      "Bash(yarn:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(mkdir:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  }
+}
