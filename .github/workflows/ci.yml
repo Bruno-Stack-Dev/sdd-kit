@@ -12,11 +12,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - name: sdd-lint (specs/ + .claude/)
         run: node scripts/sdd-lint.mjs
       - name: Testes do linter (node:test, zero-dep)
-        run: node --test scripts/tests/
+        # Forma com glob (expandida pelo shell) — funciona em qualquer versão do Node.
+        # A forma de diretório `node --test scripts/tests/` só recorre em Node >= 21.
+        run: node --test scripts/tests/*.test.mjs
 
   python-skill-tests:
     name: Testes Python das skills uiux-*
