@@ -23,12 +23,6 @@ jobs:
   python-skill-tests:
     name: Testes Python das skills uiux-*
     runs-on: ubuntu-latest
-    # TODO: hoje 3 testes falham (test_sync_parses_bundled_starter_template — segmento
-    # "design-system" não atualizado para "uiux-design-system"; test_flags_hardcoded_hex_...
-    # — dependente de encoding; test_add_components_success — script fixa shadcn@2.3.0 e o
-    # teste espera @latest). Job mantido NÃO-BLOQUEANTE até serem corrigidos. Ao resolver,
-    # remova o continue-on-error abaixo.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

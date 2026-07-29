@@ -170,10 +170,13 @@ class TestShadcnInstaller:
         assert "button" in message
         assert "card" in message
 
-        # Verify correct command was called
+        # Verify correct command was called. The shadcn version is pinned in the script
+        # (see get_shadcn_version), so assert the command shape rather than an exact version.
         mock_run.assert_called_once()
         call_args = mock_run.call_args[0][0]
-        assert call_args[:3] == ["npx", "shadcn@latest", "add"]
+        assert call_args[0] == "npx"
+        assert call_args[1].startswith("shadcn@")
+        assert call_args[2] == "add"
         assert "button" in call_args
         assert "card" in call_args
 
