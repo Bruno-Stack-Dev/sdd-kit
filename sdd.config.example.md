@@ -207,12 +207,11 @@ branco/`false` num projeto simples; ative conforme o projeto amadurece. São o q
 
 ## 12. Design System (opcional)
 
-Ativa e calibra as **skills de Design System Ops** (`.claude/skills/`, grupo DS). Preencha só se
-o projeto tem/mantém um design system. Deixe `ativo: false` caso contrário — o `/sdd-init` decide
-com base nisto e não carrega essas skills em projetos sem DS. Substitui o `.ds-ops-config.yml`
-do plugin original: as skills DS leem **esta seção**.
-
-- **ativo:** <ex.: `true` · `false`>
+Calibra as **skills do pack Design System Ops** (`_packs/ds/`). Preencha só se o projeto
+tem/mantém um design system. A **ativação** do pack é mecânica: o `/sdd-init` **copia**
+`_packs/ds/` para `.claude/skills/` quando há DS (veja `.claude/skills/README.md`) — não existe
+mais o flag `ativo:`. Sem DS, o pack fica inativo em `_packs/` e esta seção pode ficar vazia.
+Substitui o `.ds-ops-config.yml` do plugin original: as skills DS leem **esta seção**.
 
 ### 12.1 Identidade do DS
 | Item | Valor |

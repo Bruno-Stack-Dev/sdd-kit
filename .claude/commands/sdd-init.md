@@ -87,11 +87,23 @@ como referência. Não remova as entradas de `deny`. Se um comando da config nã
 allowlist, o motor não conseguirá validá-lo. As skills `uiux-*` executam um `search.py`, então
 `python`/`python3` já vêm no allowlist genérico — confirme que continuam lá.
 
-**Decida sobre as skills de Design System (`.claude/skills/ds-*`).** Verifique se o projeto
-tem/mantém um design system (tokens, biblioteca de componentes, temas). **Se sim:** preencha a
-**seção 12** da config (`ativo: true` + identidade/severidade/gates) — essas skills passam a
-valer. **Se não:** deixe `ativo: false` e informe o usuário de que as ~44 skills `ds-*` estão
-disponíveis mas inativas (podem ser ligadas depois preenchendo a seção 12). Não as remova.
+**Decida sobre os packs vendorizados (`.claude/skills/_packs/`).** Os três packs (`arch`, `ds`,
+`uiux`) vêm prontos mas ficam **inativos** por padrão, guardados em `_packs/` (ignorados até
+ativação). **Ativar = copiar** `_packs/<pack>/` para `.claude/skills/`; **desativar = apagar** a
+cópia (o original em `_packs/` permanece intacto). As pastas de notas do pack (`_knowledge-notes`,
+`_arch-templates`) viajam junto na cópia, então as referências internas continuam válidas. Avalie
+cada pack com o usuário:
+
+- **`ds` — Design System Ops (44 skills):** ative só se o projeto tem/mantém um design system
+  (tokens, biblioteca de componentes, temas). Ao ativar, preencha a **seção 12** da config
+  (identidade/severidade/gates). Se não tiver DS, deixe inativo e avise que pode ser ligado depois.
+- **`uiux` — UI/UX Pro Max (7 skills):** ative se o projeto tem trabalho de UI/design. Requer
+  `python`/`python3` no allowlist (já genérico) para o `search.py`.
+- **`arch` — software-architecture (14 skills):** ative se for usar o raciocínio de arquitetura
+  (opções, tradeoffs, views). **Atenção:** a cadeia de arquitetura do Bloco 3 do `DISCOVERY.md`
+  cita as skills `arch-*` — se for conduzir esse bloco, ative o pack `arch` antes.
+
+Nunca **remova** um pack de `_packs/` — apenas ative/desative a cópia em `.claude/skills/`.
 
 Rode `node scripts/sdd-lint.mjs`, reporte os arquivos criados e os `<TODO>` pendentes, e aponte
 o próximo passo: `/sdd-status`, `/gerar-skills`, `/gerar-projeto` (novo) ou `/nova-spec` (incremento).
