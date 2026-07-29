@@ -101,6 +101,15 @@ node scripts/sdd-lint.mjs        # specs/discovery + seções 7/8 da config + ar
 > qualquer caminho `.claude/skills/<algo>` citado em arquivos `.md`/`.py`/`.cjs`/`.mjs`/`.json`
 > que não exista no disco é reportado como erro — pega links internos que ficaram para trás.
 
+O kit também tem testes unitários do próprio linter (zero-dep, `node:test`):
+
+```bash
+node --test scripts/tests/
+```
+
+> No Windows, se a forma de diretório acima devolver `MODULE_NOT_FOUND` (quirk conhecido do
+> discovery de testes por diretório), use o padrão de arquivos: `node --test scripts/tests/*.test.mjs`.
+
 Depois disso: `/sdd-status` para ver o painel, `/gerar-projeto` para o pipeline (projeto novo),
 ou `/nova-spec` para um incremento. Referência de comandos e agentes: `README.md` e `.claude/README.md`.
 

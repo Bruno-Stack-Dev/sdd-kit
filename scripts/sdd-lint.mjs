@@ -107,9 +107,19 @@ function extractSection(text, num) {
   return m ? m[1] : null;
 }
 
+function stripCode(text) {
+  // Remove blocos cercados (```...```) e código inline (`...`). Genéricos como
+  // `Result<T, E>`, `Promise<any>`, `List<Object>` vivem em backticks e NÃO são placeholders.
+  return text.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`\n]*`/g, ' ');
+}
+
 function hasPlaceholder(body) {
-  // Placeholders do template: <TODO>, <ex.: ...>, ou qualquer <...> não resolvido.
-  return /<TODO>/i.test(body) || /<ex\.?:/i.test(body) || /<[^>\n]{1,80}>/.test(body);
+  // Só os formatos que o template realmente produz contam como placeholder não resolvido:
+  //   <TODO>          e
+  //   <ex.: ...>  /  <algo — ex.: ...>   (qualquer <...> que contenha "ex.:").
+  // Genéricos entre backticks são removidos antes, então `Result<T, E>` na seção 7 passa.
+  const s = stripCode(body);
+  return /<TODO>/i.test(s) || /<[^>\n]*ex\.?:/i.test(s);
 }
 
 function isExplicitlyEmpty(body) {
