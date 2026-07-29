@@ -1,3 +1,7 @@
+---
+description: Roda o motor inteiro (brief → specs → código) para o brief em specs/_entrada/.
+---
+
 # /gerar-projeto
 
 Dispara o pipeline automático **brief → specs → código**.

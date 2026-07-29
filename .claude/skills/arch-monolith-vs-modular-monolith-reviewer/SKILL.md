@@ -1,10 +1,11 @@
 ---
-name: "monolith-vs-modular-monolith-reviewer"
+name: arch-monolith-vs-modular-monolith-reviewer
+description: Avalia se um código ou sistema proposto deve seguir monólito, virar monólito modular ou avançar para decomposição em serviços. Acione quando pedirem: decidir entre monólito e microsserviços, avaliar um monólito modular, comparar opções de decomposição, pesar o custo operacional de dividir. Não acione para desenhar os limites de serviços já decididos — use arch-service-decomposition-advisor.
 pack: "software-architecture-pack"
 purpose: "Evaluate whether a codebase or proposed system should remain a monolith, become a modular monolith, or move further toward service decomposition."
 inputs: ["system scope", "team size and ownership model", "deployment and scaling needs", "change and failure patterns"]
 outputs: ["decision framing", "option comparison", "risks and caveats", "recommended next step"]
-handoffs: ["component-boundary-reviewer", "service-decomposition-advisor", "adr-writer"]
+handoffs: ["arch-component-boundary-reviewer", "arch-service-decomposition-advisor", "arch-adr-writer"]
 ---
 # monolith-vs-modular-monolith-reviewer
 

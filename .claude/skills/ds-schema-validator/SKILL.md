@@ -1,5 +1,5 @@
 ---
-name: schema-validator
+name: ds-schema-validator
 description: "Validate token files against DTCG 2025.10, Style Dictionary, or custom schemas. Trigger when someone says: validate token JSON, check my token files for errors, schema validation for tokens, are my token files valid, DTCG compliance check, validate token format, or anything about checking whether token files are structurally correct before they break builds."
 references:
   - ../_knowledge-notes/token-architecture.md

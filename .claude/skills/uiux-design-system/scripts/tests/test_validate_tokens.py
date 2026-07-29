@@ -25,6 +25,9 @@ def _run(tmp_path: Path, css: str) -> subprocess.CompletedProcess:
         [node, str(SCRIPT), "--dir", str(tmp_path)],
         capture_output=True,
         text=True,
+        # A saída do script contém caracteres não-ASCII; force UTF-8 para não quebrar
+        # em plataformas cujo locale padrão não é UTF-8 (ex.: Windows/cp1252).
+        encoding="utf-8",
     )
 
 

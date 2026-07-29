@@ -1,5 +1,5 @@
 ---
-name: token-documentation
+name: ds-token-documentation
 description: "Write documentation for design tokens — covering semantic intent, usage context, and do/don't examples. Trigger when someone says: document these tokens, token reference, what does this token mean, token usage guide, write the token docs, token intent, or anything about creating human-readable documentation for design tokens."
 references:
   - ../_knowledge-notes/token-architecture.md

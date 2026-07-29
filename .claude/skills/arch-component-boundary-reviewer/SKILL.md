@@ -1,10 +1,11 @@
 ---
-name: "component-boundary-reviewer"
+name: arch-component-boundary-reviewer
+description: Revisa ou define fronteiras internas de componentes para manter responsabilidades, contratos e dependências coerentes. Acione quando pedirem: revisar limites de componentes, avaliar dependências entre módulos, refinar responsabilidades internas, checar acoplamento. Não acione para decompor o sistema em serviços separados — use arch-service-decomposition-advisor.
 pack: "software-architecture-pack"
 purpose: "Review or define internal component boundaries so responsibilities, contracts, and dependencies stay coherent."
 inputs: ["architecture or code structure", "key modules/components", "dependency graph if available", "change scenarios"]
 outputs: ["boundary findings", "dependency issues", "refinement suggestions", "handoff recommendation"]
-handoffs: ["runtime-view-writer", "deployment-view-writer", "adr-writer"]
+handoffs: ["arch-runtime-view-writer", "arch-deployment-view-writer", "arch-adr-writer"]
 ---
 # component-boundary-reviewer
 

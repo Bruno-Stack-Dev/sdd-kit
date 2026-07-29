@@ -1,6 +1,6 @@
 ---
-name: banner-design
-description: "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses ui-ux-pro-max, frontend-design, ai-artist, ai-multimodal skills."
+name: uiux-banner-design
+description: "Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with AI-generated visuals. Actions: design, create, generate banner. Platforms: Facebook, Twitter/X, LinkedIn, YouTube, Instagram, Google Display, website hero, print. Styles: minimalist, gradient, bold typography, photo-based, illustrated, geometric, retro, glassmorphism, 3D, neon, duotone, editorial, collage. Uses UI/UX design intelligence, frontend design, and an available image-generation tool for the visuals."
 argument-hint: "[platform] [style] [dimensions]"
 license: MIT
 metadata:
@@ -58,41 +58,38 @@ For each art direction option:
    - Max 2 typefaces, single CTA, 4.5:1 contrast ratio
    - Inject brand context via `inject-brand-context.cjs`
 
-2. **Generate visual elements** with `ai-artist` + `ai-multimodal` skills
+2. **Generate visual elements** with the available image-generation tool
 
-   **a) Search prompt inspiration** (6000+ examples in ai-artist):
-   ```bash
-   python3 .claude/skills/ai-artist/scripts/search.py "<banner style keywords>"
-   ```
+   **a) Search prompt inspiration** — if a prompt-library or search capability is available,
+   look up banner examples matching your style keywords (`<banner style keywords>`) to seed the
+   visual prompt. Otherwise, write the prompt directly from the art direction below.
 
-   **b) Generate with Standard model** (fast, good for backgrounds/patterns):
-   ```bash
-   .claude/skills/.venv/bin/python3 .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-     --task generate --model gemini-2.5-flash-image \
-     --prompt "<banner visual prompt>" --aspect-ratio <platform-ratio> \
-     --size 2K --output assets/banners/
-   ```
+   **b) Generate with a fast/standard model** (good for backgrounds/patterns) — request a 2K
+   image at the platform aspect ratio:
+   - prompt: `<banner visual prompt>`
+   - aspect ratio: `<platform-ratio>`
+   - size: `2K`
+   - output dir: `assets/banners/`
 
-   **c) Generate with Pro model** (4K, complex illustrations/hero visuals):
-   ```bash
-   .claude/skills/.venv/bin/python3 .claude/skills/ai-multimodal/scripts/gemini_batch_process.py \
-     --task generate --model gemini-3-pro-image-preview \
-     --prompt "<creative banner prompt>" --aspect-ratio <platform-ratio> \
-     --size 4K --output assets/banners/
-   ```
+   **c) Generate with a high-quality/pro model** (4K, complex illustrations/hero visuals) — same
+   request at higher fidelity:
+   - prompt: `<creative banner prompt>`
+   - aspect ratio: `<platform-ratio>`
+   - size: `4K`
+   - output dir: `assets/banners/`
 
-   **When to use which model:**
-   | Use Case | Model | Quality |
-   |----------|-------|---------|
-   | Backgrounds, gradients, patterns | Standard (Flash) | 2K, fast |
-   | Hero illustrations, product shots | Pro | 4K, detailed |
-   | Photorealistic scenes, complex art | Pro | 4K, best quality |
-   | Quick iterations, A/B variants | Standard (Flash) | 2K, fast |
+   **When to use which model tier:**
+   | Use Case | Model tier | Quality |
+   |----------|-----------|---------|
+   | Backgrounds, gradients, patterns | Standard/fast | 2K, fast |
+   | Hero illustrations, product shots | Pro/high-quality | 4K, detailed |
+   | Photorealistic scenes, complex art | Pro/high-quality | 4K, best quality |
+   | Quick iterations, A/B variants | Standard/fast | 2K, fast |
 
    **Aspect ratios:** `1:1`, `16:9`, `9:16`, `3:4`, `4:3`, `2:3`, `3:2`
    Match to platform - e.g., Twitter header = `3:1` (use `3:2` closest), Instagram story = `9:16`
 
-   **Pro model prompt tips** (see `ai-artist` references/nano-banana-pro-examples.md):
+   **Pro model prompt tips:**
    - Be descriptive: style, lighting, mood, composition, color palette
    - Include art direction: "minimalist flat design", "cyberpunk neon", "editorial photography"
    - Specify no-text: "no text, no letters, no words" (text overlaid in HTML step)
@@ -101,25 +98,16 @@ For each art direction option:
 
 ### Step 4: Export Banners to Images
 
-After designing HTML banners, export each to PNG using `chrome-devtools` skill:
+After designing HTML banners, export each to PNG using the available browser/screenshot tool
+(headless browser, screenshot capability, or a local screenshot script):
 
 1. **Serve HTML files** via local server (python http.server or similar)
-2. **Screenshot each banner** at exact platform dimensions:
-   ```bash
-   # Export banner to PNG at exact dimensions
-   node .claude/skills/chrome-devtools/scripts/screenshot.js \
-     --url "http://localhost:8765/banner-01-minimalist.html" \
-     --width 1500 --height 500 \
-     --output "assets/banners/{campaign}/{variant}-{size}.png"
-   ```
-3. **Auto-compress** if >5MB (Sharp compression built-in):
-   ```bash
-   # With custom max size threshold
-   node .claude/skills/chrome-devtools/scripts/screenshot.js \
-     --url "http://localhost:8765/banner-02-gradient.html" \
-     --width 1500 --height 500 --max-size 3 \
-     --output "assets/banners/{campaign}/{variant}-{size}.png"
-   ```
+2. **Screenshot each banner** at exact platform dimensions — for each banner, capture:
+   - url: `http://localhost:8765/banner-01-minimalist.html`
+   - width × height: `1500 × 500` (use the exact platform dimensions)
+   - output: `assets/banners/{campaign}/{variant}-{size}.png`
+3. **Auto-compress** if >5MB — re-export with a max-size threshold (e.g. `3` MB) so large
+   PNGs are compressed on the way out.
 
 **Output path convention** (per `assets-organizing` skill):
 ```
@@ -139,7 +127,7 @@ assets/banners/{campaign}/
 
 Present all exported images side-by-side. For each option show:
 - Art direction style name
-- Exported PNG preview (use `ai-multimodal` skill to display if needed)
+- Exported PNG preview (display it with the available image-viewing tool if needed)
 - Key design rationale
 - File path & dimensions
 

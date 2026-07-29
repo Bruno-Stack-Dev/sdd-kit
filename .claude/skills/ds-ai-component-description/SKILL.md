@@ -1,5 +1,5 @@
 ---
-name: ai-component-description
+name: ds-ai-component-description
 description: "Generate AI-optimised text descriptions for components, formatted for Figma's MCP server and LLM consumption. This produces prose descriptions in a six-section format (purpose, props, anti-patterns, composition, accessibility, examples), NOT JSON schemas or structured data files. Trigger when someone says: write component description for AI, Figma MCP description, write the description for Claude to read, six-section description, describe this component for AI, or anything about writing text that makes components legible to LLMs. Do NOT trigger for JSON metadata schemas, structured constraint files, or programmatic tooling data — use metadata-schema-generator for those."
 references:
   - ../_knowledge-notes/ai-readiness.md

@@ -1,6 +1,14 @@
+---
+description: Implementa uma spec de ponta a ponta, nas camadas declaradas na config.
+argument-hint: <PREFIXO>NNN
+---
+
 # /implementar-spec <PREFIXO>NNN
 
 Implementa **uma spec inteira** de ponta a ponta (Passos 5–6 do `specs/_gerador/GERADOR.md`).
+
+Localize a spec `$ARGUMENTS` em `specs/` pelo seu `spec-id`. Se `$ARGUMENTS` estiver vazio,
+**peça o identificador da spec** (ex.: `FEAT-012`) antes de continuar — não adivinhe.
 
 Execute as **camadas de implementação declaradas em `sdd.config.md` (seção 5)**, na ordem,
 cada uma pelo agente de lá, **até o verde antes de avançar**. O padrão do kit é:

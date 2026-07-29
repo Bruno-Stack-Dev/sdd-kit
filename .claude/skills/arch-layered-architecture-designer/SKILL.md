@@ -1,10 +1,11 @@
 ---
-name: "layered-architecture-designer"
+name: arch-layered-architecture-designer
+description: Propõe uma arquitetura em camadas com responsabilidades claras, direção de dependência e regras de fronteira. Acione quando pedirem: desenhar uma arquitetura em camadas, definir a separação de responsabilidades, estabelecer regras de dependência entre camadas, organizar a estrutura do sistema. Não acione para revisar limites de componentes já existentes — use arch-component-boundary-reviewer.
 pack: "software-architecture-pack"
 purpose: "Propose a layered architecture with clear responsibilities, dependency direction, and boundary rules."
 inputs: ["system responsibilities", "key use cases", "cross-cutting concerns", "technology constraints"]
 outputs: ["layer breakdown", "responsibility map", "dependency rules", "handoff recommendation"]
-handoffs: ["component-boundary-reviewer", "runtime-view-writer", "deployment-view-writer"]
+handoffs: ["arch-component-boundary-reviewer", "arch-runtime-view-writer", "arch-deployment-view-writer"]
 ---
 # layered-architecture-designer
 

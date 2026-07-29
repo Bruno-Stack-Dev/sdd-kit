@@ -87,12 +87,28 @@ Se preferir (ou se o comando não aparecer), basta pedir no chat:
 ## Passo 4 — Validar
 
 ```bash
-node scripts/sdd-lint.mjs        # frontmatter das specs/discovery + seções 7/8 da config
+node scripts/sdd-lint.mjs        # specs/discovery + seções 7/8 da config + artefatos de .claude/
 ```
 
 > Após o `/sdd-init`, o linter também verifica se as seções **7 (Padrões proibidos)** e
 > **8 (Gates)** do `sdd.config.md` foram preenchidas — ele falha se sobrarem placeholders
-> (`<TODO>`/`<ex.: ...>`). Resolva-as com valores reais ou escreva `nenhum`.
+> (`<TODO>`/`<ex.: ...>`). Resolva-as com valores reais ou escreva `nenhum`. Genéricos entre
+> backticks (ex.: `` `Result<T, E>` ``) na seção 7 **não** são tratados como placeholder.
+
+> O linter agora cobre também o diretório **`.claude/`**: cada skill (`name` igual ao diretório,
+> `description` presente com 40–1024 chars e `references:` existentes), cada agente (`name` igual
+> ao arquivo e `description` presente) e cada comando (`description` no frontmatter). Além disso,
+> qualquer caminho `.claude/skills/<algo>` citado em arquivos `.md`/`.py`/`.cjs`/`.mjs`/`.json`
+> que não exista no disco é reportado como erro — pega links internos que ficaram para trás.
+
+O kit também tem testes unitários do próprio linter (zero-dep, `node:test`):
+
+```bash
+node --test scripts/tests/
+```
+
+> No Windows, se a forma de diretório acima devolver `MODULE_NOT_FOUND` (quirk conhecido do
+> discovery de testes por diretório), use o padrão de arquivos: `node --test scripts/tests/*.test.mjs`.
 
 Depois disso: `/sdd-status` para ver o painel, `/gerar-projeto` para o pipeline (projeto novo),
 ou `/nova-spec` para um incremento. Referência de comandos e agentes: `README.md` e `.claude/README.md`.

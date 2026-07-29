@@ -1,5 +1,5 @@
 ---
-name: engineering-onboarding
+name: ds-engineering-onboarding
 description: "Create an onboarding guide for an engineer joining a team that consumes the design system. Trigger when someone says: onboard new engineer, developer getting started guide, new engineer guide, engineering onboarding, first day for developers, frontend onboarding, or anything about helping an engineer new to the team get up to speed with the design system."
 references:
   - ../_knowledge-notes/design-to-code-contract.md

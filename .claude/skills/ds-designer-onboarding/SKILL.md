@@ -1,5 +1,5 @@
 ---
-name: designer-onboarding
+name: ds-designer-onboarding
 description: "Create an onboarding guide for a designer joining a team that uses a design system. Trigger when someone says: onboard new designer, getting started guide, new team member guide, onboarding documentation, first day with the system, new designer guide, or anything about helping a designer new to the team or the design system get up to speed."
 ---
 

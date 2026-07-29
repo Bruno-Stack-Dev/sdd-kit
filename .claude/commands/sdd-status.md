@@ -1,3 +1,7 @@
+---
+description: Dashboard: varre o frontmatter das specs e mostra status, CAs e pendências.
+---
+
 # /sdd-status
 
 Dashboard do estado do SDD: derivado do frontmatter das specs, não do que está escrito à mão

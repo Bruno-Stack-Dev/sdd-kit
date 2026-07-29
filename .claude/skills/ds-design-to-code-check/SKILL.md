@@ -1,5 +1,5 @@
 ---
-name: design-to-code-check
+name: ds-design-to-code-check
 description: "Check alignment between a specific design specification and its code implementation — a focused, single-component or single-screen comparison. Trigger when someone says: does this match the design, check implementation, design code alignment, what's different between the design and the build, spec check, implementation review, or anything about comparing a designed component or screen to its coded equivalent. Do NOT trigger for system-wide drift detection across multiple components or teams — use drift-detection for that."
 references:
   - ../_knowledge-notes/design-to-code-contract.md

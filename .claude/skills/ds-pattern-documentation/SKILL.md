@@ -1,5 +1,5 @@
 ---
-name: pattern-documentation
+name: ds-pattern-documentation
 description: "Write documentation for a design system pattern — a multi-component recipe covering use cases, anti-patterns, composition, and related patterns. Patterns span multiple components working together (e.g. a form pattern, a data table pattern). Trigger when someone says: document this pattern, write the pattern page, usage pattern, when to use this, pattern guidelines, document how this works, or anything about creating documentation for a reusable UI pattern rather than a single component. Do NOT trigger for writing usage guidelines for a single named component — use usage-guidelines for that."
 references:
   - ../_knowledge-notes/ai-readiness.md

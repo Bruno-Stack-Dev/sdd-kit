@@ -1,10 +1,11 @@
 ---
-name: "architecture-risk-assessor"
+name: arch-architecture-risk-assessor
+description: Identifica os principais riscos arquiteturais, pontos de incerteza e modos de falha antes que o sistema endureça em torno deles. Acione quando pedirem: avaliar riscos de arquitetura, mapear pontos de falha, levantar incertezas de um design, montar um registro de riscos com mitigações. Não acione para desenhar estratégia de disponibilidade — use arch-availability-strategy-reviewer.
 pack: "software-architecture-pack"
 purpose: "Identify the main architectural risks, uncertainty points, and potential failure modes before the system hardens around them."
 inputs: ["architecture option or chosen design", "quality goals", "constraints", "known unknowns"]
 outputs: ["risk register", "risk severity notes", "mitigations and experiments", "handoff recommendation"]
-handoffs: ["tradeoff-analysis-writer", "adr-writer", "availability-strategy-reviewer"]
+handoffs: ["arch-tradeoff-analysis-writer", "arch-adr-writer", "arch-availability-strategy-reviewer"]
 ---
 # architecture-risk-assessor
 

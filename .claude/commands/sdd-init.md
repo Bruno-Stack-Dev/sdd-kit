@@ -1,3 +1,7 @@
+---
+description: Bootstrap inteligente: confirma o diretório, detecta projeto novo × em produção e roteia (discovery ou engenharia reversa).
+---
+
 # /sdd-init
 
 Bootstrap **inteligente** do SDD Kit. Confirma o diretório, detecta se o projeto é novo ou já

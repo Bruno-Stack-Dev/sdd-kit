@@ -1,5 +1,5 @@
 ---
-name: drift-detection
+name: ds-drift-detection
 description: "Identify where a design system has diverged from its original intent across the whole system — components implemented differently to spec, tokens overridden locally, patterns forked across teams. This is a system-wide sweep for divergence patterns, NOT a single-component spec comparison. Trigger when someone says: find drift, where has the system diverged, design code inconsistency, what's out of sync, where are teams going off-system, component drift, or anything about identifying gaps between design system intent and actual implementation. Do NOT trigger for checking one specific component against its design spec — use design-to-code-check for that."
 references:
   - ../_knowledge-notes/token-architecture.md

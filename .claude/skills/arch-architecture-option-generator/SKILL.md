@@ -1,10 +1,11 @@
 ---
-name: "architecture-option-generator"
+name: arch-architecture-option-generator
+description: Gera opções de arquitetura credíveis para um sistema e enquadra a decisão como trade-offs explícitos, em vez de assumir um estilo favorito. Acione quando pedirem: gerar opções de arquitetura, explorar alternativas de design, comparar abordagens possíveis, evitar decidir cedo demais por um estilo. Não acione para registrar uma decisão já tomada — use arch-adr-writer.
 pack: "software-architecture-pack"
 purpose: "Generate credible architecture options for a system and frame the decision as explicit tradeoffs rather than defaulting to a favorite style."
 inputs: ["problem context", "functional and non-functional requirements", "constraints and assumptions", "existing system context if any"]
 outputs: ["architecture options table", "tradeoff summary", "recommended option", "handoff recommendation"]
-handoffs: ["quality-attribute-scenario-writer", "adr-writer", "component-boundary-reviewer"]
+handoffs: ["arch-quality-attribute-scenario-writer", "arch-adr-writer", "arch-component-boundary-reviewer"]
 ---
 # architecture-option-generator
 

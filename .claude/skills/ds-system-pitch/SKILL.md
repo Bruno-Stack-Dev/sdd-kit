@@ -1,5 +1,5 @@
 ---
-name: system-pitch
+name: ds-system-pitch
 description: "Write a design system investment pitch with a business case and ROI framing. Trigger when someone says: pitch the design system, make the case for the system, sell this to leadership, justify the investment, business case for design systems, why should we invest in a design system, or anything about building an argument for design system investment or continuation."
 ---
 

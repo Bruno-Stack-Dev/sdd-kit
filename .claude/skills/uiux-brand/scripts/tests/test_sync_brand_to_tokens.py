@@ -20,7 +20,7 @@ SCRIPTS = Path(__file__).resolve().parent.parent
 SCRIPT = SCRIPTS / "sync-brand-to-tokens.cjs"
 BRAND_STARTER = SCRIPTS.parent / "templates" / "brand-guidelines-starter.md"
 TOKENS_STARTER = (
-    SCRIPTS.parent.parent / "design-system" / "templates" / "design-tokens-starter.json"
+    SCRIPTS.parent.parent / "uiux-design-system" / "templates" / "design-tokens-starter.json"
 )
 
 
@@ -39,6 +39,9 @@ def test_sync_parses_bundled_starter_template(tmp_path):
         cwd=tmp_path,
         capture_output=True,
         text=True,
+        # O script imprime caracteres não-ASCII (ex.: ✅/✨); force UTF-8 para não quebrar
+        # em plataformas cujo locale padrão não é UTF-8 (ex.: Windows/cp1252).
+        encoding="utf-8",
     )
 
     # Must not crash (the bug raised an unhandled TypeError).

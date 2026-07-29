@@ -1,10 +1,11 @@
 ---
-name: "deployment-view-writer"
+name: arch-deployment-view-writer
+description: Mapeia elementos de software em ambientes, nós, contêineres ou processos e explica as consequências de implantação. Acione quando pedirem: escrever a visão de implantação, mapear componentes em ambientes e nós, documentar a topologia de deploy, avaliar riscos de implantação. Não acione para descrever o comportamento em runtime — use arch-runtime-view-writer.
 pack: "software-architecture-pack"
 purpose: "Map software elements onto environments, nodes, containers, or processes and explain the deployment consequences."
 inputs: ["runtime structure", "environment assumptions", "infrastructure/platform choice", "security and availability constraints"]
 outputs: ["deployment view", "environment mapping", "deployment risks", "handoff recommendation"]
-handoffs: ["availability-strategy-reviewer", "scalability-hotspot-detector", "adr-writer"]
+handoffs: ["arch-availability-strategy-reviewer", "arch-scalability-hotspot-detector", "arch-adr-writer"]
 ---
 # deployment-view-writer
 

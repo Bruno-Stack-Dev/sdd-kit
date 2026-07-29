@@ -1,5 +1,5 @@
 ---
-name: version-bump-advisor
+name: ds-version-bump-advisor
 description: "Recommend the correct semver bump with reasoning and a generated changelog entry. Trigger when someone says: what version bump, is this a breaking change, semver recommendation, should this be major or minor, version this release, changelog entry, what kind of release is this, or anything about versioning a design system release."
 references:
   - ../_knowledge-notes/component-governance.md
