@@ -1,5 +1,5 @@
 ---
-name: session-memory
+name: ds-session-memory
 description: "Persist and recall findings across skill runs within and between sessions, building a cumulative knowledge base of what has been discovered about a design system. This is the cross-skill memory layer — it saves what was found, when, and by which skill, so future runs can compare, correlate, and avoid repeating work. Trigger when someone says: save these findings, remember this for later, compare with last run, what did we find before, load previous findings, recall the last audit, session history, show me what changed, cross-reference with previous runs, or anything about persisting, recalling, or comparing findings over time. Do NOT trigger for generating a single standalone report — use the specific skill for that. Do NOT trigger for running a full diagnostic — use full-system-diagnostic for that."
 references:
   - ../_knowledge-notes/agent-orchestration-guide.md

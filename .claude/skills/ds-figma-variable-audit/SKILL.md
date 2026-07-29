@@ -1,5 +1,5 @@
 ---
-name: figma-variable-audit
+name: ds-figma-variable-audit
 description: "Audit Figma variable collections against token architecture best practices. Trigger when someone says: audit my Figma variables, check my Figma tokens, are my variables structured correctly, Figma variable health, review my variable collections, variable naming check, or anything about auditing the quality or structure of Figma variables."
 references:
   - ../_knowledge-notes/token-architecture.md

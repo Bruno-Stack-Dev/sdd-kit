@@ -1,5 +1,5 @@
 ---
-name: deprecation-process
+name: ds-deprecation-process
 description: "Plan and execute the full deprecation lifecycle for a design system component, token, or pattern — including timeline, migration paths, communication plan, and multi-phase removal. Trigger when someone says: deprecate a component, remove a component, sunset this pattern, phase out these tokens, retire this variant, replace this with, or anything involving removing or replacing something from the design system. Do NOT trigger for communicating non-deprecation changes like new releases or feature updates — use change-communication for those."
 references:
   - ../_knowledge-notes/component-governance.md

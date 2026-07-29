@@ -1,10 +1,11 @@
 ---
-name: "runtime-view-writer"
+name: arch-runtime-view-writer
+description: Descreve o comportamento em runtime da arquitetura: componentes principais, fluxos de requisição, comportamento assíncrono e caminhos de falha. Acione quando pedirem: escrever a visão de runtime, documentar fluxos de execução e interação, descrever comportamento assíncrono, mapear caminhos de falha e recuperação. Não acione para mapear a implantação física — use arch-deployment-view-writer.
 pack: "software-architecture-pack"
 purpose: "Describe the runtime behavior of the architecture including major components, request flows, async behavior, and failure paths."
 inputs: ["chosen architecture", "main use cases or flows", "components/services", "operational assumptions"]
 outputs: ["runtime view summary", "interaction flow notes", "failure and recovery notes", "handoff recommendation"]
-handoffs: ["deployment-view-writer", "availability-strategy-reviewer", "quality-attribute-scenario-writer"]
+handoffs: ["arch-deployment-view-writer", "arch-availability-strategy-reviewer", "arch-quality-attribute-scenario-writer"]
 ---
 # runtime-view-writer
 

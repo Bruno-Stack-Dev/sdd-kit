@@ -1,5 +1,5 @@
 ---
-name: component-api-validator
+name: ds-component-api-validator
 description: "Audit component APIs for consistency, breaking changes, TypeScript coverage, and contract compliance across a component library. Trigger when someone says: component prop review, verify component types are exported, component API audit, check our component interfaces, are our props consistent, API consistency check, prop naming review, breaking change detection, or anything about checking whether component APIs are structurally sound and consistent across the library."
 references:
   - ../_knowledge-notes/design-to-code-contract.md

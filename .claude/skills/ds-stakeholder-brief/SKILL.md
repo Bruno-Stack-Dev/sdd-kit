@@ -1,5 +1,5 @@
 ---
-name: stakeholder-brief
+name: ds-stakeholder-brief
 description: "Write a one-page stakeholder brief translating design system health or status into business language. Trigger when someone says: stakeholder update, exec brief, leadership summary, status report for leadership, system status for non-designers, write a brief for the business, or anything about communicating design system status to an audience that does not have a design systems background."
 references:
   - ../_knowledge-notes/output-discipline.md

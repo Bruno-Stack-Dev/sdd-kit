@@ -1,10 +1,11 @@
 ---
-name: "availability-strategy-reviewer"
+name: arch-availability-strategy-reviewer
+description: Revisa a arquitetura quanto a resiliência, redundância, degradação graciosa, recuperação e continuidade operacional. Acione quando pedirem: revisar disponibilidade, achar pontos únicos de falha, planejar recuperação e failover, avaliar a resiliência do sistema. Não acione para mapear riscos gerais de arquitetura — use arch-architecture-risk-assessor.
 pack: "software-architecture-pack"
 purpose: "Review the architecture for resilience, redundancy, graceful degradation, recovery, and operational continuity."
 inputs: ["deployment view or environment plan", "critical user journeys", "failure assumptions", "recovery expectations"]
 outputs: ["availability findings", "single points of failure", "recovery recommendations", "handoff recommendation"]
-handoffs: ["deployment-view-writer", "architecture-risk-assessor", "adr-writer"]
+handoffs: ["arch-deployment-view-writer", "arch-architecture-risk-assessor", "arch-adr-writer"]
 ---
 # availability-strategy-reviewer
 

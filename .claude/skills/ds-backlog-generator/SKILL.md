@@ -1,5 +1,5 @@
 ---
-name: backlog-generator
+name: ds-backlog-generator
 description: "Transform audit findings into sprint-ready work items with effort estimates, acceptance criteria, and stakeholder-friendly rationale. This converts existing findings into tickets, NOT the process for contributing new components to the system. Trigger when someone says: generate backlog items, create tickets from audit, turn findings into work items, sprint planning from audit, create issues from report, backlog from diagnostic, or anything about converting audit output into actionable work items. Do NOT trigger for defining the contribution process or guidelines for new components — use contribution-workflow for that."
 references:
   - ../_knowledge-notes/component-governance.md

@@ -1,10 +1,11 @@
 ---
-name: "adr-writer"
+name: arch-adr-writer
+description: Escreve um Architecture Decision Record preservando contexto, opções consideradas, racional e consequências. Acione quando pedirem: registrar uma decisão de arquitetura, escrever um ADR, documentar por que escolhemos X em vez de Y, formalizar um trade-off já decidido. Não acione para comparar opções ainda abertas — use arch-tradeoff-analysis-writer primeiro.
 pack: "software-architecture-pack"
 purpose: "Write an architecture decision record that preserves context, options considered, rationale, and consequences."
 inputs: ["decision to capture", "drivers and constraints", "options considered", "outcome and consequences"]
 outputs: ["ADR draft", "open questions", "follow-up actions", "traceable decision summary"]
-handoffs: ["tradeoff-analysis-writer", "deployment-view-writer", "architecture-risk-assessor"]
+handoffs: ["arch-tradeoff-analysis-writer", "arch-deployment-view-writer", "arch-architecture-risk-assessor"]
 ---
 # adr-writer
 

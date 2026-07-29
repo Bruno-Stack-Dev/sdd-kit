@@ -1,5 +1,5 @@
 ---
-name: component-to-release
+name: ds-component-to-release-agent
 description: "Run a component through a complete pre-release validation and documentation pipeline. Trigger when someone says: get this component ready to release, pre-release checklist, component readiness review, validate this component, release pipeline, component review end-to-end, or anything about taking a component from 'built' to 'ready to ship'."
 ---
 

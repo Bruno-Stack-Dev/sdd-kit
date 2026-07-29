@@ -1,5 +1,5 @@
 ---
-name: migration
+name: ds-migration-agent
 description: "Run an end-to-end token migration workflow — from diagnosis through execution plan to communication. Trigger when someone says: plan a token migration, migrate our tokens, DTCG migration, Style Dictionary v3 to v4, rename our tokens, token naming overhaul, migration plan, or anything about executing a large-scale token transformation."
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: full-system-diagnostic
+name: ds-full-system-diagnostic-agent
 description: "Run a comprehensive design system health sweep chaining six audit skills — plus conditional theme and Figma audits — into a unified diagnostic report. Trigger when someone says: run a full audit, full system diagnostic, comprehensive review, end-to-end health check, give me the full picture, quarterly review, or anything requesting a complete rather than focused assessment of a design system's health."
 ---
 

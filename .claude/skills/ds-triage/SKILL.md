@@ -1,5 +1,5 @@
 ---
-name: triage
+name: ds-triage
 description: "Recommend which design system skills to run first based on a quick assessment of the system's state. Trigger when someone says: where should I start, what should I run first, triage my design system, which audit first, help me prioritise, I'm new to this system, first time using this plugin, or anything about deciding which skills or commands to use."
 ---
 

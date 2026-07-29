@@ -1,5 +1,5 @@
 ---
-name: governance-review
+name: ds-governance-review-agent
 description: "Run a quarterly or periodic governance review combining adoption analysis, drift detection, and stakeholder communication into a complete governance package. Trigger when someone says: governance review, quarterly review, governance report, how is adoption going, produce the quarterly update, system status for leadership, or anything about a periodic review of how the design system is performing across teams."
 ---
 
