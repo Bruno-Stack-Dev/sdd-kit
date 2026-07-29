@@ -1,3 +1,7 @@
+---
+description: Cria uma spec avulsa a partir do template.
+---
+
 # /nova-spec
 
 Cria uma nova spec avulsa a partir do template.

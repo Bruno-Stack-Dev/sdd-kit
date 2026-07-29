@@ -23,7 +23,7 @@
  *      todo caminho em references: deve existir no disco.
  *  - Agentes (.claude/agents/*.md): name presente e igual ao nome do arquivo (sem .md);
  *      description presente.
- *  - Comandos (.claude/commands/*.md): frontmatter com description (aviso se ausente).
+ *  - Comandos (.claude/commands/*.md): frontmatter com description obrigatório (erro se ausente).
  *  - Caminhos internos: qualquer referência no formato `.claude/skills/<algo>` em arquivos
  *      .md/.py/.cjs/.mjs/.json que não exista no disco é reportada como erro.
  */
@@ -265,7 +265,7 @@ if (existsSync(AGENTS_DIR)) {
   }
 }
 
-// --- 2.3 Comandos (aviso: vira erro quando todos tiverem description) ---
+// --- 2.3 Comandos (todos precisam de description no frontmatter) ---
 const CMD_DIR = join(ROOT, '.claude', 'commands');
 if (existsSync(CMD_DIR)) {
   for (const f of readdirSync(CMD_DIR)) {
@@ -275,7 +275,7 @@ if (existsSync(CMD_DIR)) {
     const block = fmBlock(readFileSync(join(CMD_DIR, f), 'utf8'));
     const desc = block ? fmScalar(block, 'description') : undefined;
     if (desc === undefined) {
-      console.warn(`⚠ ${rel}: sem frontmatter com 'description' (o menu / não mostra descrição)`); warns++;
+      console.error(`✖ ${rel}: sem frontmatter com 'description' (o menu / não mostra descrição)`); errors++;
     }
   }
 }

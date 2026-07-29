@@ -1,3 +1,7 @@
+---
+description: Gera skills sob medida do projeto (domínio, integração, banco) a partir do discovery.
+---
+
 # /gerar-skills
 
 Gera **skills sob medida** para este projeto, a partir do que o discovery já sabe. Aciona o
