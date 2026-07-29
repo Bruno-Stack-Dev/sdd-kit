@@ -74,9 +74,11 @@ Para cada área, extraia do código e anote a proveniência. As perguntas ao usu
 - **Desenhe** o C4 (contexto/contêineres/componentes) do que existe **de fato**.
 - **Cada decisão arquitetural encontrada vira um ADR** com `status: aceito` e nota
   "documentado por engenharia reversa" — é o registro de por que o sistema é como é.
-- **Avalie a saúde do que existe** com as skills `arch-*`: `arch-scalability-hotspot-detector`
-  (gargalos), `arch-availability-strategy-reviewer` (resiliência) e `arch-architecture-risk-assessor`
-  (riscos) apontam dívida arquitetural — registre os achados no `AUDITORIA-DIVERGENCIAS.md`.
+- **Avalie a saúde do que existe** com as skills `arch-*` (pack `arch`, **inativo por padrão** em
+  `.claude/skills/_packs/arch/` — **ative-o antes** copiando `_packs/arch/` para `.claude/skills/`):
+  `arch-scalability-hotspot-detector` (gargalos), `arch-availability-strategy-reviewer` (resiliência)
+  e `arch-architecture-risk-assessor` (riscos) apontam dívida arquitetural — registre os achados no
+  `AUDITORIA-DIVERGENCIAS.md`.
 - **Pergunte só:** integrações externas não óbvias; a intenção por trás de escolhas estranhas.
 
 ### 2.4 Planejamento → `BACKLOG.md`
