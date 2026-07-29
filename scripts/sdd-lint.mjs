@@ -20,7 +20,8 @@
  * Regras (.claude/):
  *  - Skills (cada .claude/skills/<dir>/SKILL.md, ignora diretórios que começam com `_`):
  *      name presente e igual ao nome do diretório; description presente e com 40..1024 chars;
- *      todo caminho em references: deve existir no disco.
+ *      todo caminho em references: deve existir no disco. Packs vendorizados inativos em
+ *      .claude/skills/_packs/<pack>/<skill>/ também são validados (serão ativados por cópia).
  *  - Agentes (.claude/agents/*.md): name presente e igual ao nome do arquivo (sem .md);
  *      description presente.
  *  - Comandos (.claude/commands/*.md): frontmatter com description obrigatório (erro se ausente).
@@ -215,31 +216,51 @@ function fmList(block, key) {
   return out;
 }
 
-// --- 2.1 Skills ---
+// --- 2.1 Skills (ativas em .claude/skills/* e inativas em .claude/skills/_packs/<pack>/*) ---
 const SKILLS_DIR = join(ROOT, '.claude', 'skills');
+
+function validateSkill(dir, name, relBase) {
+  const rel = `${relBase}/SKILL.md`;
+  const skf = join(dir, 'SKILL.md');
+  if (!existsSync(skf)) { console.error(`✖ ${rel}: SKILL.md ausente`); errors++; return; }
+  checked++;
+  const block = fmBlock(readFileSync(skf, 'utf8'));
+  if (!block) { console.error(`✖ ${rel}: sem frontmatter`); errors++; return; }
+  const nm = fmScalar(block, 'name');
+  if (nm !== name) {
+    console.error(`✖ ${rel}: 'name' (${nm ?? '—'}) difere do diretório '${name}'`); errors++;
+  }
+  const desc = fmScalar(block, 'description');
+  if (desc === undefined) { console.error(`✖ ${rel}: falta 'description'`); errors++; }
+  else if (desc.length < 40 || desc.length > 1024) {
+    console.error(`✖ ${rel}: 'description' com ${desc.length} chars (fora de 40..1024)`); errors++;
+  }
+  for (const ref of fmList(block, 'references')) {
+    if (!existsSync(resolve(dir, ref))) {
+      console.error(`✖ ${rel}: references aponta para caminho inexistente '${ref}'`); errors++;
+    }
+  }
+}
+
 if (existsSync(SKILLS_DIR)) {
   for (const name of readdirSync(SKILLS_DIR)) {
     if (name.startsWith('_')) continue;
     const dir = join(SKILLS_DIR, name);
     if (!statSync(dir).isDirectory()) continue;
-    const rel = `.claude/skills/${name}/SKILL.md`;
-    const skf = join(dir, 'SKILL.md');
-    if (!existsSync(skf)) { console.error(`✖ ${rel}: SKILL.md ausente`); errors++; continue; }
-    checked++;
-    const block = fmBlock(readFileSync(skf, 'utf8'));
-    if (!block) { console.error(`✖ ${rel}: sem frontmatter`); errors++; continue; }
-    const nm = fmScalar(block, 'name');
-    if (nm !== name) {
-      console.error(`✖ ${rel}: 'name' (${nm ?? '—'}) difere do diretório '${name}'`); errors++;
-    }
-    const desc = fmScalar(block, 'description');
-    if (desc === undefined) { console.error(`✖ ${rel}: falta 'description'`); errors++; }
-    else if (desc.length < 40 || desc.length > 1024) {
-      console.error(`✖ ${rel}: 'description' com ${desc.length} chars (fora de 40..1024)`); errors++;
-    }
-    for (const ref of fmList(block, 'references')) {
-      if (!existsSync(resolve(dir, ref))) {
-        console.error(`✖ ${rel}: references aponta para caminho inexistente '${ref}'`); errors++;
+    validateSkill(dir, name, `.claude/skills/${name}`);
+  }
+  // Packs vendorizados ficam inativos em _packs/<pack>/<skill>/ (ativados por cópia via /sdd-init).
+  // Diretórios de notas do pack (que começam com `_`, ex.: _knowledge-notes) são ignorados.
+  const PACKS_DIR = join(SKILLS_DIR, '_packs');
+  if (existsSync(PACKS_DIR)) {
+    for (const pack of readdirSync(PACKS_DIR)) {
+      const packDir = join(PACKS_DIR, pack);
+      if (!statSync(packDir).isDirectory()) continue;
+      for (const name of readdirSync(packDir)) {
+        if (name.startsWith('_')) continue;
+        const dir = join(packDir, name);
+        if (!statSync(dir).isDirectory()) continue;
+        validateSkill(dir, name, `.claude/skills/_packs/${pack}/${name}`);
       }
     }
   }
@@ -294,18 +315,37 @@ function walkAllFiles(dir, exts, out = []) {
 const CODE_EXTS = new Set(['.md', '.py', '.cjs', '.mjs', '.json']);
 const skillPathRe = /\.claude\/skills\/[A-Za-z0-9._/-]*/g;
 const seenRefs = new Set();
+
+// Um resto de caminho (após `.claude/skills/`) existe sob algum pack inativo?
+function existsSyncInAnyPack(sub) {
+  const packsDir = join(ROOT, '.claude', 'skills', '_packs');
+  if (!existsSync(packsDir)) return false;
+  const parts = sub.split('/').filter(Boolean);
+  for (const pack of readdirSync(packsDir)) {
+    const packDir = join(packsDir, pack);
+    if (!statSync(packDir).isDirectory()) continue;
+    if (existsSync(join(packDir, ...parts))) return true;
+  }
+  return false;
+}
 for (const file of walkAllFiles(ROOT, CODE_EXTS)) {
   const rel = file.replace(ROOT + '/', '').replace(ROOT + '\\', '').replace(/\\/g, '/');
   const text = readFileSync(file, 'utf8');
   let m;
   while ((m = skillPathRe.exec(text)) !== null) {
-    // Ignora globs/placeholders: `.claude/skills/ds-*`, `.claude/skills/<nome>`.
+    // Ignora globs/placeholders/interpolações: `.claude/skills/ds-*`,
+    // `.claude/skills/<nome>`, `.claude/skills/${pack}` (caminho computado em código).
     const next = text[skillPathRe.lastIndex];
-    if (next === '*' || next === '<') continue;
+    if (next === '*' || next === '<' || next === '$') continue;
     const ref = m[0].replace(/[.,;:)]+$/, ''); // remove pontuação de fim de frase
     // Ignora o prefixo puro (sem nome de skill).
     if (ref === '.claude/skills' || ref === '.claude/skills/') continue;
     if (existsSync(join(ROOT, ref))) continue;
+    // Fallback: a skill referida pode estar num pack inativo. Um caminho
+    // `.claude/skills/<resto>` é válido se existir sob `.claude/skills/_packs/<pack>/<resto>`
+    // (o pack é validado como se fosse ativado por cópia).
+    const sub = ref.slice('.claude/skills/'.length);
+    if (sub && existsSyncInAnyPack(sub)) continue;
     const key = `${rel}::${ref}`;
     if (seenRefs.has(key)) continue;
     seenRefs.add(key);

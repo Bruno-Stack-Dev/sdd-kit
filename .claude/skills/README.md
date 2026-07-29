@@ -6,20 +6,37 @@ conhecimento de uma vez, em vez de redescobri-lo a cada spec.
 
 ## De onde vêm
 
-Não são entregues prontas pelo kit — o kit é **genérico**. Elas são **geradas sob medida** pelo
-`@agente-gerador-skills` (via `/gerar-skills`), lendo o `specs/discovery/` e o `sdd.config.md`
-**do seu projeto**. Assim, um e-commerce ganha skills como `cadastro-produtos` e `marketplace`;
-uma clínica ganharia `agendamento` e `prontuario`; e o kit continua servindo qualquer domínio.
+Há **dois tipos**, e eles chegam de formas diferentes:
+
+- **Skills de domínio** — *não* vêm prontas. São **geradas sob medida** pelo
+  `@agente-gerador-skills` (via `/gerar-skills`), lendo o `specs/discovery/` e o `sdd.config.md`
+  **do seu projeto**. Um e-commerce ganha `cadastro-produtos` e `marketplace`; uma clínica ganharia
+  `agendamento` e `prontuario`; e o kit continua servindo qualquer domínio.
+- **Packs vendorizados** (`arch-*`, `ds-*`, `uiux-*`) — *vêm prontos* com o kit, mas ficam
+  **inativos por padrão**, guardados em `_packs/` (diretório ignorado como skill por começar com
+  `_`). São opcionais e só entram em `.claude/skills/` quando um pack é **ativado** (por cópia).
+  Assim um projeto sem design system não paga o custo de ~44 skills `ds-*` carregando
+  `description` em toda sessão.
 
 ## Estrutura
 
 ```
 .claude/skills/
-├── _template-skill.md        ← modelo (ignorado como skill; começa com _)
-├── cadastro-produtos/SKILL.md   ← exemplo gerado (e-commerce)
-├── marketplace/SKILL.md         ← exemplo gerado (e-commerce)
-└── postgres/SKILL.md            ← exemplo gerado (banco específico do projeto)
+├── _template-skill.md            ← modelo (ignorado; começa com _)
+├── cadastro-produtos/SKILL.md    ← skill de domínio gerada (fica ativa aqui)
+├── postgres/SKILL.md             ← skill de infra gerada (fica ativa aqui)
+└── _packs/                       ← packs vendorizados, INATIVOS até ativação
+    ├── arch/   (14 skills + _arch-templates/)
+    ├── ds/     (44 skills + _knowledge-notes/)
+    └── uiux/   (7 skills)
 ```
+
+### Ativar / desativar um pack
+
+A ativação é **mecânica**, não um flag de texto: o `/sdd-init` (ou você) **copia** o pack
+escolhido de `_packs/<pack>/` para `.claude/skills/`. A partir daí o Claude Code descobre aquelas
+skills normalmente. Para **desativar**, apague as pastas copiadas de `.claude/skills/` — o
+original continua intacto em `_packs/`, pronto para reativar.
 
 ## Três lentes de geração
 
@@ -39,15 +56,16 @@ uma clínica ganharia `agendamento` e `prontuario`; e o kit continua servindo qu
 
 ## Skills de Design System (`ds-*`)
 
-As pastas com prefixo **`ds-`** são o pacote **Design System Ops** (44 skills, adaptado de
+O pack **`ds`** (em `_packs/ds/`) é o **Design System Ops** (44 skills, adaptado de
 designsystemops.com, MIT), integrado ao kit para cobrir o ciclo de vida de um design system:
 auditoria de tokens, drift, cobertura de docs, acessibilidade por componente, governança,
 migração, adoção, onboarding, benchmark, comunicação com stakeholders, e mais.
 
-- **Entrada condicional:** o `/sdd-init` só as ativa se o projeto tem/mantém um design system
-  (config seção 12, `ativo: true`). Em projeto sem DS, ignore-as.
+- **Ativação condicional:** ative este pack (copie `_packs/ds/` para `.claude/skills/`) só se o
+  projeto tem/mantém um design system. Em projeto sem DS, deixe-o inativo.
 - **Config unificada:** foram adaptadas para ler o nosso **`sdd.config.md` (seção 12)** em vez do
-  `.ds-ops-config.yml` original. As knowledge-notes que elas citam vivem em `_knowledge-notes/`.
+  `.ds-ops-config.yml` original. As knowledge-notes que elas citam vivem em
+  `_packs/ds/_knowledge-notes/` (viajam junto na cópia de ativação).
 
 ### Mapa de campos (o que as skills chamam → onde mora na seção 12)
 | Campo citado nas skills | Na seção 12 do `sdd.config.md` |
@@ -65,9 +83,9 @@ migração, adoção, onboarding, benchmark, comunicação com stakeholders, e m
 
 ## Skills de Arquitetura (`arch-*`)
 
-As pastas com prefixo **`arch-`** são o pacote **software-architecture-skills** (14 skills +
-10 templates em `_arch-templates/`, MIT), para o raciocínio de decisão arquitetural que vem
-**antes** de escrever o ADR: gerar opções, escrever cenários de qualidade, analisar tradeoffs,
+O pack **`arch`** (em `_packs/arch/`) é o **software-architecture-skills** (14 skills +
+10 templates em `_packs/arch/_arch-templates/`, MIT), para o raciocínio de decisão arquitetural que
+vem **antes** de escrever o ADR: gerar opções, escrever cenários de qualidade, analisar tradeoffs,
 avaliar riscos, mapear fronteiras e views (runtime/deployment).
 
 - **Ligadas ao discovery:** o Bloco 3 do `DISCOVERY.md` aciona a cadeia
@@ -88,14 +106,15 @@ avaliar riscos, mapear fronteiras e views (runtime/deployment).
 
 ## Skills de UI/UX (`uiux-*`)
 
-As pastas com prefixo **`uiux-`** são o pacote **UI/UX Pro Max** (v2.11, MIT, uupm.cc): 7 skills
+O pack **`uiux`** (em `_packs/uiux/`) é o **UI/UX Pro Max** (v2.11, MIT, uupm.cc): 7 skills
 (banner-design, brand, design, design-system, slides, ui-styling, e o núcleo `ui-ux-pro-max`) com
 uma **base de dados consultável** — 84 estilos, 192 paletas, 74 pares de fontes, 98 diretrizes de
 UX, 25 gráficos, 22 stacks.
 
 - **Núcleo consultável via Python:** a skill `uiux-ui-ux-pro-max` roda um `search.py` sobre CSVs.
-  Requer Python 3 (o `/sdd-init` libera `python`/`python3` no allowlist). Caminho já adaptado ao
-  nosso layout: `.claude/skills/uiux-ui-ux-pro-max/scripts/search.py` (relativo à raiz do projeto).
+  Requer Python 3 (o `/sdd-init` libera `python`/`python3` no allowlist). Uma vez ativado o pack,
+  o caminho é `.claude/skills/uiux-ui-ux-pro-max/scripts/search.py` (relativo à raiz do projeto);
+  enquanto inativo, ele vive em `_packs/uiux/uiux-ui-ux-pro-max/scripts/search.py`.
 - **Peso:** ~8 MB (inclui fontes `.ttf` em `ui-styling/canvas-fonts/` e os CSVs de dados). É o
   maior componente do kit — esperado, dada a base de dados embutida.
 
