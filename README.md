@@ -87,8 +87,13 @@ Ver também: `specs/README.md` (estrutura das specs) e `.claude/README.md` (agen
 ## Licença
 
 O material **próprio** do kit — o motor em `specs/_gerador/`, os 12 agentes, os 8 comandos, os
-14 templates e os scripts em `scripts/` — é licenciado sob **MIT** (ver `LICENSE`).
+14 templates e os scripts em `scripts/` — é licenciado sob **MIT** (ver `LICENSE`), © 2026
+**Bruno Silveira / Atlan Global Group**.
 
 Os três **packs** de skills vendorizados mantêm as licenças e a atribuição dos seus próprios
-arquivos `ATTRIBUTION.md`: `arch-*` (software-architecture-pack), `ds-*` (design-system pack) e
-`uiux-*`. A licença MIT acima **não** os cobre — consulte o `ATTRIBUTION.md` de cada pack.
+arquivos `ATTRIBUTION.md` (em `_packs/<pack>/`): `arch` (software-architecture-pack), `ds`
+(design-system pack) e `uiux`. A licença MIT acima **não** os cobre — consulte o `ATTRIBUTION.md`
+de cada pack.
+
+**Manutenção (Atlan Global Group):** titular/autor Bruno Silveira · Gerente de T.I. Guilherme
+Pessoa · CIO Jonathas Menegatto.
