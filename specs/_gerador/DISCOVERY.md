@@ -62,12 +62,15 @@ tags: [discovery, entrevista, bootstrap, sdd, portavel]
 > Alimenta: `template-arquitetura.md` (C4), `template-api.md`, `template-rbac.md`, e a base do
 > `sdd.config.md` (seções 2, 3, 5). Decisões relevantes → ADRs.
 >
-> **Para decisões arquiteturais não triviais, use as skills `arch-*`** (`.claude/skills/`) em
-> cadeia, em vez de improvisar: `arch-architecture-option-generator` (gera opções) →
-> `arch-quality-attribute-scenario-writer` (transforma "quero performance" em cenários concretos)
-> → `arch-tradeoff-analysis-writer` (compara) → `arch-adr-writer` (registra em `specs/decisions/`).
-> Para o corte monolito×serviços: `arch-monolith-vs-modular-monolith-reviewer` e
-> `arch-service-decomposition-advisor`. Elas produzem o raciocínio; o resultado alimenta o
+> **Para decisões arquiteturais não triviais, use as skills `arch-*` em cadeia**, em vez de
+> improvisar. Elas vêm no pack `arch`, **inativo por padrão** em `.claude/skills/_packs/arch/`.
+> **Antes de usá-las, ative o pack**: copie `_packs/arch/` para `.claude/skills/` (a cópia leva
+> junto `_arch-templates/`, então as referências das skills continuam válidas; o allowlist do
+> `/sdd-init` cobre a cópia). Ativado, siga a cadeia: `arch-architecture-option-generator`
+> (gera opções) → `arch-quality-attribute-scenario-writer` (transforma "quero performance" em
+> cenários concretos) → `arch-tradeoff-analysis-writer` (compara) → `arch-adr-writer` (registra em
+> `specs/decisions/`). Para o corte monolito×serviços: `arch-monolith-vs-modular-monolith-reviewer`
+> e `arch-service-decomposition-advisor`. Elas produzem o raciocínio; o resultado alimenta o
 > `ARQUITETURA.md` e os ADRs — não são documentos paralelos.
 
 1. **Estilo arquitetural:** monolito · monolito modular · microserviços? Por quê.
