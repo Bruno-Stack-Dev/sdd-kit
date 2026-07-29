@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+
+# Node
+node_modules/
+
+# SO
+.DS_Store
+
+# gerado por projeto, nunca versionado no kit
+sdd.config.md
+graphify-out/

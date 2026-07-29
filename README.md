@@ -83,3 +83,12 @@ ao `sdd.config.md`. Assim o mesmo kit serve para um SaaS Vue, uma CLI Go ou uma 
 fork do motor.
 
 Ver também: `specs/README.md` (estrutura das specs) e `.claude/README.md` (agentes).
+
+## Licença
+
+O material **próprio** do kit — o motor em `specs/_gerador/`, os 12 agentes, os 8 comandos, os
+14 templates e os scripts em `scripts/` — é licenciado sob **MIT** (ver `LICENSE`).
+
+Os três **packs** de skills vendorizados mantêm as licenças e a atribuição dos seus próprios
+arquivos `ATTRIBUTION.md`: `arch-*` (software-architecture-pack), `ds-*` (design-system pack) e
+`uiux-*`. A licença MIT acima **não** os cobre — consulte o `ATTRIBUTION.md` de cada pack.
