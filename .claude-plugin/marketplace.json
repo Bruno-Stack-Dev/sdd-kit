@@ -35,6 +35,13 @@
       "description": "Criação de UI com base consultável de estilos, paletas, tipografia e diretrizes de UX. Base: UI/UX Pro Max v2.11.0 (MIT, com partes Apache-2.0 e OFL-1.1 — ver THIRD_PARTY.md).",
       "version": "3.0.0-dev",
       "category": "development"
+    },
+    {
+      "name": "sdd-ai",
+      "source": "./.claude/skills/_packs/ai",
+      "description": "Pack de IA do SDD Kit para produtos que usam LLM, agentes, RAG ou memória: discovery de IA, avaliação criteriosa de arquitetura, modelos, RAG/memória, saída estruturada, evals, segurança e governança — sem tabela de recomendação fixa, com documentação atual verificada e ADR. Conteúdo próprio do kit (MIT).",
+      "version": "3.0.0-dev",
+      "category": "development"
     }
   ]
 }

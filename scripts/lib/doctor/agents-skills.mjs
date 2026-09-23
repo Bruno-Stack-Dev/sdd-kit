@@ -179,13 +179,30 @@ export async function checkSupplyChain(report, p) {
   const modified = active.flatMap((a) => a.modified.map((s) => `${a.pack}/${s}`));
   if (active.length) report.add(G, 'supply.active', modified.length ? 'warn' : 'pass', modified.length ? `cópias ativas alteradas localmente: ${modified.join(', ')}` : `packs ativos íntegros: ${active.map((a) => `${a.pack} (${a.skills}/${a.total})`).join(', ')}`);
   // Packs habilitados como plugins do marketplace do kit (modo plugin): versionados pelo próprio plugin.
+  const PLUGIN_OF = { arch: 'sdd-architecture', ds: 'sdd-design-system', uiux: 'sdd-uiux', ai: 'sdd-ai' };
+  let packPlugins = [];
   try {
     const settings = JSON.parse(readFileSync(join(p.root, '.claude', 'settings.json'), 'utf8'));
-    const packPlugins = Object.entries(settings.enabledPlugins ?? {}).filter(([k, v]) => v && /^sdd-(architecture|design-system|uiux|ai)@/.test(k)).map(([k]) => k);
+    packPlugins = Object.entries(settings.enabledPlugins ?? {}).filter(([k, v]) => v && /^sdd-(architecture|design-system|uiux|ai)@/.test(k)).map(([k]) => k);
     if (packPlugins.length) report.pass(G, 'supply.pack-plugins', `packs habilitados como plugin: ${packPlugins.join(', ')}`);
-    const both = packPlugins.filter((k) => active.some((a) => k.startsWith(`sdd-${{ arch: 'architecture', ds: 'design-system', uiux: 'uiux', ai: 'ai' }[a.pack]}@`)));
+    const both = packPlugins.filter((k) => active.some((a) => k.startsWith(`${PLUGIN_OF[a.pack]}@`)));
     if (both.length) report.warn(G, 'supply.pack-duplicate', `pack ativo por cópia E como plugin (skills em dobro): ${both.join(', ')}`);
   } catch { /* sem settings.json: nada a relatar */ }
+  // Packs declarados na config (integrations.packs) × ativos (cópia ou plugin).
+  const declared = p.cfg?.config?.integrations?.packs ?? [];
+  const isOn = (pack) => active.some((a) => a.pack === pack) || packPlugins.some((k) => k.startsWith(`${PLUGIN_OF[pack]}@`));
+  if (declared.length) {
+    const off = declared.filter((pk) => !isOn(pk));
+    report.add(G, 'supply.packs-declared', off.length ? 'warn' : 'pass', off.length
+      ? `packs declarados em integrations.packs mas não ativos: ${off.join(', ')} — \`sdd pack activate <pack>\` ou /plugin install ${off.map((o) => `${PLUGIN_OF[o]}@sdd-kit`).join(' ')}`
+      : `packs declarados ativos: ${declared.join(', ')}`);
+  }
+  // Produto usa IA (dependências) sem o pack ai declarado: sugestão, nunca falha.
+  if (p.cfg?.config) {
+    const { detectAi } = await import('../ai-detect.mjs');
+    const ai = detectAi(p.root);
+    if (ai.uses_ai && !declared.includes('ai') && !isOn('ai')) report.warn(G, 'supply.ai-pack', `o produto usa IA (${Object.keys(ai.signals).join(', ')}) e o pack ai não está declarado — avalie \`sdd ai detect\` e o pack ai (discovery de IA, evals, segurança)`);
+  }
   let lock = null;
   try { lock = readLock(projectLockPath(p.root)); } catch (e) { report.fail(G, 'supply.project', e.message); return; }
   const ext = Object.entries(lock?.external ?? {});

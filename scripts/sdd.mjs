@@ -22,6 +22,7 @@ import { scanCommand } from './commands/scan.mjs';
 import { projectCommand } from './commands/project.mjs';
 import { evalCommand } from './commands/eval.mjs';
 import { traceCommand } from './commands/trace.mjs';
+import { aiCommand } from './commands/ai.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -42,6 +43,7 @@ const COMMANDS = {
   project: projectCommand,
   eval: evalCommand,
   trace: traceCommand,
+  ai: aiCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -82,6 +84,7 @@ Comandos:
                                     MCP só da allowlist, drift e pin de schema das ferramentas
   scan agents [--consent] [--target p]  Snyk Agent Scan opcional (NOT_RUN sem consentimento/token)
   project classify [--json]         projeto novo × existente, com evidência
+  ai detect [--json]                o produto usa IA? sinais e artefatos AI-* sugeridos (pack ai)
   eval run [--suite deterministic|model] [--update-baseline]   evals (fixtures; modelo opcional)
   trace show [--session|--spec|--task|--agent|--trace]   linha do tempo (trace local + eventos)
   trace export --otlp <url>         exporta para um backend OTLP (ex.: Phoenix), fail-open

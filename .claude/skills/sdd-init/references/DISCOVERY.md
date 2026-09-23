@@ -110,6 +110,22 @@ tags: [discovery, entrevista, bootstrap, sdd, portavel]
 
 ---
 
+## Bloco IA (condicional) — só se o PRODUTO usa IA
+> Alimenta: bloco `ai:` da config e artefatos `AI-*` do pack `ai`.
+
+Entre neste bloco se o usuário descreveu chatbot, assistente, agente, busca semântica, RAG,
+geração ou classificação por modelo — ou se `sdd ai detect` encontrar sinais nas dependências
+(brownfield). Não se aplica ao uso de IA **no desenvolvimento** (o próprio Claude Code).
+
+1. Ative o pack: `sdd pack activate ai` (ou `/plugin install sdd-ai@sdd-kit`).
+2. Siga a skill **`ai-discovery`**: uma rodada de perguntas (problema e risco, precisa de agente?,
+   modelos, conhecimento/RAG, memória, saída estruturada e ferramentas, dados/PII/residência,
+   qualidade, segurança, operação), o bloco `ai:` e **só os artefatos `AI-*` necessários**.
+3. Não escolha framework, modelo ou banco vetorial aqui: registre requisitos e drivers. As escolhas
+   vêm das skills `ai-*` de avaliação, com documentação atual verificada e ADR.
+
+---
+
 ## Fechamento — Gerar os artefatos
 
 Depois do último bloco, **sem pedir confirmação adicional** (o allowlist já cobre escrita):
@@ -124,6 +140,7 @@ Depois do último bloco, **sem pedir confirmação adicional** (o allowlist já 
    - `RBAC.md` ← `template-rbac.md` (`sdd template show rbac`)
    - `BACKLOG.md` ← `template-backlog.md` (`sdd template show backlog`)
    - `INFRA.md` ← `template-infra.md` (`sdd template show infra`)
+   - `AI-*.md` ← templates do pack `ai` (só se o Bloco IA se aplicou, e só os necessários — ver `ai-discovery`)
    > Todo campo indefinido fica como `<TODO>` — nunca invente fato de produto.
 2. **ADRs** — para cada decisão arquitetural relevante do Bloco 3, crie
    `specs/decisions/ADR-NNN-<slug>.md` (← `template-adr.md` (`sdd template show adr`)), status `aceito`. Use a skill

@@ -172,7 +172,7 @@ test('lista de arquivos do motor não inclui testes, docs nem CI', () => {
 test('packs como plugins: manifesto próprio, versão do motor e skills no diretório do pack', () => {
   const market = json(join(KIT_ROOT, '.claude-plugin', 'marketplace.json'));
   const packs = market.plugins.filter((p) => p.name !== 'sdd-kit');
-  assert.deepEqual(packs.map((p) => p.name).sort(), ['sdd-architecture', 'sdd-design-system', 'sdd-uiux']);
+  assert.deepEqual(packs.map((p) => p.name).sort(), ['sdd-ai', 'sdd-architecture', 'sdd-design-system', 'sdd-uiux']);
   for (const p of packs) {
     const m = json(join(KIT_ROOT, p.source, '.claude-plugin', 'plugin.json'));
     assert.equal(m.name, p.name);

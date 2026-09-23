@@ -1,0 +1,33 @@
+{
+  "skill_name": "ai-discovery",
+  "evals": [
+    {
+      "id": "aid-01",
+      "prompt": "Nosso SaaS de RH vai ter um assistente que responde dúvidas sobre a política interna da empresa. Faça o discovery da parte de IA.",
+      "expected_output": "Pergunta só os gaps (risco, dados/PII, fontes, memória, qualidade), preenche o bloco ai: com rag e pii, gera AI-ARCHITECTURE, AI-MODEL-STRATEGY, AI-EVALS, AI-SECURITY, AI-RAG e AI-DATA-GOVERNANCE e não escolhe framework nem banco vetorial.",
+      "expectations": [
+        "não escolhe framework nem banco vetorial no discovery",
+        "gera AI-RAG",
+        "marca indefinidos como <TODO>"
+      ]
+    },
+    {
+      "id": "aid-02",
+      "prompt": "É um CRUD de estoque sem nenhum recurso de IA. Rode o bloco de IA do discovery.",
+      "expected_output": "Reconhece que o produto não usa IA, não gera artefatos AI-* e não ativa o pack.",
+      "expectations": [
+        "não gera artefatos AI-*",
+        "não sugere adicionar IA sem necessidade"
+      ]
+    },
+    {
+      "id": "aid-03",
+      "prompt": "Já decidimos: usem o framework X com memória de longo prazo, só preencha o discovery.",
+      "expected_output": "Registra como intenção declarada, mas deixa a escolha de framework para ai-architecture-evaluator com documentação atual e ADR; trata memória de longo prazo como dado pessoal.",
+      "expectations": [
+        "encaminha a decisão para avaliação com ADR",
+        "liga memória a AI-DATA-GOVERNANCE"
+      ]
+    }
+  ]
+}

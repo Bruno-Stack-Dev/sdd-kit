@@ -56,14 +56,22 @@ function run({ flags }) {
 export function buildPromptfooTests() {
   const tests = [];
   const skillsDir = join(ENGINE_ROOT, '.claude', 'skills');
-  for (const s of readdirSync(skillsDir).filter((n) => existsSync(join(skillsDir, n, 'evals', 'evals.json')))) {
-    const ev = JSON.parse(readFileSync(join(skillsDir, s, 'evals', 'evals.json'), 'utf8'));
+  const packsDir = join(skillsDir, '_packs');
+  // Skills núcleo e skills de packs que trazem evals (ex.: pack ai).
+  const dirs = readdirSync(skillsDir).filter((n) => !n.startsWith('_')).map((n) => ({ s: n, dir: join(skillsDir, n), pack: null }));
+  if (existsSync(packsDir)) {
+    for (const pk of readdirSync(packsDir)) {
+      for (const n of readdirSync(join(packsDir, pk)).filter((x) => !x.startsWith('_') && !x.startsWith('.'))) dirs.push({ s: n, dir: join(packsDir, pk, n), pack: pk });
+    }
+  }
+  for (const { s, dir, pack } of dirs.filter((d) => existsSync(join(d.dir, 'evals', 'evals.json')))) {
+    const ev = JSON.parse(readFileSync(join(dir, 'evals', 'evals.json'), 'utf8'));
     for (const c of ev.evals) {
       tests.push({
         description: `skill ${s} · ${c.id}`,
         vars: { prompt: c.prompt, skill: s },
         assert: [{ type: 'llm-rubric', value: [c.expected_output, ...(c.expectations ?? []).map((e) => `- ${e}`)].join('\n') }],
-        metadata: { kind: 'skill', skill: s, case: c.id },
+        metadata: { kind: 'skill', skill: s, case: c.id, ...(pack ? { pack } : {}) },
       });
     }
   }
@@ -85,7 +93,7 @@ function exportPromptfoo({ flags }) {
   const tests = buildPromptfooTests();
   mkdirSync(PROMPTFOO_DIR, { recursive: true });
   const file = join(PROMPTFOO_DIR, 'generated-tests.yaml');
-  writeFileSync(file, stringifyYaml(tests, { header: 'AUTO-GENERATED — DO NOT EDIT DIRECTLY. Fonte: .claude/skills/*/evals/evals.json e evals/agents/agents.json.\nRegenerar: node scripts/sdd.mjs eval export-promptfoo' }));
+  writeFileSync(file, stringifyYaml(tests, { header: 'AUTO-GENERATED — DO NOT EDIT DIRECTLY. Fonte: .claude/skills/*/evals/evals.json, .claude/skills/_packs/*/*/evals/evals.json e evals/agents/agents.json.\nRegenerar: node scripts/sdd.mjs eval export-promptfoo' }));
   if (flags.json) console.log(JSON.stringify({ file, tests: tests.length }));
   else console.log(`${ICON.ok} ${tests.length} teste(s) exportado(s) para ${file}`);
   return 0;

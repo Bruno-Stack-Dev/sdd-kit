@@ -26,3 +26,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0013](ADR-0013-brownfield-observed-intended-runtime.md) | Brownfield OBSERVED × INTENDED × RUNTIME | aceito |
 | [0014](ADR-0014-pipelines-dinamicas.md) | Pipelines vêm da config; templates não fixam stack | aceito |
 | [0015](ADR-0015-packs-como-plugins.md) | Packs opcionais como plugins do marketplace | aceito |
+| [0016](ADR-0016-pack-ai-por-criterios.md) | Pack ai por critérios e evidência atual; nenhum framework de IA no core | aceito |

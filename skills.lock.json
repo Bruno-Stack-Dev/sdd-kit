@@ -281,6 +281,45 @@
           "line": 38
         }
       ]
+    },
+    "ai": {
+      "name": "sdd-ai (conteúdo próprio do SDD Kit)",
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "ref": null,
+      "license": "MIT",
+      "attribution": ".claude/skills/_packs/ai/_ai-references/ATTRIBUTION.md",
+      "trust": "core",
+      "reviewed_at": "2026-09-23",
+      "review_notes": "Escrito pelo mantenedor no v3 (Fase 17). Sem scripts; só instruções, templates e evals. Frameworks citados apenas como candidatos a verificar.",
+      "hash": "sha256:38ee37a65679cd4a7c7c54661979fe4c4311d43b570fd30a9a2ff3b8efcb866a",
+      "skills": {
+        "ai-architecture-evaluator": "sha256:b9094f144a433b3fd22cf0aabe392f91d2256d9db01e5e0265a49925c8a9b447",
+        "ai-discovery": "sha256:ac3fd00ea886bef0cbf32d97b60d1b4555278cf0760329b47db05fedd888fd6e",
+        "ai-evals-designer": "sha256:c103b7dba937ff3dc85b4ded4f7abdbecd4dae2a953540a970a958fd00562b4c",
+        "ai-model-strategy": "sha256:e986e0dcbe5b6bf9d08863cef9c555928a5a332be96f70da985139ae624806a4",
+        "ai-observability-governance": "sha256:51608f4198e2197fecc1d9fd1cc5c92e46c784f8f21aa787e5e25c9096f98186",
+        "ai-rag-memory-designer": "sha256:48e8f91ad5275e0eb6c17635651a34c419fb88d69182050552552eee443e716c",
+        "ai-security-reviewer": "sha256:e198b409527b17751d57934fdece5d613f79fd9dd22973cfe234555eed7854a3",
+        "ai-structured-output-designer": "sha256:e752e0542afa55e599aecfde4c721e2c01ce56c8f62b719f1f4d16da1c553b14"
+      },
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "findings": []
     }
   },
   "skills": {
@@ -414,7 +453,7 @@
       "license": "MIT",
       "trust": "core",
       "reviewed_at": null,
-      "hash": "sha256:88d93c569040b97395adae531919fb4153e2a45299a3d9be4b121422fdeea9f6",
+      "hash": "sha256:fd21578bfbd45b35e1f10bfec9a8b700369351ea326f1709f011e23bf109f302",
       "risk": "low",
       "scan": {
         "sdd_static": {

@@ -1,0 +1,23 @@
+{
+  "skill_name": "ai-observability-governance",
+  "evals": [
+    {
+      "id": "aog-01",
+      "prompt": "Queremos logar todos os prompts e respostas completos para depurar.",
+      "expected_output": "Padrão redigido com amostragem, acesso restrito e retenção curta; justifica registro integral só com controle; liga à governança (PII, LGPD).",
+      "expectations": [
+        "padrão redigido",
+        "retenção definida"
+      ]
+    },
+    {
+      "id": "aog-02",
+      "prompt": "Qual ferramenta de observabilidade de LLM devemos usar?",
+      "expected_output": "Prefere instrumentação OpenTelemetry (convenções GenAI verificadas na versão atual), compara com o backend já operado pelo time e registra evidência datada.",
+      "expectations": [
+        "prefere padrão aberto",
+        "compara com backend existente"
+      ]
+    }
+  ]
+}

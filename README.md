@@ -24,7 +24,7 @@ sdd-kit/
 ├── .claude/
 │   ├── commands/              ← /sdd-init /gerar-projeto /gerar-skills /nova-spec ...
 │   ├── agents/                ← 12 agentes genéricos com protocolo de raciocínio (leem sdd.config.md)
-│   ├── skills/                ← skills: sob medida + ds-* (design system) + arch-* (arquitetura) + uiux-* (UI/UX)
+│   ├── skills/                ← skills: sob medida + ds-* (design system) + arch-* (arquitetura) + uiux-* (UI/UX) + ai-* (produtos com IA)
 │   └── settings.json          ← allowlist portátil (+ settings.example.python/go.json)
 └── scripts/sdd-lint.mjs       ← linter de frontmatter das specs + seções críticas da config
 ```
@@ -96,7 +96,7 @@ O material **próprio** do kit — o motor em `specs/_gerador/`, os 12 agentes, 
 Os três **packs** de skills vendorizados mantêm as licenças e a atribuição dos seus próprios
 arquivos `ATTRIBUTION.md` (em `_packs/<pack>/`): `arch` (software-architecture-pack), `ds`
 (design-system pack) e `uiux`. A licença MIT acima **não** os cobre — consulte o `ATTRIBUTION.md`
-de cada pack.
+de cada pack. O pack `ai` é conteúdo próprio do kit, sob a mesma licença MIT.
 
 **Manutenção (Atlan Global Group):** titular/autor Bruno Silveira · Gerente de T.I. Guilherme
 Pessoa · CIO Jonathas Menegatto.

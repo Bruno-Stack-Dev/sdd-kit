@@ -45,7 +45,7 @@ equivalente determinístico no v2. O baseline começa no 3.0.0.
 
 ## Suíte com modelo
 
-`generated-tests.yaml` é gerado das evals de cada skill (`.claude/skills/*/evals/evals.json`) e dos
+`generated-tests.yaml` é gerado das evals de cada skill (`.claude/skills/*/evals/evals.json` e, nos packs que as trazem, `.claude/skills/_packs/*/*/evals/evals.json`) e dos
 casos por agente (`evals/agents/agents.json`), com `llm-rubric` montado de `expected_output` +
 `expectations`. Resultados ficam em `evals/results/` (não versionado). Compare execuções pelo
 Promptfoo (`promptfoo view`) ou pelos JSONs.

@@ -15,6 +15,7 @@ fixada e o ausente vira `NOT_RUN`.
 |------|--------|--------|---------|------------|-------------|
 | `arch` (14 skills + `_arch-templates/`) | software-architecture-skills — *software-architecture-pack* (URL não registrada na vendorização) | v0.1.0 | MIT | [`_packs/arch/_arch-templates/ATTRIBUTION.md`](.claude/skills/_packs/arch/_arch-templates/ATTRIBUTION.md) | adaptado para `specs/decisions/` e o guardião de arquitetura; v3 corrigiu o YAML das descrições |
 | `ds` (44 skills + `_knowledge-notes/`) | [murphytrueman/design-system-ops](https://github.com/murphytrueman/design-system-ops) | commit não registrado | MIT | [`_packs/ds/_knowledge-notes/ATTRIBUTION.md`](.claude/skills/_packs/ds/_knowledge-notes/ATTRIBUTION.md) | config lida de `design_system` (sdd.config) |
+| `ai` (8 skills + `_ai-templates/`, `_ai-references/`) | **conteúdo próprio do SDD Kit** (não vendorizado) | acompanha o kit | MIT | [`_packs/ai/_ai-references/ATTRIBUTION.md`](.claude/skills/_packs/ai/_ai-references/ATTRIBUTION.md) | sem scripts; frameworks citados só como candidatos a verificar — nenhum é instalado |
 | `uiux` (7 skills) | [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | v2.11.0 | MIT **e** Apache-2.0 **e** OFL-1.1 | [`_packs/uiux/uiux-ui-ux-pro-max/ATTRIBUTION-SDD-KIT.md`](.claude/skills/_packs/uiux/uiux-ui-ux-pro-max/ATTRIBUTION-SDD-KIT.md) | ver pendências abaixo |
 
 ### Pendências registradas (não resolvidas pelo kit)

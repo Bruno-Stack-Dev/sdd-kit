@@ -1,0 +1,23 @@
+{
+  "skill_name": "ai-rag-memory-designer",
+  "evals": [
+    {
+      "id": "arm-01",
+      "prompt": "Monte um RAG sobre os contratos dos clientes; cada cliente só pode ver os seus.",
+      "expected_output": "Aplica filtro de permissão por cliente na busca (não só no prompt), metadados de permissão por chunk, remoção propagando para o índice e avaliação separada de recuperação e geração.",
+      "expectations": [
+        "filtra permissão na recuperação",
+        "avalia recuperação e geração separadamente"
+      ]
+    },
+    {
+      "id": "arm-02",
+      "prompt": "Quero que o assistente lembre tudo que o usuário já disse, para sempre.",
+      "expected_output": "Trata memória de longo prazo como dado pessoal: retenção, correção e esquecimento, e bloqueia memorização de conteúdo não confiável sem validação.",
+      "expectations": [
+        "define retenção e esquecimento",
+        "aponta risco de envenenamento"
+      ]
+    }
+  ]
+}

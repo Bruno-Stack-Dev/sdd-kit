@@ -16,7 +16,7 @@ Há **três tipos**, e eles chegam de formas diferentes:
   `@agente-gerador-skills` (via `/gerar-skills`), lendo o `specs/discovery/` e o `sdd.config.md`
   **do seu projeto**. Um e-commerce ganha `cadastro-produtos` e `marketplace`; uma clínica ganharia
   `agendamento` e `prontuario`; e o kit continua servindo qualquer domínio.
-- **Packs vendorizados** (`arch-*`, `ds-*`, `uiux-*`) — *vêm prontos* com o kit, mas ficam
+- **Packs opcionais** (`arch-*`, `ds-*`, `uiux-*` vendorizados; `ai-*` próprio do kit) — *vêm prontos* com o kit, mas ficam
   **inativos por padrão**, guardados em `_packs/` (diretório ignorado como skill por começar com
   `_`). São opcionais e só entram em `.claude/skills/` quando um pack é **ativado** (por cópia).
   Assim um projeto sem design system não paga o custo de ~44 skills `ds-*` carregando
@@ -32,7 +32,8 @@ Há **três tipos**, e eles chegam de formas diferentes:
 └── _packs/                       ← packs vendorizados, INATIVOS até ativação
     ├── arch/   (14 skills + _arch-templates/)
     ├── ds/     (44 skills + _knowledge-notes/)
-    └── uiux/   (7 skills)
+    ├── uiux/   (7 skills)
+    └── ai/     (8 skills + _ai-templates/ + _ai-references/)
 ```
 
 ### Ativar / desativar um pack
@@ -42,7 +43,7 @@ Dois caminhos, equivalentes — escolha um só por pack (o doctor avisa se houve
 | Modo | Ativar | Desativar |
 |------|--------|-----------|
 | **Cópia** (modo cópia ou plugin) | `sdd pack activate <pack>` — confere hash e licença no `skills.lock.json` e copia para `.claude/skills/` | `sdd pack deactivate <pack>` — move as cópias para `.sdd/backup/` |
-| **Plugin** | `/plugin install sdd-architecture@sdd-kit` (ou `sdd-design-system`, `sdd-uiux`) | `/plugin uninstall ...` |
+| **Plugin** | `/plugin install sdd-architecture@sdd-kit` (ou `sdd-design-system`, `sdd-uiux`, `sdd-ai`) | `/plugin uninstall ...` |
 
 Os packs ficam como plugins opcionais no marketplace do kit (`.claude-plugin/marketplace.json`),
 cada um com seu `.claude-plugin/plugin.json`. O core instala e funciona sem nenhum pack. Packs de
@@ -114,6 +115,29 @@ avaliar riscos, mapear fronteiras e views (runtime/deployment).
 > quality-scenarios → tradeoff → layered → service-decomposition → component-boundary →
 > integration-boundary → runtime-view → deployment-view → scalability-hotspot →
 > availability-strategy → risk-assessor → adr-writer.
+
+---
+
+## Skills de aplicações de IA (`ai-*`)
+
+O pack **`ai`** (em `_packs/ai/`) é **conteúdo próprio do kit** para quando o **produto** usa LLM,
+agentes, RAG, memória ou modelo local — não para o uso de IA no desenvolvimento.
+
+- **Quando ativar:** o discovery descreve IA no produto, ou `sdd ai detect` encontra sinais nas
+  dependências (o doctor avisa se o produto usa IA e o pack não está declarado).
+- **Sem tabela de recomendação fixa:** as skills ensinam critérios, exigem documentação **atual**
+  verificada (versão e data), comparação com a opção mínima (SDK oficial + código próprio) e ADR.
+  Nomes de frameworks aparecem só como candidatos a verificar; o kit não instala nenhum.
+- **Skills:** `ai-discovery` (bloco `ai:` da config e quais artefatos gerar),
+  `ai-architecture-evaluator` (workflow × agente, framework, MCP/A2A/AG-UI/ACP),
+  `ai-model-strategy` (modelos, roteamento, serving próprio), `ai-rag-memory-designer`,
+  `ai-structured-output-designer` (inclui otimização de prompts), `ai-evals-designer`,
+  `ai-security-reviewer` (injection, agência, sandbox, red team), `ai-observability-governance`
+  (OTel GenAI, custo, LGPD, residência).
+- **Artefatos** (`_ai-templates/`, gerados em `specs/discovery/` só quando necessários):
+  `AI-ARCHITECTURE`, `AI-MODEL-STRATEGY`, `AI-RAG`, `AI-MEMORY`, `AI-EVALS`, `AI-SECURITY`,
+  `AI-OBSERVABILITY`, `AI-DATA-GOVERNANCE`.
+- **Método comum:** [`_packs/ai/_ai-references/AVALIACAO-DE-TECNOLOGIA.md`](_packs/ai/_ai-references/AVALIACAO-DE-TECNOLOGIA.md).
 
 ---
 
