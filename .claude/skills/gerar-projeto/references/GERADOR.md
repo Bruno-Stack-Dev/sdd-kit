@@ -23,7 +23,7 @@ tags: [gerador, pipeline, sdd, automacao, portavel]
 
 Transforma **um brief markdown** (em `specs/_entrada/`) num conjunto completo de
 **specs + planos + tarefas** e então **implementa o código** seguindo as *camadas de
-implementação* declaradas em `sdd.config.md` (seção 5), com testes, validação pelo
+implementação* declaradas nas pipelines do `sdd.config.yaml` (visão: seção 5), com testes, validação pelo
 `@agente-spec-guardian` e feedback de execução — **sem o usuário criar arquivos à mão**.
 
 ---
@@ -90,16 +90,16 @@ LEDGER é **derivado** de `.sdd/events.jsonl`: nunca o edite à mão.
 
 Para cada submódulo, a partir de `sdd template list`:
 
-1. `specs/features/<PREFIXO>NNN-<slug>.md` ← `template-spec.md` (`sdd template show spec`)
-   - Frontmatter completo, `status: rascunho`, **`cas:` com a contagem de CAs**.
-   - Objetivos, não-objetivos, RF/RNF, modelo de dados, **CAs numerados** (cada CA vira teste),
-     riscos, segurança, acessibilidade.
-   - Marque **gates de controle humano** e **dados sensíveis** (config seções 8 e 10).
-   - Seção "Decisões assumidas" para defaults adotados.
-2. `specs/plans/<PREFIXO>NNN-<slug>.md` ← `template-plano.md` (`sdd template show plano`) (fases, ordem, estratégia de testes).
-3. `specs/tasks/<PREFIXO>NNN-<slug>.md` ← `template-tarefas.md` (`sdd template show tarefas`)
-   - Uma tarefa por **camada de implementação** da config (seção 5), atribuída ao agente de lá.
-   - Inclua sempre testes (unit + e2e se houver UI) e a tarefa de `@agente-spec-guardian`.
+1. **Gere os três arquivos pela CLI:** `sdd spec new --slug <slug> --title "<título>" --pipeline <nome>`
+   (use `--new-block` no primeiro submódulo de um módulo novo e `--depends` para as dependências).
+   A CLI calcula o ID, cria spec, plano e tarefas — **uma tarefa por etapa da pipeline escolhida**,
+   com o agente da etapa — e registra os eventos de criação. Nenhuma pipeline é fixa no motor: a
+   config pode declarar `frontend`, `api`, `cli`, `data`... (exemplos em `docs/examples/pipelines/`).
+2. Preencha a **spec**: objetivos, não-objetivos, RF/RNF, modelo de dados, **CAs numerados** (cada CA
+   vira teste; `cas:` igual à contagem), riscos, segurança, acessibilidade, **gates de controle
+   humano** e **dados sensíveis** (config seções 8 e 10), "Decisões assumidas".
+3. Ajuste o **plano** (pré-requisitos, estratégia de testes) sem reordenar etapas à mão: mudar a
+   ordem de verdade é mudar a pipeline na config.
 4. Decisão transversal nova (relaxar regra, nova lib, novo padrão)? Crie um **ADR**
    (`specs/decisions/ADR-...md` ← `template-adr.md` (`sdd template show adr`)) **antes** de implementar.
 
@@ -116,8 +116,8 @@ Para cada submódulo, a partir de `sdd template list`:
 
 ## Passo 5 — Implementar (automático, em ordem)
 
-Para **cada spec, na ordem do LEDGER**, execute as **camadas de implementação da config**,
-uma a uma, cada uma pelo agente declarado, **até o verde antes da próxima spec**.
+Para **cada spec, na ordem do LEDGER**, execute as **etapas da pipeline da spec**, uma a uma,
+cada uma pelo agente declarado, **até o verde antes da próxima spec**.
 Equivale a `/implementar-spec`. Escolha a próxima tarefa com `sdd tasks ready`
 (respeita dependências) e registre o ciclo de vida de cada uma:
 
@@ -126,16 +126,13 @@ Equivale a `/implementar-spec`. Escolha a próxima tarefa com `sdd tasks ready`
 - travou: `event TASK_BLOCKED --task ... --reason "<motivo>"`;
 - verde: `event TASK_COMPLETED --task ...`.
 
-**Escolha o conjunto de camadas conforme o que a spec toca e o estágio (config seção 1):**
-- **Frontend** (seção 5) — telas, estado, navegação.
-- **Backend** (seção 5-B) — quando a spec toca servidor/persistência e o estágio inclui backend:
-  contrato de API → migrations → repositórios → serviços → handlers/RBAC → integração → conformidade.
-- **Infra/entrega** (seção 5-C) — quando há mudança de arquitetura (roda o `@agente-arquiteto-guardian`)
-  ou de infraestrutura/CI (roda o `@agente-devops`).
-
-Uma spec full-stack combina 5-B (backend, geralmente primeiro: contrato → servidor) e 5
-(frontend consumindo a API). Um projeto mock-first usa só a seção 5. Rode as camadas de backend
-antes das de UI quando a UI depender da API real; em mock-first, a UI consome mock.
+**A pipeline de cada spec vem da config** (escolhida no `spec new --pipeline`), conforme o que a
+spec toca e o estágio (config seção 1). As etapas, a ordem e o agente de cada uma estão em
+`pipelines.<nome>`; o motor não assume frontend nem backend. Uma entrega que atravessa camadas vira
+**specs separadas por pipeline** ligadas por `depende-de` (ex.: a spec da API antes da spec da UI que
+a consome; em mock-first, a UI consome mock e não depende da API). Mudanças de arquitetura ou de
+infraestrutura usam a pipeline de entrega da config, quando existir (ex.: `delivery`, com
+`@agente-arquiteto-guardian` e `@agente-devops`).
 
 Em cada camada, o agente aplica:
 - as **regras inegociáveis** (config seção 6);

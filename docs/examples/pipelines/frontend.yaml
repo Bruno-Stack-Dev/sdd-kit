@@ -1,0 +1,33 @@
+# Pipeline de frontend (UI navegável). Cole em `pipelines:` do sdd.config.yaml e ajuste.
+# Cada etapa vira uma tarefa em `sdd spec new --pipeline frontend`, na ordem, com o agente da etapa.
+frontend:
+  - id: contract
+    name: Contratos/tipos
+    agent: agente-arquiteto-contratos
+    output: tipos com literais para gates
+  - id: mock
+    name: Dados mockados
+    agent: agente-mock-data
+    output: ≥5 itens cobrindo todos os estados
+  - id: state
+    name: Estado/store
+    agent: agente-frontend
+    output: gates readonly + setter único; escopo em todo getter
+  - id: ui
+    name: UI + rotas + menu
+    agent: agente-frontend
+    output: telas, rota e entrada no menu
+  - id: component-test
+    name: Testes de componente
+    agent: agente-qa-testes
+    output: 1 teste por CA + negativos
+  - id: e2e
+    name: Testes e2e
+    agent: agente-e2e
+    output: fluxo pelo menu com evidência por CA
+    when: se houver UI navegável
+  - id: guardian
+    name: Guardião
+    agent: agente-spec-guardian
+    output: evidência por CA
+    guardian: true

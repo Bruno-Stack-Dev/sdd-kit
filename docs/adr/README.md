@@ -24,3 +24,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0011](ADR-0011-evals-deterministicas-e-com-modelo.md) | Evals determinísticas em todo PR; com modelo fora do caminho crítico | aceito |
 | [0012](ADR-0012-observabilidade-local-otel.md) | Trace local compatível com OTel; Phoenix opcional | aceito |
 | [0013](ADR-0013-brownfield-observed-intended-runtime.md) | Brownfield OBSERVED × INTENDED × RUNTIME | aceito |
+| [0014](ADR-0014-pipelines-dinamicas.md) | Pipelines vêm da config; templates não fixam stack | aceito |
