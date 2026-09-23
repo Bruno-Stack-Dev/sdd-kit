@@ -142,7 +142,9 @@ Em cada camada, o agente aplica:
 - os **gates de controle humano** na store/serviço, não só na UI (config seção 8);
 - os **paths** corretos (config seções 3 e 3-B) — incluindo a entrada de **menu/navegação** se o
   projeto tiver uma (rota sem entrada de menu é bug de entrega);
-- **invariantes** que provam a ausência do caminho proibido, não só a presença do correto.
+- **invariantes** que provam a ausência do caminho proibido, não só a presença do correto;
+- **APIs de bibliotecas conferidas na versão em uso** (lockfile/manifesto) — documentação oficial ou
+  Context7 (perfil MCP `minimal`); nunca invente API. Sem MCP, a documentação oficial basta.
 
 ---
 

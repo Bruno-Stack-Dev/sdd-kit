@@ -121,6 +121,11 @@ async function sessionStart(input) {
   else if (cfg.errors.length) lines.push(`Config INVÁLIDA (${cfg.errors.length} erro[s]): rode \`${cliCommand(root)} config validate\` e corrija antes de implementar.`);
   else if (cfg.source === 'md-legacy') lines.push(`Config ainda no formato v2 (sdd.config.md): sugira \`${cliCommand(root)} config migrate\`.`);
   try {
+    const { checkMcpGovernance } = await lazy('../lib/mcp.mjs');
+    const m = checkMcpGovernance(root, cfg.config);
+    if (m.errors.length) lines.push(`ATENÇÃO — MCP não governado: ${m.errors.join('; ')}. Não use esses servidores até revisar (\`${cliCommand(root)} mcp check\`).`);
+  } catch { /* governança de MCP é informativa aqui */ }
+  try {
     const { appendEvent } = await lazy('../lib/events.mjs');
     if (input.session_id && existsSync(join(root, '.sdd', 'events.jsonl'))) {
       appendEvent(root, { type: 'SESSION_STARTED', session: input.session_id, key: `session-started:${input.session_id}:${input.source ?? 'startup'}` });

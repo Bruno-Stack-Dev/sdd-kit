@@ -1,0 +1,7 @@
+{
+  "name": "minimal",
+  "description": "Padrão: documentação de bibliotecas consciente de versão.",
+  "servers": [
+    "context7"
+  ]
+}

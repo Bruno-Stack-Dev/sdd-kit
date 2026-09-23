@@ -17,6 +17,7 @@ import { policyCommand, securityCommand } from './commands/security.mjs';
 import { initCommand, upgradeCommand, versionCommand } from './commands/init.mjs';
 import { skillsCommand, packCommand } from './commands/skills.mjs';
 import { lspCommand } from './commands/lsp.mjs';
+import { mcpCommand } from './commands/mcp.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -32,6 +33,7 @@ const COMMANDS = {
   skills: skillsCommand,
   pack: packCommand,
   lsp: lspCommand,
+  mcp: mcpCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -68,6 +70,8 @@ Comandos:
                                     proveniência, integridade e ingestão de skills
   pack list | activate <pack> | deactivate <pack>   packs opcionais (verificados contra o lock)
   lsp detect [--json]               linguagens, language servers e plugins LSP recomendados
+  mcp profiles | apply <perfil> | check | pin <servidor> [--consent|--from-file f]
+                                    MCP só da allowlist, drift e pin de schema das ferramentas
   init [--mode plugin|copy] [--force]  instala o kit no projeto (plugin: só estado do projeto)
   upgrade [--dry-run]               atualiza o motor copiado (modo cópia), com backup
   version [--json]                  versões do motor, schemas e do projeto

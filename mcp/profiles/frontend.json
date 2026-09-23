@@ -1,0 +1,8 @@
+{
+  "name": "frontend",
+  "description": "UI: documentação + navegador para validar telas.",
+  "servers": [
+    "context7",
+    "playwright"
+  ]
+}

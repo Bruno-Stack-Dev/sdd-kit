@@ -1,0 +1,57 @@
+# Allowlist de servidores MCP do SDD Kit — a ÚNICA fonte de servidores que o kit escreve no
+# .mcp.json de um projeto. Um servidor fora desta lista nunca é aplicado por `sdd mcp apply` e é
+# acusado por `sdd mcp check` / doctor / SessionStart.
+#
+# Para aprovar um servidor novo: leia README e licença, fixe a versão (nunca @latest), descreva a
+# saída de dados (data_egress), rode `sdd mcp pin <nome> --consent` num ambiente isolado para capturar
+# as ferramentas e registre a revisão. Versões verificadas em docs/references/integrations-snapshot.md.
+# O MCP Registry (github.com/modelcontextprotocol/registry) serve para DESCOBRIR candidatos; aparecer
+# lá não aprova nada.
+
+version: 1
+servers:
+  context7:
+    description: Documentação de bibliotecas e frameworks consciente de versão (evita APIs inventadas).
+    source: https://github.com/upstash/context7
+    package: "@upstash/context7-mcp"
+    version: 4.1.1
+    license: MIT
+    transport: stdio
+    command: npx
+    args: ["-y", "@upstash/context7-mcp@4.1.1"]
+    env:
+      CONTEXT7_API_KEY: "${CONTEXT7_API_KEY:-}"
+    network: [context7.com, mcp.context7.com]
+    data_egress: nomes de bibliotecas e perguntas de documentação vão para o serviço da Upstash; nunca envie código ou segredos na consulta.
+    tools_expected: [resolve-library-id, query-docs]
+    trust: reviewed
+    reviewed_at: 2026-09-23
+  playwright:
+    description: Automação de navegador para e2e, validação de critérios de aceitação e captura de evidências.
+    source: https://github.com/microsoft/playwright-mcp
+    package: "@playwright/mcp"
+    version: 0.0.82
+    license: Apache-2.0
+    transport: stdio
+    command: npx
+    args: ["@playwright/mcp@0.0.82", "--headless", "--isolated", "--output-dir", ".sdd/reports/e2e"]
+    network: [localhost]
+    data_egress: o navegador acessa as URLs pedidas pelo agente; --isolated evita perfil com sessão salva. --allowed-origins NÃO é fronteira de segurança.
+    tools_expected: [browser_navigate, browser_snapshot, browser_click, browser_type, browser_take_screenshot, browser_close]
+    trust: reviewed
+    reviewed_at: 2026-09-23
+  contextforge:
+    description: Gateway/registry corporativo (IBM ContextForge) que federa MCPs e agentes A2A com auth, política e auditoria. Só no perfil enterprise.
+    source: https://github.com/IBM/mcp-context-forge
+    package: mcp-contextforge-gateway
+    version: 1.0.10
+    license: Apache-2.0
+    transport: http
+    url: "${CONTEXTFORGE_URL}"
+    headers:
+      Authorization: "Bearer ${CONTEXTFORGE_TOKEN}"
+    network: ["${CONTEXTFORGE_URL}"]
+    data_egress: todo tráfego MCP passa pelo gateway da organização (auditado lá).
+    tools_expected: []
+    trust: reviewed
+    reviewed_at: 2026-09-23

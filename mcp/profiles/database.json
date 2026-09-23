@@ -1,0 +1,7 @@
+{
+  "name": "database",
+  "description": "Dados: documentação. Nenhum MCP de banco por padrão; se aprovado, somente leitura e nunca contra produção.",
+  "servers": [
+    "context7"
+  ]
+}
