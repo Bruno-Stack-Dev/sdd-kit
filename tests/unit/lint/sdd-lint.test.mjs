@@ -1,6 +1,6 @@
 // Testes do sdd-lint (zero-dep, node:test nativo).
 //
-// Rode com:  node --test scripts/tests/
+// Rode com:  node --test tests/
 //
 // Estratégia: cada teste cria um diretório temporário isolado contendo apenas um
 // sdd.config.md forjado e executa o linter com cwd nesse diretório. Assim só a validação
@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const LINTER = fileURLToPath(new URL('../sdd-lint.mjs', import.meta.url));
+const LINTER = fileURLToPath(new URL('../../../scripts/sdd-lint.mjs', import.meta.url));
 
 // Monta uma config mínima válida variando apenas o corpo da seção 7. A seção 8 fica
 // resolvida como `nenhum` para não interferir.
