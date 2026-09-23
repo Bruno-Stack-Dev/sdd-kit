@@ -16,3 +16,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0003](ADR-0003-config-yaml-canonica.md) | `sdd.config.yaml` canônico; `sdd.config.md` gerado | aceito |
 | [0004](ADR-0004-estado-por-eventos.md) | Estado por eventos; `state.json` e LEDGER derivados | aceito |
 | [0005](ADR-0005-hooks-e-politica-deterministica.md) | Guardrails por hooks + política única + sandbox opcional | aceito |
+| [0006](ADR-0006-plugin-e-modo-copia.md) | Motor como plugin do Claude Code, modo cópia mantido | aceito |

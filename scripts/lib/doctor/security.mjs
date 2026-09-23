@@ -4,7 +4,8 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { gitTrackedFiles, walkFiles, isBinary, relPosix } from '../files.mjs';
 import { scanText, isSensitivePath } from '../secrets.mjs';
-import { ENGINE_ROOT } from '../engine.mjs';
+import { ENGINE_ROOT, ENGINE_VERSION } from '../engine.mjs';
+import { readEngineInfo, compareVersions } from '../install.mjs';
 
 function readJson(file) {
   try { return JSON.parse(readFileSync(file, 'utf8')); } catch { return undefined; }
@@ -93,4 +94,23 @@ export function checkPolicyFile(report) {
   if (!existsSync(file)) { report.fail(G, 'policy.file', 'policies/sdd-policy.json ausente (motor sem política determinística)'); return; }
   const pol = readJson(file);
   report.add(G, 'policy.file', pol?.version === 1 && pol.paths && pol.bash ? 'pass' : 'fail', pol?.version === 1 && pol.paths && pol.bash ? `política núcleo carregada (v${pol.version}: ${Object.keys(pol.bash).length} grupos de regras de shell, ${Object.keys(pol.paths).length} de caminhos)` : 'policies/sdd-policy.json inválido ou sem versão 1');
+}
+
+/** Instalação: versão do motor × projeto e instalação dupla (cópia + plugin). */
+export function checkInstall(report, p) {
+  const G = 'Instalação';
+  const info = readEngineInfo(p.root);
+  if (!info) {
+    report.warn(G, 'install.info', 'sem .sdd/engine.json — projeto instalado manualmente ou em v2 (rode `sdd init` ou `sdd upgrade`)');
+  } else {
+    const cmp = compareVersions(info.engine_version, ENGINE_VERSION);
+    if (cmp > 0) report.warn(G, 'install.version', `projeto registrado com motor ${info.engine_version}, mais novo que o em uso (${ENGINE_VERSION}) — atualize o kit/plugin`);
+    else if (cmp < 0) report.warn(G, 'install.version', `motor em uso ${ENGINE_VERSION} é mais novo que o registrado (${info.engine_version}) — ${info.mode === 'copy' ? 'rode `sdd upgrade`' : 'rode `sdd init --mode plugin` para atualizar o registro'}`);
+    else report.pass(G, 'install.version', `modo ${info.mode}, motor ${ENGINE_VERSION}`);
+  }
+  const s = loadSettings(p.root);
+  const localHooks = JSON.stringify(s.settings?.hooks ?? {}).includes('sdd-hook.mjs');
+  const pluginOn = Object.entries(s.settings?.enabledPlugins ?? {}).some(([k, v]) => k.startsWith('sdd-kit@') && v);
+  if (localHooks && pluginOn) report.warn(G, 'install.duplicate', 'hooks do SDD no settings.json do projeto E plugin sdd-kit habilitado: os hooks rodam em dobro — escolha um modo (`sdd init --mode plugin` remove os locais)');
+  else report.pass(G, 'install.duplicate', 'sem instalação dupla de hooks');
 }

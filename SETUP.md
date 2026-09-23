@@ -32,27 +32,54 @@ Em ambos, **abrir o Claude Code nessa pasta** é o que importa (`cd meu-projeto 
 
 ---
 
-## Passo 2 — Copiar o kit para a RAIZ do projeto
+## Passo 2 — Instalar o kit no projeto (plugin ou cópia)
 
-Copie o **conteúdo** de `sdd-kit/` para a raiz — não a pasta `sdd-kit` aninhada. Devem ficar
-na raiz: `specs/`, `.claude/`, `scripts/` e `sdd.config.example.md`.
+Há dois modos. Os dois usam os mesmos agentes, skills, hooks e CLI; muda **onde o motor mora**.
 
-```bash
-# a partir da raiz do projeto-alvo, com o kit descompactado ao lado:
-cp -R caminho/para/sdd-kit/specs        ./
-cp -R caminho/para/sdd-kit/.claude      ./
-cp -R caminho/para/sdd-kit/scripts      ./
-cp    caminho/para/sdd-kit/sdd.config.example.md ./
-```
+### Modo plugin (recomendado para projetos novos)
 
-Confira que deu certo — estas três pastas têm de existir na raiz:
+O motor fica no plugin do Claude Code; o projeto guarda só o que é dele (`sdd.config.yaml`,
+`specs/`, `.sdd/`, `CLAUDE.md`, `.claude/settings.json`). Atualizar o motor = atualizar o plugin.
 
 ```bash
-ls .claude specs/_gerador scripts/sdd-lint.mjs
+# 1) com um clone do kit em qualquer lugar, prepare o projeto:
+node caminho/para/sdd-kit/scripts/sdd.mjs init --mode plugin --root .
 ```
 
-> Se você copiar a pasta `sdd-kit` inteira por engano, o `/sdd-init` detecta o aninhamento no
-> Passo A e te avisa para mover o conteúdo para a raiz. Nada quebra — só corrija e rode de novo.
+```
+# 2) no Claude Code, dentro do projeto:
+/plugin marketplace add Bruno-Stack-Dev/sdd-kit
+/plugin install sdd-kit@sdd-kit
+```
+
+O `init` já grava no `.claude/settings.json` do projeto a referência ao marketplace e ao plugin
+(`extraKnownMarketplaces` + `enabledPlugins`), então o resto do time recebe o plugin ao abrir o
+projeto. No modo plugin, os workflows aparecem com o prefixo do plugin (ex.: `/sdd-kit:sdd-init`) e
+o comando exato da CLI é informado no início de cada sessão.
+
+### Modo cópia (compatível com o v2)
+
+O motor é copiado para o projeto — como no v2, mas sem cópia manual:
+
+```bash
+node caminho/para/sdd-kit/scripts/sdd.mjs init --mode copy --root .
+```
+
+Para atualizar depois (com backup de tudo que for sobrescrito em `.sdd/backup/`):
+
+```bash
+node caminho/para/sdd-kit-novo/scripts/sdd.mjs upgrade --root .
+```
+
+> **Projeto já instalado com o kit v2?** Rode o `upgrade` acima e depois
+> `node scripts/sdd.mjs config migrate` e `node scripts/sdd.mjs state import-ledger <LEDGER>`.
+> Passo a passo em `MIGRATION.md`.
+
+Confira a instalação:
+
+```bash
+node scripts/sdd.mjs version        # modo cópia (no modo plugin, use o caminho do plugin)
+```
 
 ---
 

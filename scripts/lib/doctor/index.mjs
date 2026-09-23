@@ -11,7 +11,7 @@ import { Report } from './report.mjs';
 import { loadProject } from '../project.mjs';
 import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns } from './project.mjs';
 import { checkAgents, checkSkills, checkSkillScanner } from './agents-skills.mjs';
-import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile } from './security.mjs';
+import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
 import { checkMcp } from './mcp.mjs';
 import { checkEngine, isEngineRepo } from './engine.mjs';
 
@@ -20,10 +20,10 @@ export const MODES = ['fast', 'project', 'security', 'skills', 'mcp', 'full'];
 const PLAN = {
   fast: ['lint', 'config', 'specs', 'tasks', 'state', 'agents'],
   project: ['config', 'specs', 'tasks', 'adrs', 'state', 'forbidden'],
-  security: ['permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
+  security: ['install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
   skills: ['skills', 'agents', 'scanner'],
   mcp: ['mcp'],
-  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'agents', 'skills', 'scanner', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp'],
+  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'agents', 'skills', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp'],
 };
 
 export function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
@@ -44,6 +44,7 @@ export function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     agents: () => checkAgents(report, p),
     skills: () => checkSkills(report, p, { ownedPredicate }),
     scanner: () => checkSkillScanner(report, p),
+    install: () => (engine ? null : checkInstall(report, p)),
     permissions: () => checkPermissions(report, p),
     hooks: () => checkHooks(report, p),
     sandbox: () => checkSandbox(report, p),

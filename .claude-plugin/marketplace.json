@@ -1,0 +1,14 @@
+{
+  "name": "sdd-kit",
+  "owner": { "name": "Bruno Silveira / Atlan Global Group", "url": "https://github.com/Bruno-Stack-Dev" },
+  "metadata": { "description": "SDD Kit: motor de Spec-Driven Development e packs opcionais." },
+  "plugins": [
+    {
+      "name": "sdd-kit",
+      "source": "./",
+      "description": "Motor do SDD Kit (core): skills, agentes, hooks de política e CLI determinística.",
+      "version": "3.0.0-dev",
+      "category": "development"
+    }
+  ]
+}

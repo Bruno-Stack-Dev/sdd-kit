@@ -14,6 +14,7 @@ import { eventCommand, stateCommand } from './commands/state.mjs';
 import { tasksCommand, specCommand } from './commands/tasks.mjs';
 import { doctorCommand, checkCommand } from './commands/doctor.mjs';
 import { policyCommand, securityCommand } from './commands/security.mjs';
+import { initCommand, upgradeCommand, versionCommand } from './commands/init.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -25,11 +26,9 @@ const COMMANDS = {
   check: checkCommand,
   policy: policyCommand,
   security: securityCommand,
-  version: async (args) => {
-    if (args.flags.json) console.log(JSON.stringify({ engine: ENGINE_VERSION }));
-    else console.log(`sdd-kit ${ENGINE_VERSION}`);
-    return 0;
-  },
+  init: initCommand,
+  upgrade: upgradeCommand,
+  version: versionCommand,
 };
 
 const HELP = `sdd-kit ${ENGINE_VERSION} — CLI determinística do SDD Kit
@@ -55,7 +54,9 @@ Comandos:
   policy check --command "<cmd>" | --file <p> [--tool T] [--agent A]
                                     explica a decisão da política (deny/ask/allow)
   security sandbox [--show|--enable] mostra/habilita o sandbox do Claude Code no settings.json
-  version [--json]                  versão do motor
+  init [--mode plugin|copy] [--force]  instala o kit no projeto (plugin: só estado do projeto)
+  upgrade [--dry-run]               atualiza o motor copiado (modo cópia), com backup
+  version [--json]                  versões do motor, schemas e do projeto
 
 Opções globais: --root <dir> (padrão: diretório atual), --json`;
 
