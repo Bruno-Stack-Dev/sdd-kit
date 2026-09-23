@@ -1,8 +1,12 @@
 {
-  "$comment": "Exemplo para backend Python. Copie o que faltar para o settings.json gerado pelo /sdd-init. Ajuste ao gerenciador real (pip, poetry, uv) e ao runner (pytest, tox).",
+  "$comment": "Exemplo para backend Python. Copie o que faltar para o settings.json gerado pelo /sdd-init. Ajuste ao gerenciador real (pip, poetry, uv) e ao runner (pytest, tox). Estas entradas SOMAM-SE ao .claude/settings.json do kit (que já traz os hooks do SDD e o deny de segredos); não substitua o arquivo base.",
   "permissions": {
     "allow": [
-      "Read", "Glob", "Grep", "Write", "Edit",
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
       "Bash(python:*)",
       "Bash(python3:*)",
       "Bash(pip install:*)",
@@ -13,10 +17,21 @@
       "Bash(ruff:*)",
       "Bash(mypy:*)",
       "Bash(alembic:*)",
-      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git add:*)", "Bash(git commit:*)"
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [
-      "Bash(rm -rf:*)", "Bash(git push:*)", "Bash(git reset --hard:*)", "Bash(sudo:*)"
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -f:*)",
+      "Bash(sudo:*)",
+      "Read(./.env)",
+      "Edit(./.env)"
     ]
   }
 }

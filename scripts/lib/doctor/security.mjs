@@ -92,5 +92,5 @@ export function checkPolicyFile(report) {
   const file = join(ENGINE_ROOT, 'policies', 'sdd-policy.json');
   if (!existsSync(file)) { report.fail(G, 'policy.file', 'policies/sdd-policy.json ausente (motor sem política determinística)'); return; }
   const pol = readJson(file);
-  report.add(G, 'policy.file', pol ? 'pass' : 'fail', pol ? `política carregada (${(pol.rules ?? []).length} regra(s))` : 'policies/sdd-policy.json inválido');
+  report.add(G, 'policy.file', pol?.version === 1 && pol.paths && pol.bash ? 'pass' : 'fail', pol?.version === 1 && pol.paths && pol.bash ? `política núcleo carregada (v${pol.version}: ${Object.keys(pol.bash).length} grupos de regras de shell, ${Object.keys(pol.paths).length} de caminhos)` : 'policies/sdd-policy.json inválido ou sem versão 1');
 }

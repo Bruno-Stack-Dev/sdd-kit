@@ -206,8 +206,12 @@ Estas valem sempre; o **detalhe concreto** (qual lib, quais paths, quais greps) 
 
 ## Execução sem autorização
 
-O pipeline roda sem prompts graças ao allowlist em `.claude/settings.json`. Comandos
-destrutivos (`rm`, `git push`) ficam fora do allowlist de propósito.
+O pipeline roda com poucos prompts graças ao allowlist em `.claude/settings.json`. As regras críticas
+**não** dependem deste texto: os hooks do SDD (`scripts/hooks/sdd-hook.mjs`, política em
+`policies/sdd-policy.json`) negam segredos, git destrutivo, escrita direta no estado e em arquivos
+gerados, e pedem confirmação para instalar dependências novas e acessar a rede. Se um comando for
+negado, leia o motivo (`[regra]`) e siga o caminho indicado — não tente contornar. Detalhes:
+`docs/security/policy.md`.
 
 ## Retomada
 

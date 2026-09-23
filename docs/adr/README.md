@@ -15,3 +15,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0002](ADR-0002-parser-yaml-de-subconjunto.md) | Parser YAML de subconjunto próprio, sem dependência | aceito |
 | [0003](ADR-0003-config-yaml-canonica.md) | `sdd.config.yaml` canônico; `sdd.config.md` gerado | aceito |
 | [0004](ADR-0004-estado-por-eventos.md) | Estado por eventos; `state.json` e LEDGER derivados | aceito |
+| [0005](ADR-0005-hooks-e-politica-deterministica.md) | Guardrails por hooks + política única + sandbox opcional | aceito |

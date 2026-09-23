@@ -13,6 +13,7 @@ import { configCommand } from './commands/config.mjs';
 import { eventCommand, stateCommand } from './commands/state.mjs';
 import { tasksCommand, specCommand } from './commands/tasks.mjs';
 import { doctorCommand, checkCommand } from './commands/doctor.mjs';
+import { policyCommand, securityCommand } from './commands/security.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -22,6 +23,8 @@ const COMMANDS = {
   spec: specCommand,
   doctor: doctorCommand,
   check: checkCommand,
+  policy: policyCommand,
+  security: securityCommand,
   version: async (args) => {
     if (args.flags.json) console.log(JSON.stringify({ engine: ENGINE_VERSION }));
     else console.log(`sdd-kit ${ENGINE_VERSION}`);
@@ -49,6 +52,9 @@ Comandos:
   doctor [--fast|--project|--security|--skills|--mcp|--full] [--json] [--strict] [--verbose]
                                     saúde do projeto; exit 1 se NOT_READY (pronto para CI)
   check forbidden [--json]          roda os padrões proibidos da config (grep de ausência)
+  policy check --command "<cmd>" | --file <p> [--tool T] [--agent A]
+                                    explica a decisão da política (deny/ask/allow)
+  security sandbox [--show|--enable] mostra/habilita o sandbox do Claude Code no settings.json
   version [--json]                  versão do motor
 
 Opções globais: --root <dir> (padrão: diretório atual), --json`;

@@ -1,8 +1,12 @@
 {
-  "$comment": "Exemplo para backend Go. Copie o que faltar para o settings.json gerado pelo /sdd-init.",
+  "$comment": "Exemplo para backend Go. Copie o que faltar para o settings.json gerado pelo /sdd-init. Estas entradas SOMAM-SE ao .claude/settings.json do kit (que já traz os hooks do SDD e o deny de segredos); não substitua o arquivo base.",
   "permissions": {
     "allow": [
-      "Read", "Glob", "Grep", "Write", "Edit",
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
       "Bash(go build:*)",
       "Bash(go test:*)",
       "Bash(go run:*)",
@@ -11,10 +15,21 @@
       "Bash(gofmt:*)",
       "Bash(golangci-lint:*)",
       "Bash(migrate:*)",
-      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git add:*)", "Bash(git commit:*)"
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [
-      "Bash(rm -rf:*)", "Bash(git push:*)", "Bash(git reset --hard:*)", "Bash(sudo:*)"
+      "Bash(rm -rf:*)",
+      "Bash(rm -fr:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -f:*)",
+      "Bash(sudo:*)",
+      "Read(./.env)",
+      "Edit(./.env)"
     ]
   }
 }
