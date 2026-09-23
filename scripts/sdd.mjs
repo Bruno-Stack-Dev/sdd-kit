@@ -16,6 +16,7 @@ import { doctorCommand, checkCommand } from './commands/doctor.mjs';
 import { policyCommand, securityCommand } from './commands/security.mjs';
 import { initCommand, upgradeCommand, versionCommand } from './commands/init.mjs';
 import { skillsCommand, packCommand } from './commands/skills.mjs';
+import { lspCommand } from './commands/lsp.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -30,6 +31,7 @@ const COMMANDS = {
   security: securityCommand,
   skills: skillsCommand,
   pack: packCommand,
+  lsp: lspCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -65,6 +67,7 @@ Comandos:
   skills add <dir> --source <url> --license <SPDX> [--ref r] | review <nome> --trust <t>
                                     proveniência, integridade e ingestão de skills
   pack list | activate <pack> | deactivate <pack>   packs opcionais (verificados contra o lock)
+  lsp detect [--json]               linguagens, language servers e plugins LSP recomendados
   init [--mode plugin|copy] [--force]  instala o kit no projeto (plugin: só estado do projeto)
   upgrade [--dry-run]               atualiza o motor copiado (modo cópia), com backup
   version [--json]                  versões do motor, schemas e do projeto

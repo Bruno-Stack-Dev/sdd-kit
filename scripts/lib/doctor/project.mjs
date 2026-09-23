@@ -132,3 +132,20 @@ export function checkForbiddenPatterns(report, p) {
     report.add(G, `forbidden.${i}`, status, title, r.matches);
   }
 }
+
+/** Code intelligence: linguagens tipadas detectadas × LSP declarado na config e binários no PATH. */
+export async function checkCodeIntelligence(report, p) {
+  const G = 'Code intelligence';
+  const { detectLanguages } = await import('../lsp.mjs');
+  const { languages, unsupported } = detectLanguages(p.root);
+  const lsp = p.cfg.config?.integrations?.lsp;
+  if (!languages.length) { report.skip(G, 'lsp', 'nenhuma linguagem com plugin LSP oficial detectada'); return; }
+  const names = languages.map((l) => l.label).join(', ');
+  if (!lsp?.enabled) {
+    report.warn(G, 'lsp', `linguagens detectadas (${names}) sem code intelligence habilitado — rode \`sdd lsp detect\``, languages.map((l) => `${l.label}: /plugin install ${l.plugin}`));
+    return;
+  }
+  const missing = languages.filter((l) => !l.binaryFound).map((l) => `${l.label}: binário ${l.binary} ausente (${l.install})`);
+  const undeclared = languages.filter((l) => !(lsp.plugins ?? []).includes(l.plugin)).map((l) => `${l.label}: ${l.plugin} não está em integrations.lsp.plugins`);
+  report.fromIssues(G, 'lsp', `code intelligence habilitado para ${names}`, [], [...missing, ...undeclared, ...unsupported.map((u) => `${u}: sem plugin oficial (Serena como alternativa)`)]);
+}
