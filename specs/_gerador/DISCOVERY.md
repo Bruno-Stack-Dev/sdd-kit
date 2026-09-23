@@ -129,9 +129,12 @@ Depois do último bloco, **sem pedir confirmação adicional** (o allowlist já 
    `specs/decisions/ADR-NNN-<slug>.md` (← `template-adr.md`), status `aceito`. Use a skill
    `arch-adr-writer` para redigir cada um de forma verificável (regras que o
    `@agente-arquiteto-guardian` possa checar).
-3. **`sdd.config.md`** (raiz) ← `sdd.config.example.md`, preenchido com Blocos 3–5:
-   stack e comandos (2), paths (3), numeração (4), camadas (5), regras (6), proibidos (7),
-   gates (8), tópicos bloqueados (9), defaults (10). Indefinidos → `<TODO>`.
+3. **`sdd.config.yaml`** (raiz) ← `sdd.config.example.yaml`, preenchido com Blocos 3–5:
+   `stack`/`commands` (2), `paths` (3), `numbering` (4), `pipelines` (5), `rules` (6),
+   `forbidden_patterns` (7), `human_gates` (8), `blocked_topics` (9), `defaults` (10). Indefinidos →
+   `<TODO>` (nas três listas críticas, use `[]` se não se aplicam). Depois rode
+   `node scripts/sdd.mjs config validate` e `node scripts/sdd.mjs config render` (gera a visão
+   `sdd.config.md`).
 4. **`CLAUDE.md`** (raiz): injete o bloco "Spec-Driven Development (SDD Kit)" do `README.md`
    do kit (se ainda não estiver lá) e uma seção **"Discovery"** apontando para `specs/discovery/`.
 5. **`specs/_entrada/<slug>-brief.md`**: gere um brief consolidado a partir dos Blocos 1–2

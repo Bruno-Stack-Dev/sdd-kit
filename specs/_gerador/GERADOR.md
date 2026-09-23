@@ -27,10 +27,13 @@ implementação* declaradas em `sdd.config.md` (seção 5), com testes, validaç
 
 ## Passo 0 — Pré-condições (sempre)
 
-1. **Leia `sdd.config.md`** (raiz). Se não existir, **pare e diga: "rode `/sdd-init` primeiro"**.
-   - Rode `node scripts/sdd-lint.mjs`. Se ele acusar placeholders nas seções 7/8 da config,
-     **pare e avise**: a rede de segurança (padrões proibidos, gates) precisa estar preenchida
-     antes de gerar código sobre ela.
+1. **Valide a config**: rode `node scripts/sdd.mjs config validate`. A fonte canônica é
+   `sdd.config.yaml` (a visão legível `sdd.config.md` é gerada dela; num projeto v2 ainda sem YAML,
+   o `.md` legado é lido com aviso — sugira `config migrate`). Se não houver config, **pare e diga:
+   "rode `/sdd-init` primeiro"**. Se o comando sair com erro, **pare e mostre os erros**: config
+   inválida (schema, placeholders em `forbidden_patterns`/`human_gates`/`blocked_topics`, agente
+   inexistente) não pode sustentar geração de código.
+   - Rode `node scripts/sdd-lint.mjs` (fast path: frontmatter das specs + config + `.claude/`).
 2. Leia o `CLAUDE.md`. As regras inegociáveis (config seção 6) valem para tudo que for gerado.
 3. Rode o **comando de testes** (config seção 2) e confirme verde. Se houver vermelho
    pré-existente, **pare e avise** — não gere sobre base quebrada.

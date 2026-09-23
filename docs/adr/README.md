@@ -12,3 +12,5 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | ADR | Título | Status |
 |-----|--------|--------|
 | [0001](ADR-0001-registrar-decisoes-do-kit.md) | Registrar decisões do kit em `docs/adr/` | aceito |
+| [0002](ADR-0002-parser-yaml-de-subconjunto.md) | Parser YAML de subconjunto próprio, sem dependência | aceito |
+| [0003](ADR-0003-config-yaml-canonica.md) | `sdd.config.yaml` canônico; `sdd.config.md` gerado | aceito |

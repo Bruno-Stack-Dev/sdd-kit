@@ -13,3 +13,7 @@ node_modules/
 # gerado por projeto, nunca versionado no kit
 sdd.config.md
 graphify-out/
+
+# config e estado de PROJETO — o repositório do kit não tem (são gerados nos projetos consumidores)
+sdd.config.yaml
+.sdd/

@@ -87,7 +87,8 @@ Se preferir (ou se o comando não aparecer), basta pedir no chat:
 ## Passo 4 — Validar
 
 ```bash
-node scripts/sdd-lint.mjs        # specs/discovery + seções 7/8 da config + artefatos de .claude/
+node scripts/sdd.mjs config validate   # sdd.config.yaml contra o schema (+ checagens semânticas)
+node scripts/sdd-lint.mjs              # specs/discovery + config + artefatos de .claude/
 ```
 
 > Após o `/sdd-init`, o linter também verifica se as seções **7 (Padrões proibidos)** e

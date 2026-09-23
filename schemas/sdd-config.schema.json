@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Bruno-Stack-Dev/sdd-kit/schemas/sdd-config.schema.json",
+  "title": "sdd.config.yaml — configuração executável do projeto (SDD Kit v3)",
+  "description": "Fonte canônica do que é específico do projeto. O sdd.config.md passa a ser uma visão gerada (node scripts/sdd.mjs config render). Cada bloco cita a seção equivalente da visão Markdown em x-legacy-section.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "project", "commands", "paths", "numbering", "pipelines", "rules", "forbidden_patterns", "human_gates", "blocked_topics"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": {
+      "description": "Versão MAJOR do formato da config. O motor recusa versões que não conhece.",
+      "const": 3
+    },
+    "project": {
+      "x-legacy-section": "1",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "type": "string", "minLength": 1, "description": "Ex.: SaaS B2B web, API, CLI, biblioteca, fullstack." },
+        "domain": { "type": ["string", "null"], "description": "O que o produto faz, em uma frase." },
+        "stage": { "type": ["string", "null"], "description": "Ex.: mock-first, MVP, produção. Governa se as camadas de backend se aplicam." },
+        "updated_at": { "type": ["string", "null"] }
+      }
+    },
+    "stack": {
+      "x-legacy-section": "2",
+      "description": "Stack declarada. Chaves livres (language, framework, ui_library, state, package_manager, database...), valores texto ou sub-objetos.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/stackValue" }
+    },
+    "commands": {
+      "x-legacy-section": "2",
+      "description": "Comandos que o motor e os guardiões executam. null = não se aplica (n/a).",
+      "type": "object",
+      "required": ["test"],
+      "properties": {
+        "test": { "$ref": "#/$defs/command" },
+        "e2e": { "$ref": "#/$defs/command" },
+        "typecheck": { "$ref": "#/$defs/command" },
+        "lint": { "$ref": "#/$defs/command" },
+        "build": { "$ref": "#/$defs/command" }
+      },
+      "additionalProperties": { "$ref": "#/$defs/command" }
+    },
+    "paths": {
+      "x-legacy-section": "3",
+      "description": "Onde cada artefato é escrito. null = não se aplica. Aceita marcadores como <modulo>.",
+      "type": "object",
+      "required": ["specs"],
+      "properties": {
+        "specs": { "type": "string", "minLength": 1 },
+        "backend": {
+          "x-legacy-section": "3-B",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/pathValue" }
+        }
+      },
+      "additionalProperties": { "$ref": "#/$defs/pathValue" }
+    },
+    "numbering": {
+      "x-legacy-section": "4",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prefix", "increment"],
+      "properties": {
+        "prefix": { "type": "string", "pattern": "^[A-Z][A-Z0-9]*-([A-Z0-9]+-)*$|^<", "description": "Ex.: SPEC-2026-. PLAN/TASKS espelham o número." },
+        "increment": { "type": "integer", "minimum": 1 },
+        "start": { "anyOf": [{ "const": "auto" }, { "type": "integer", "minimum": 0 }] }
+      }
+    },
+    "pipelines": {
+      "x-legacy-section": "5",
+      "description": "Pipelines de implementação: nome → lista ordenada de etapas. O motor e o gerador de tarefas iteram exatamente estas etapas.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "$ref": "#/$defs/pipelineStep" }
+      }
+    },
+    "rules": {
+      "x-legacy-section": "6",
+      "description": "Regras inegociáveis do projeto. O guardião recusa entregas que violem qualquer item.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "forbidden_patterns": {
+      "x-legacy-section": "7",
+      "description": "Padrões proibidos (grep de ausência). Lista vazia = nenhum (declaração explícita). Executados por `sdd check forbidden`.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/forbiddenPattern" }
+    },
+    "human_gates": {
+      "x-legacy-section": "8",
+      "description": "Gates de controle humano. Lista vazia = nenhum.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/humanGate" }
+    },
+    "blocked_topics": {
+      "x-legacy-section": "9",
+      "description": "Tópicos que o motor não implementa sem autorização humana explícita. Lista vazia = nenhum.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "defaults": {
+      "x-legacy-section": "10",
+      "description": "Defaults aplicados quando o brief omite um campo opcional.",
+      "type": "object",
+      "additionalProperties": { "type": ["string", "null"] }
+    },
+    "engineering_gates": {
+      "x-legacy-section": "11",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/engineeringGate" }
+    },
+    "security": {
+      "description": "Políticas de segurança do projeto. Somam-se às políticas núcleo do kit (policies/sdd-policy.json); nunca as relaxam abaixo do piso.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protected_paths": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Globs extras que agentes não podem ler/editar." },
+        "production": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "db_write": { "enum": ["deny", "ask"] },
+            "markers": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Trechos que identificam alvos de produção em comandos (hosts, nomes de banco, perfis)." }
+          }
+        },
+        "destructive_git": { "enum": ["deny", "ask"] },
+        "network": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "enum": ["sandbox", "ask", "unrestricted"] },
+            "allowed_domains": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "disabled": { "type": "array", "items": { "type": "string", "pattern": "^agente-[a-z0-9-]+$" } }
+      }
+    },
+    "integrations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mcp_profile": { "type": ["string", "null"], "pattern": "^[a-z][a-z0-9-]*$", "description": "Perfil em mcp/profiles/<nome>.json. null = sem MCP." },
+        "packs": { "type": "array", "uniqueItems": true, "items": { "enum": ["arch", "ds", "uiux", "ai"] } },
+        "lsp": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "languages": { "type": "array", "items": { "type": "string" } },
+            "plugins": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "design_system": {
+      "x-legacy-section": "12",
+      "description": "Calibração do pack ds (livre; as skills ds-* leem daqui).",
+      "type": "object"
+    },
+    "ai": {
+      "description": "Perfil de aplicação de IA (pack ai), quando o PRODUTO usa IA. Livre; ver skills ai-*.",
+      "type": "object"
+    },
+    "legacy": {
+      "description": "Informação preservada na migração do sdd.config.md que não tem campo próprio (ex.: seções extras).",
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "command": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "pathValue": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "stackValue": {
+      "anyOf": [
+        { "type": ["string", "null"] },
+        { "type": "object", "additionalProperties": { "type": ["string", "null"] } }
+      ]
+    },
+    "pipelineStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "agent"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "name": { "type": "string", "minLength": 1 },
+        "agent": { "type": "string", "pattern": "^agente-[a-z0-9-]+$" },
+        "output": { "type": ["string", "null"] },
+        "when": { "type": ["string", "null"], "description": "Condição em prosa para a etapa se aplicar (ex.: 'se houver UI')." },
+        "guardian": { "type": "boolean", "description": "Etapa de validação: exige aprovação (GUARDIAN_APPROVED) antes de fechar a spec." }
+      }
+    },
+    "forbiddenPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pattern", "scope"],
+      "properties": {
+        "pattern": { "type": "string", "minLength": 1, "format": "regex" },
+        "scope": { "type": "string", "minLength": 1 },
+        "expected": { "type": "integer", "minimum": 0 },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "humanGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "entity", "setter"],
+      "properties": {
+        "decision": { "type": "string", "minLength": 1 },
+        "entity": { "type": "string", "minLength": 1 },
+        "setter": { "type": "string", "minLength": 1 },
+        "invariant": { "type": ["string", "null"] }
+      }
+    },
+    "engineeringGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "blocking": { "type": "boolean" },
+        "command": { "type": ["string", "null"] },
+        "threshold": { "type": ["number", "string", "null"] },
+        "label": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -3,7 +3,7 @@
 Um kit autocontido para rodar **Spec-Driven Development** (brief → specs → código) em
 **qualquer projeto**, com geração automática de specs, agentes especializados e comandos do
 Claude Code. O motor é **genérico**; tudo que é específico do seu projeto mora num único
-arquivo: `sdd.config.md`.
+arquivo: `sdd.config.yaml` (validado por schema; a visão legível `sdd.config.md` é gerada dele).
 
 > **Primeira vez?** Comece pelo **`SETUP.md`** — pré-requisitos (Claude Code, Node), como copiar
 > o kit para a raiz e como rodar o `/sdd-init`.
@@ -40,17 +40,20 @@ sdd-kit/
    - **Novo:** entrevista de **discovery em blocos** (produto → dados → arquitetura/stack → planejamento → infra) → gera toda a documentação técnica em `specs/discovery/`, os ADRs, o `sdd.config.md`, o `CLAUDE.md` e um brief pronto em `specs/_entrada/`.
 3. Pronto. Para incrementos, coloque um brief em `specs/_entrada/` e rode **`/gerar-projeto`**.
 
-> Sem o `/sdd-init`? Faça manual: copie `sdd.config.example.md` → `sdd.config.md`, preencha,
-> e cole o bloco abaixo no `CLAUDE.md`.
+> Sem o `/sdd-init`? Faça manual: copie `sdd.config.example.yaml` → `sdd.config.yaml`, preencha,
+> rode `node scripts/sdd.mjs config validate` e cole o bloco abaixo no `CLAUDE.md`.
+>
+> **Projeto já instalado com o kit v2?** `node scripts/sdd.mjs config migrate` converte o
+> `sdd.config.md` para `sdd.config.yaml` (o original fica em `.sdd/backup/`). Ver `MIGRATION.md`.
 
 ## Bloco para colar no `CLAUDE.md` do projeto
 
 ```markdown
 ## Spec-Driven Development (SDD Kit)
 
-Este projeto usa o SDD Kit em `specs/` + `.claude/`. **Antes de qualquer tarefa, leia
-`sdd.config.md`** (raiz) — ele declara a stack, os paths, as regras inegociáveis e os
-padrões proibidos DESTE projeto. O motor em `specs/_gerador/GERADOR.md` é genérico e lê
+Este projeto usa o SDD Kit em `specs/` + `.claude/`. **Antes de qualquer tarefa, leia a config
+do projeto** — `sdd.config.yaml` (canônica) ou sua visão `sdd.config.md` — ela declara a stack, os
+paths, as regras inegociáveis e os padrões proibidos DESTE projeto. O motor em `specs/_gerador/GERADOR.md` é genérico e lê
 essa config; não duplique regras de projeto dentro do motor.
 
 - Todo trabalho deriva de uma spec em `specs/`. Sem spec → `/nova-spec` antes de codar.

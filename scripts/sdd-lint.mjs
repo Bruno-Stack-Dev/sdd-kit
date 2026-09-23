@@ -30,6 +30,7 @@
  */
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, resolve, extname } from 'node:path';
+import { loadConfig, CONFIG_YAML } from './lib/config.mjs';
 
 const ROOT = process.cwd();
 const DIRS = ['specs/features', 'specs/architecture', 'specs/apis', 'specs/discovery'];
@@ -176,6 +177,15 @@ if (existsSync(CONFIG)) {
       warns += ativos.length;
     }
   }
+}
+
+// --- Validação do sdd.config.yaml (v3, canônico) — schema + semântica ---
+// Config inválida é rejeitada aqui, antes de o motor gerar qualquer código (Passo 0 do GERADOR).
+if (existsSync(join(ROOT, CONFIG_YAML))) {
+  checked++;
+  const r = loadConfig(ROOT);
+  for (const e of r.errors) { console.error(`✖ ${CONFIG_YAML}: ${e.path}: ${e.message}`); errors++; }
+  for (const w of r.warnings) { console.warn(`⚠ ${CONFIG_YAML}: ${w.path}: ${w.message}`); warns++; }
 }
 
 // ======================================================================

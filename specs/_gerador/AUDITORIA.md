@@ -127,8 +127,10 @@ Sem pedir confirmação adicional (allowlist cobre escrita):
    `BACKLOG`, `INFRA`). Indefinidos → `<TODO>`.
 2. **ADRs retroativos** em `specs/decisions/` para as decisões arquiteturais encontradas.
 3. **`AUDITORIA-DIVERGENCIAS.md`** (Passo 4).
-4. **`sdd.config.md`** (raiz) ← `sdd.config.example.md`, preenchido a partir do código +
-   respostas. Comandos da seção 2 têm de ser os **reais** (validados no Passo 1).
+4. **`sdd.config.yaml`** (raiz) ← `sdd.config.example.yaml`, preenchido a partir do código +
+   respostas. `commands` têm de ser os **reais** (validados no Passo 1). Se o projeto já tinha um
+   `sdd.config.md` v2, use `node scripts/sdd.mjs config migrate` em vez de reescrever. Valide com
+   `config validate` e gere a visão com `config render`.
 5. **`CLAUDE.md`** (raiz): injete o bloco "Spec-Driven Development (SDD Kit)" (se ausente) +
    seção "Discovery (documentado por engenharia reversa)" apontando para `specs/discovery/`.
 6. **Validar:** rode `node scripts/sdd-lint.mjs` **e o comando de testes real** — confirme que
