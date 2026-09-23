@@ -1,12 +1,38 @@
 {
   "name": "sdd-kit",
-  "owner": { "name": "Bruno Silveira / Atlan Global Group", "url": "https://github.com/Bruno-Stack-Dev" },
-  "metadata": { "description": "SDD Kit: motor de Spec-Driven Development e packs opcionais." },
+  "owner": {
+    "name": "Bruno Silveira / Atlan Global Group",
+    "url": "https://github.com/Bruno-Stack-Dev"
+  },
+  "metadata": {
+    "description": "SDD Kit: motor de Spec-Driven Development e packs opcionais."
+  },
   "plugins": [
     {
       "name": "sdd-kit",
       "source": "./",
       "description": "Motor do SDD Kit (core): skills, agentes, hooks de política e CLI determinística.",
+      "version": "3.0.0-dev",
+      "category": "development"
+    },
+    {
+      "name": "sdd-architecture",
+      "source": "./.claude/skills/_packs/arch",
+      "description": "Raciocínio de decisão arquitetural (opções, cenários de qualidade, trade-offs, riscos, views, ADR) integrado ao SDD Kit. Base: software-architecture-pack (MIT).",
+      "version": "3.0.0-dev",
+      "category": "development"
+    },
+    {
+      "name": "sdd-design-system",
+      "source": "./.claude/skills/_packs/ds",
+      "description": "Operação de design system (tokens, drift, governança, acessibilidade por componente, adoção) calibrada pela config do SDD. Base: Design System Ops (MIT).",
+      "version": "3.0.0-dev",
+      "category": "development"
+    },
+    {
+      "name": "sdd-uiux",
+      "source": "./.claude/skills/_packs/uiux",
+      "description": "Criação de UI com base consultável de estilos, paletas, tipografia e diretrizes de UX. Base: UI/UX Pro Max v2.11.0 (MIT, com partes Apache-2.0 e OFL-1.1 — ver THIRD_PARTY.md).",
       "version": "3.0.0-dev",
       "category": "development"
     }

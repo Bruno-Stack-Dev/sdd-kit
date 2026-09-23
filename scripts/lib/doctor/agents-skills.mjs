@@ -178,6 +178,14 @@ export async function checkSupplyChain(report, p) {
   const active = activePacks(p.root);
   const modified = active.flatMap((a) => a.modified.map((s) => `${a.pack}/${s}`));
   if (active.length) report.add(G, 'supply.active', modified.length ? 'warn' : 'pass', modified.length ? `cópias ativas alteradas localmente: ${modified.join(', ')}` : `packs ativos íntegros: ${active.map((a) => `${a.pack} (${a.skills}/${a.total})`).join(', ')}`);
+  // Packs habilitados como plugins do marketplace do kit (modo plugin): versionados pelo próprio plugin.
+  try {
+    const settings = JSON.parse(readFileSync(join(p.root, '.claude', 'settings.json'), 'utf8'));
+    const packPlugins = Object.entries(settings.enabledPlugins ?? {}).filter(([k, v]) => v && /^sdd-(architecture|design-system|uiux|ai)@/.test(k)).map(([k]) => k);
+    if (packPlugins.length) report.pass(G, 'supply.pack-plugins', `packs habilitados como plugin: ${packPlugins.join(', ')}`);
+    const both = packPlugins.filter((k) => active.some((a) => k.startsWith(`sdd-${{ arch: 'architecture', ds: 'design-system', uiux: 'uiux', ai: 'ai' }[a.pack]}@`)));
+    if (both.length) report.warn(G, 'supply.pack-duplicate', `pack ativo por cópia E como plugin (skills em dobro): ${both.join(', ')}`);
+  } catch { /* sem settings.json: nada a relatar */ }
   let lock = null;
   try { lock = readLock(projectLockPath(p.root)); } catch (e) { report.fail(G, 'supply.project', e.message); return; }
   const ext = Object.entries(lock?.external ?? {});

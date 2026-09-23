@@ -37,10 +37,17 @@ Há **três tipos**, e eles chegam de formas diferentes:
 
 ### Ativar / desativar um pack
 
-A ativação é **mecânica**, não um flag de texto: o `/sdd-init` (ou você) **copia** o pack
-escolhido de `_packs/<pack>/` para `.claude/skills/`. A partir daí o Claude Code descobre aquelas
-skills normalmente. Para **desativar**, apague as pastas copiadas de `.claude/skills/` — o
-original continua intacto em `_packs/`, pronto para reativar.
+Dois caminhos, equivalentes — escolha um só por pack (o doctor avisa se houver os dois):
+
+| Modo | Ativar | Desativar |
+|------|--------|-----------|
+| **Cópia** (modo cópia ou plugin) | `sdd pack activate <pack>` — confere hash e licença no `skills.lock.json` e copia para `.claude/skills/` | `sdd pack deactivate <pack>` — move as cópias para `.sdd/backup/` |
+| **Plugin** | `/plugin install sdd-architecture@sdd-kit` (ou `sdd-design-system`, `sdd-uiux`) | `/plugin uninstall ...` |
+
+Os packs ficam como plugins opcionais no marketplace do kit (`.claude-plugin/marketplace.json`),
+cada um com seu `.claude-plugin/plugin.json`. O core instala e funciona sem nenhum pack. Packs de
+segurança e DevOps (`sdd-security`, `sdd-devops`) não existem ainda: os agentes `devops` e os
+guardiões cobrem esses papéis no core.
 
 ## Três lentes de geração
 

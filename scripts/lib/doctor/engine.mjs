@@ -52,8 +52,15 @@ export function checkPluginManifest(report, root) {
   }
   if (!market) issues.push('.claude-plugin/marketplace.json ausente ou inválido');
   else for (const pl of market.plugins ?? []) {
-    if (typeof pl.source === 'string' && !existsSync(join(root, pl.source))) issues.push(`marketplace: source '${pl.source}' de ${pl.name} não existe`);
-    if (pl.name === 'sdd-kit' && pl.version && pl.version !== ENGINE_VERSION) issues.push(`marketplace: versão do sdd-kit ${pl.version} ≠ ${ENGINE_VERSION}`);
+    if (typeof pl.source === 'string' && !existsSync(join(root, pl.source))) { issues.push(`marketplace: source '${pl.source}' de ${pl.name} não existe`); continue; }
+    if (pl.version && pl.version !== ENGINE_VERSION) issues.push(`marketplace: versão de ${pl.name} ${pl.version} ≠ ${ENGINE_VERSION}`);
+    if (pl.name === 'sdd-kit') continue;
+    // Packs como plugins: manifesto próprio no diretório do pack, skills no próprio diretório.
+    const manifest = read(join(pl.source, '.claude-plugin', 'plugin.json'));
+    if (!manifest) { issues.push(`pack ${pl.name}: ${pl.source}/.claude-plugin/plugin.json ausente ou inválido`); continue; }
+    if (manifest.name !== pl.name) issues.push(`pack ${pl.name}: plugin.json name '${manifest.name}' ≠ marketplace`);
+    if (manifest.version !== ENGINE_VERSION) issues.push(`pack ${pl.name}: plugin.json version ${manifest.version} ≠ ${ENGINE_VERSION}`);
+    if (manifest.skills !== './') issues.push(`pack ${pl.name}: skills deve ser './' (as skills ficam no próprio diretório do pack)`);
   }
   if (!hooks?.hooks?.PreToolUse) issues.push('hooks/hooks.json sem PreToolUse');
   else if (!JSON.stringify(hooks).includes('${CLAUDE_PLUGIN_ROOT}/scripts/hooks/sdd-hook.mjs')) issues.push('hooks/hooks.json deve chamar ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/sdd-hook.mjs');

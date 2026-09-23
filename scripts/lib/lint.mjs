@@ -237,7 +237,7 @@ export function runLint(ROOT = process.cwd()) {
 
   if (existsSync(SKILLS_DIR)) {
     for (const name of readdirSync(SKILLS_DIR)) {
-      if (name.startsWith('_')) continue;
+      if (name.startsWith('_') || name.startsWith('.')) continue;
       const dir = join(SKILLS_DIR, name);
       if (!statSync(dir).isDirectory()) continue;
       validateSkill(dir, name, `.claude/skills/${name}`);
@@ -250,7 +250,7 @@ export function runLint(ROOT = process.cwd()) {
         const packDir = join(PACKS_DIR, pack);
         if (!statSync(packDir).isDirectory()) continue;
         for (const name of readdirSync(packDir)) {
-          if (name.startsWith('_')) continue;
+          if (name.startsWith('_') || name.startsWith('.')) continue;
           const dir = join(packDir, name);
           if (!statSync(dir).isDirectory()) continue;
           validateSkill(dir, name, `.claude/skills/_packs/${pack}/${name}`);
