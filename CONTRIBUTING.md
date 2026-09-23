@@ -86,5 +86,7 @@ Regressão contra o baseline falha o CI.
    `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` e
    `.claude/skills/_packs/*/.claude-plugin/plugin.json` — o doctor falha se divergirem.
 2. `CHANGELOG.md` com a data; `node scripts/sdd.mjs eval run --update-baseline` se a versão mudou.
-3. `npm test`, `node scripts/sdd.mjs doctor --full`, `node scripts/sdd.mjs skills verify`.
+3. `npm test`, `node scripts/sdd.mjs doctor --full`, `node scripts/sdd.mjs skills verify` e a
+   regressão completa numa cópia limpa:
+   `node tests/regression/full-regression.mjs --report docs/reports/regression-X.Y.Z.md`.
 4. Tag `vX.Y.Z` e release criados manualmente pelo mantenedor. Nenhum workflow publica ou faz push.
