@@ -67,16 +67,18 @@ O brief vira **1 módulo** (domínio coeso) com **N submódulos**, onde cada sub
 - Partes paralelizáveis com donos/dependências diferentes.
 - Uma spec estimada em > ~2 dias.
 
-**Numeração** (config seção 4): varra `specs/**` e ache o maior bloco de centena usado; o novo
-projeto começa no próximo bloco livre; cada submódulo recebe o incremento da config (ex.: `+10`).
-`PLAN-` e `TASKS-` espelham o número da `SPEC-`.
+**Numeração** (config `numbering`): **não calcule à mão**. O primeiro submódulo de um projeto/módulo
+novo recebe `node scripts/sdd.mjs spec next-id --new-block`; cada submódulo seguinte,
+`node scripts/sdd.mjs spec next-id` (maior número usado + incremento). `PLAN-` e `TASKS-` espelham o
+número da `SPEC-`.
 
 **Ordenação por dependência** (a ordem de execução do Passo 5): contratos antes de telas;
 entidades-base antes das que as referenciam. Registre num grafo simples no `PLAN` de cada spec.
 
-Ao fim, produza o **manifesto de execução** `specs/_gerador/LEDGER-<slug-projeto>.md`
-(modelo: `LEDGER.example.md`) listando as specs na ordem correta e o estado de cada uma
-(`pendente`/`feita`). É o arquivo de retomada.
+Ao fim do Passo 3, **registre no estado**: `node scripts/sdd.mjs tasks sync` (cria os eventos de
+spec/plano/tarefa, idempotente, e valida o grafo — ciclo, dependência órfã e agente inexistente
+**param** aqui) e `node scripts/sdd.mjs state ledger` (gera `specs/_gerador/LEDGER-<slug>.md`). O
+LEDGER é **derivado** de `.sdd/events.jsonl`: nunca o edite à mão.
 
 ---
 
@@ -112,7 +114,13 @@ Para cada submódulo, a partir de `specs/_templates/`:
 
 Para **cada spec, na ordem do LEDGER**, execute as **camadas de implementação da config**,
 uma a uma, cada uma pelo agente declarado, **até o verde antes da próxima spec**.
-Equivale a `/implementar-spec`.
+Equivale a `/implementar-spec`. Escolha a próxima tarefa com `node scripts/sdd.mjs tasks ready`
+(respeita dependências) e registre o ciclo de vida de cada uma:
+
+- antes: `node scripts/sdd.mjs event TASK_STARTED --task <SPEC>/T-NNN --agent <agente>` (recusado se
+  houver dependência não concluída);
+- travou: `event TASK_BLOCKED --task ... --reason "<motivo>"`;
+- verde: `event TASK_COMPLETED --task ...`.
 
 **Escolha o conjunto de camadas conforme o que a spec toca e o estágio (config seção 1):**
 - **Frontend** (seção 5) — telas, estado, navegação.
@@ -139,13 +147,19 @@ Em cada camada, o agente aplica:
 Após cada spec:
 
 1. Rode o **comando de testes** e o **comando e2e** da config (seção 2). Tudo verde é obrigatório.
+   Registre o resultado: `event TEST_PASSED` ou `event TEST_FAILED` com `--spec <SPEC> --command "<cmd>"`.
 2. Rode `scripts/sdd-lint.mjs` (frontmatter íntegro: CAs numerados, status coerente; seções
    críticas da config preenchidas; portões de engenharia ativos reportados). Para cada **portão
    ativo** (config seção 11), rode o comando declarado e reporte — bloqueie se marcado como tal.
 3. Se vermelho: **pare nessa spec**, investigue, corrija. Não esconda com flags.
 4. Emita um **feedback por spec**: nº de testes, arquivos criados, CAs cobertos, greps de
    ausência (= 0), e o que vem a seguir.
-5. Ao fechar a spec: `status: implementada`, tarefas `[x]`, atualize o `LEDGER-<slug>.md`.
+5. **Guardião:** `event GUARDIAN_STARTED --spec <SPEC>`; o `@agente-spec-guardian` devolve o
+   relatório; então `event GUARDIAN_APPROVED --spec <SPEC> --evidence <relatório>` ou
+   `event GUARDIAN_REJECTED --spec <SPEC> --reason "<o que falta>"` (volta ao Passo 5).
+6. Ao fechar a spec: `event SPEC_IMPLEMENTED --spec <SPEC>` — **recusado** sem aprovação do
+   guardião, com tarefa aberta, teste falhando ou gate bloqueado. Só então `status: implementada` no
+   frontmatter, `sdd tasks sync` (checkboxes a partir do estado) e `sdd state ledger`.
 
 ---
 
@@ -195,5 +209,7 @@ destrutivos (`rm`, `git push`) ficam fora do allowlist de propósito.
 
 ## Retomada
 
-Se interrompido, releia `LEDGER-<slug>.md`: continue da primeira spec `pendente`. Specs
-`feita` não são refeitas.
+Se interrompido, rode `node scripts/sdd.mjs state resume`: mostra sessões sem fechamento, specs
+ativas, tarefas em andamento/bloqueadas (com motivo) e as próximas prontas — reconstruído
+deterministicamente de `.sdd/events.jsonl`, sem depender de reler prosa. Specs `implemented` não são
+refeitas. Projeto v2 com `LEDGER` escrito à mão: `sdd state import-ledger <arquivo>` uma vez.

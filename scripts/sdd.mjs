@@ -10,9 +10,15 @@
 import { ENGINE_VERSION } from './lib/engine.mjs';
 import { parseArgs, fail, UsageError } from './lib/cli.mjs';
 import { configCommand } from './commands/config.mjs';
+import { eventCommand, stateCommand } from './commands/state.mjs';
+import { tasksCommand, specCommand } from './commands/tasks.mjs';
 
 const COMMANDS = {
   config: configCommand,
+  event: eventCommand,
+  state: stateCommand,
+  tasks: tasksCommand,
+  spec: specCommand,
   version: async (args) => {
     if (args.flags.json) console.log(JSON.stringify({ engine: ENGINE_VERSION }));
     else console.log(`sdd-kit ${ENGINE_VERSION}`);
@@ -29,6 +35,14 @@ Comandos:
   config migrate [--force] [--keep-md]  sdd.config.md (v2) → sdd.config.yaml (v3)
   config render [--check]           gera a visão sdd.config.md a partir do YAML
   config show [--json]              imprime a config normalizada
+  event <TIPO> [--spec S] [--task T] [--agent A] [--reason R] [--evidence E] [--key K]
+                                    registra um evento validado em .sdd/events.jsonl
+  state show|resume|rebuild|verify|repair   estado derivado do log; retomada de sessão
+  state ledger [--check]            gera o LEDGER-<slug>.md a partir do estado
+  state import-ledger <arquivo>     importa um LEDGER v2 escrito à mão
+  tasks list|ready|show <id>|graph  grafo de tarefas (DAG) validado
+  tasks sync [--dry-run]            registra specs/tarefas no estado e reescreve checkboxes
+  spec next-id [--new-block]        próximo ID de spec pela config (numbering)
   version [--json]                  versão do motor
 
 Opções globais: --root <dir> (padrão: diretório atual), --json`;
