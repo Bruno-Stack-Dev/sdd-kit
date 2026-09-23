@@ -44,7 +44,7 @@ Versões e ressalvas verificadas em [`docs/references/integrations-snapshot.md`]
 | Playwright MCP | perfil MCP `e2e` | Apache-2.0 |
 | MCP Inspector | captura de schema de ferramentas para o lock de MCP | MIT |
 | Repomix | `sdd export-context --repomix` | MIT |
-| Arize Phoenix | backend opcional de traces (OTLP) | Elastic License 2.0 |
+| Arize Phoenix | backend opcional de traces (`sdd trace export --otlp`) | Elastic License 2.0 (verificado) |
 | IBM ContextForge | perfil MCP `enterprise` (gateway) | Apache-2.0 |
 
 ## GitHub Actions (CI do kit)

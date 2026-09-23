@@ -4,7 +4,10 @@
  *
  *   node scripts/hooks/sdd-hook.mjs <evento>     (JSON do Claude Code em stdin)
  *
- * Eventos: pre-tool-use · post-tool-use · session-start · session-end · stop · subagent-stop
+ * Eventos: pre-tool-use · post-tool-use · session-start · session-end · stop · subagent-start · subagent-stop
+ *
+ * Trace local (fail-open) em .sdd/trace/<sessão>.jsonl: policy.decision, tool.completed, file.modified,
+ * session.started/finished, agent.spawned/stopped — sem conteúdo, com segredos redigidos.
  *
  * Princípios:
  *  - PreToolUse aplica policies/sdd-policy.json (+ endurecimento da config). Só responde deny/ask;
@@ -47,9 +50,34 @@ async function lazy(mod) {
   return import(new URL(mod, import.meta.url).href);
 }
 
+/** Trace local ligado? Só em projeto SDD e se a config não desligou (observability.trace: false). */
+function tracing(root, config) {
+  return isSddProject(root) && config?.observability?.trace !== false;
+}
+
+/** Grava um evento de trace; fail-open (nunca lança). */
+async function trace(root, config, input, name, attrs = {}, status = 'ok') {
+  try {
+    if (!tracing(root, config)) return;
+    const { traceEvent } = await lazy('../lib/trace.mjs');
+    traceEvent(root, { session: input.session_id, name, attrs: { 'sdd.agent': input.agent_type, ...attrs }, status });
+  } catch { /* observabilidade é fail-open */ }
+}
+
+/** Tarefa em andamento correlacionada à chamada: a do agente, ou a única em andamento. */
+async function currentTask(root, agent) {
+  try {
+    if (!existsSync(join(root, '.sdd', 'events.jsonl'))) return {};
+    const { computeState } = await lazy('../lib/events.mjs');
+    const { state } = computeState(root);
+    const open = Object.entries(state.tasks).filter(([, t]) => t.status === 'in_progress' && (!agent || t.agent === agent));
+    return open.length === 1 ? { 'sdd.task': open[0][0], 'sdd.spec': open[0][1].spec } : {};
+  } catch { return {}; }
+}
+
 // ------------------------------------------------------------------------------------------------
 
-function preToolUse(input) {
+async function preToolUse(input) {
   // Costura de teste: simula falha interna do policy engine para provar o fail-closed.
   if (process.env.SDD_HOOK_TEST_THROW === '1') throw new Error('falha simulada');
   const root = projectRoot(input);
@@ -58,6 +86,8 @@ function preToolUse(input) {
   const eff = effectivePolicy(loadPolicy(), config);
   const r = evaluateToolCall(input, { root, eff });
   if (r.decision === 'allow') return;
+  const { summarizeToolInput } = await lazy('../lib/trace.mjs');
+  await trace(root, config, input, 'policy.decision', { 'tool.name': input.tool_name, 'policy.decision': r.decision, 'policy.rule': r.rule, ...summarizeToolInput(input.tool_name, input.tool_input) }, r.decision === 'deny' ? 'error' : 'ok');
   out({
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
@@ -69,6 +99,17 @@ function preToolUse(input) {
 
 async function postToolUse(input) {
   const root = projectRoot(input);
+  if (isSddProject(root)) {
+    let config = null;
+    try { config = loadConfig(root).config; } catch { /* trace segue com o default */ }
+    if (tracing(root, config)) {
+      const { summarizeToolInput } = await lazy('../lib/trace.mjs');
+      const failed = input.tool_response && typeof input.tool_response === 'object' && (input.tool_response.is_error || input.tool_response.error);
+      const attrs = { 'tool.name': input.tool_name, ...summarizeToolInput(input.tool_name, input.tool_input), ...(await currentTask(root, input.agent_type)) };
+      await trace(root, config, input, ['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(input.tool_name) ? 'file.modified' : 'tool.completed', attrs, failed ? 'error' : 'ok');
+    }
+  }
+  if (!['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(input.tool_name ?? 'Write')) return;
   const file = input.tool_input?.file_path ?? input.tool_input?.notebook_path;
   if (!file || !isSddProject(root)) return;
   const rel = relToRoot(root, file);
@@ -117,6 +158,7 @@ async function sessionStart(input) {
     if (input.session_id) writeFileSync(join(root, '.sdd', 'cache', 'session.json'), JSON.stringify({ id: input.session_id, source: input.source ?? null, started: new Date().toISOString() }));
   } catch { /* cache é opcional */ }
   const cfg = loadConfig(root);
+  await trace(root, cfg.config, input, 'session.started', { 'session.source': input.source ?? 'startup' });
   if (cfg.source === 'none') lines.push('Sem sdd.config.yaml: rode /sdd-init antes de gerar specs ou código.');
   else if (cfg.errors.length) lines.push(`Config INVÁLIDA (${cfg.errors.length} erro[s]): rode \`${cliCommand(root)} config validate\` e corrija antes de implementar.`);
   else if (cfg.source === 'md-legacy') lines.push(`Config ainda no formato v2 (sdd.config.md): sugira \`${cliCommand(root)} config migrate\`.`);
@@ -160,10 +202,22 @@ async function stop(input) {
   if (issues.length) out({ decision: 'block', reason: `SDD — reconciliação de fim de turno:\n- ${issues.join('\n- ')}` });
 }
 
+async function subagentStart(input) {
+  const root = projectRoot(input);
+  let config = null;
+  try { config = loadConfig(root).config; } catch { /* default */ }
+  await trace(root, config, input, 'agent.spawned', { ...(await currentTask(root, input.agent_type)) });
+}
+
 async function subagentStop(input) {
-  if (input.stop_hook_active) return;
   const root = projectRoot(input);
   const agent = input.agent_type;
+  if (!input.stop_hook_active) {
+    let config = null;
+    try { config = loadConfig(root).config; } catch { /* default */ }
+    await trace(root, config, input, 'agent.stopped', {});
+  }
+  if (input.stop_hook_active) return;
   if (!agent || !existsSync(join(root, '.sdd', 'events.jsonl'))) return;
   const { computeState } = await lazy('../lib/events.mjs');
   const { state } = computeState(root);
@@ -182,6 +236,9 @@ async function subagentStop(input) {
 
 async function sessionEnd(input) {
   const root = projectRoot(input);
+  let config = null;
+  try { config = loadConfig(root).config; } catch { /* default */ }
+  await trace(root, config, input, 'session.finished', { 'session.reason': input.reason });
   if (!input.session_id || !existsSync(join(root, '.sdd', 'events.jsonl'))) return;
   const { appendEvent } = await lazy('../lib/events.mjs');
   appendEvent(root, { type: 'SESSION_FINISHED', session: input.session_id, key: `session-finished:${input.session_id}` });
@@ -195,6 +252,7 @@ const HANDLERS = {
   'session-start': sessionStart,
   'session-end': sessionEnd,
   stop,
+  'subagent-start': subagentStart,
   'subagent-stop': subagentStop,
 };
 

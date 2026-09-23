@@ -615,7 +615,7 @@ export function renderConfigMd(cfg, { source = 'sdd.config.yaml' } = {}) {
     }
   } else L.push('n/a — sem design system (ative o pack `ds` e preencha `design_system` se houver).', '');
 
-  const extKeys = ['security', 'agents', 'integrations', 'ai', 'legacy'];
+  const extKeys = ['security', 'agents', 'integrations', 'observability', 'ai', 'legacy'];
   for (const k of extKeys) if (cfg[k] !== undefined) ext[k] = cfg[k];
   if (Object.keys(ext).length) {
     L.push('## 13. Extensões v3', '');

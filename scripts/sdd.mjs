@@ -21,6 +21,7 @@ import { mcpCommand } from './commands/mcp.mjs';
 import { scanCommand } from './commands/scan.mjs';
 import { projectCommand } from './commands/project.mjs';
 import { evalCommand } from './commands/eval.mjs';
+import { traceCommand } from './commands/trace.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -40,6 +41,7 @@ const COMMANDS = {
   scan: scanCommand,
   project: projectCommand,
   eval: evalCommand,
+  trace: traceCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -81,6 +83,8 @@ Comandos:
   scan agents [--consent] [--target p]  Snyk Agent Scan opcional (NOT_RUN sem consentimento/token)
   project classify [--json]         projeto novo × existente, com evidência
   eval run [--suite deterministic|model] [--update-baseline]   evals (fixtures; modelo opcional)
+  trace show [--session|--spec|--task|--agent|--trace]   linha do tempo (trace local + eventos)
+  trace export --otlp <url>         exporta para um backend OTLP (ex.: Phoenix), fail-open
   eval export-promptfoo             gera os testes do Promptfoo a partir das evals das skills/agentes
   init [--mode plugin|copy] [--force]  instala o kit no projeto (plugin: só estado do projeto)
   upgrade [--dry-run]               atualiza o motor copiado (modo cópia), com backup
