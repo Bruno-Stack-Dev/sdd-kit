@@ -12,6 +12,9 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 ## [Não lançado]
 
 ### Corrigido
+- `sdd scan agents`: erro de execução do scanner sem achados (ex.: cota diária da versão pública do
+  Agent-Scan, autenticação) passa a ser `NOT_RUN` com o motivo, não `FAIL`; `FAIL` fica para achados
+  reais. O doctor mostra o motivo.
 - `sdd scan agents`: o agent-scan 0.6.4 em modo `--ci` exige `--dangerously-run-mcp-servers`; o kit
   passa a pedir uma segunda confirmação (`--run-mcp-servers`), separada do `--consent` do envio à Snyk,
   e o workflow manual a usa (runner descartável). Sem ela, `NOT_RUN`.

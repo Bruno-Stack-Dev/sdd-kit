@@ -27,8 +27,12 @@ configurações MCP e skills. No kit ele é **opcional** e nunca roda sozinho.
    ```
 
 3. Versão fixada (`snyk-agent-scan@0.6.4`); atualizar é mudança revisada.
-4. O kit guarda a saída **crua** em `.sdd/reports/agent-scan-*.json` e usa só o exit code do modo
-   `--ci` (o formato JSON muda entre versões — nenhum CI do kit depende de campos dele).
+4. O kit guarda a saída **crua** em `.sdd/reports/agent-scan-*.json`. Resultado: exit 0 do modo
+   `--ci` = `PASS`; achados = `FAIL`; erro de execução **sem nenhum achado** (cota diária da versão
+   pública, autenticação, rede) = `NOT_RUN`, com o motivo — não houve análise. Erros e achados são
+   lidos do JSON sem depender do schema exato (ele muda entre versões); saída ilegível conta como
+   `FAIL`. Na falha ou no `NOT_RUN`, um resumo com segredos redigidos sai no log (no CI o relatório
+   some com o runner).
 5. Resultado é **best-effort**: "sem achados" não prova segurança. Achado = revisar o servidor/skill,
    não "suprimir".
 

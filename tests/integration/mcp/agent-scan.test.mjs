@@ -132,3 +132,31 @@ test('falha com stderr só de instalação do uvx: o diagnóstico traz o resulta
     assert.doesNotMatch(r.out, /Downloading pydantic-core/, 'ruído de instalação do uv é filtrado');
   } finally { cleanup(bin); cleanup(dir); }
 });
+
+test('erro de execução sem achados (cota, autenticação) vira NOT_RUN, não FAIL; o doctor mostra o motivo', async () => {
+  const json = JSON.stringify({ scan_path_responses: [{ path: '/x', error: { message: 'Daily usage limit reached for the public version of Agent-Scan.' } }] });
+  const files = win
+    ? { 'out.json': json, 'uvx.cmd': `@echo off\r\ntype "%~dp0out.json"\r\nexit /b 1\r\n` }
+    : { 'out.json': json, uvx: `#!/bin/sh\ncat "$(dirname "$0")/out.json"\nexit 1\n` };
+  const bin = tempProject(files);
+  const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
+  try {
+    if (!win) await runChmod(join(bin, 'uvx'));
+    const r = runSdd(['scan', 'agents', '--consent', '--run-mcp-servers', '--root', dir], { env: env(bin, true) });
+    assert.equal(r.status, 0, 'NOT_RUN não reprova');
+    assert.match(r.out, /NOT_RUN — o scanner não conseguiu analisar: Daily usage limit reached/);
+    const d = JSON.parse(runSdd(['doctor', '--mcp', '--json', '--root', dir]).stdout);
+    const c = d.checks.find((x) => x.id === 'scanner.agent-scan');
+    assert.equal(c.status, 'not_run');
+    assert.match(c.details.join(' '), /Daily usage limit/);
+  } finally { cleanup(bin); cleanup(dir); }
+});
+
+test('classifyScan: exit 0 = PASS; achados = FAIL (mesmo com erro junto); só erro = NOT_RUN; saída ilegível = FAIL', async () => {
+  const { classifyScan } = await import('../../../scripts/commands/scan.mjs');
+  assert.equal(classifyScan(0, '').status, 'pass');
+  assert.equal(classifyScan(1, JSON.stringify({ issues: [{ code: 'E001', message: 'x' }] })).status, 'fail');
+  assert.equal(classifyScan(1, JSON.stringify({ error: 'rede', servers: [{ issues: [{ code: 'W1', message: 'y' }] }] })).status, 'fail');
+  assert.equal(classifyScan(1, JSON.stringify({ error: { message: 'unauthorized' } })).status, 'not_run');
+  assert.equal(classifyScan(2, 'Traceback: algo quebrou').status, 'fail');
+});
