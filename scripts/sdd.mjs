@@ -18,6 +18,7 @@ import { initCommand, upgradeCommand, versionCommand } from './commands/init.mjs
 import { skillsCommand, packCommand } from './commands/skills.mjs';
 import { lspCommand } from './commands/lsp.mjs';
 import { mcpCommand } from './commands/mcp.mjs';
+import { scanCommand } from './commands/scan.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -34,6 +35,7 @@ const COMMANDS = {
   pack: packCommand,
   lsp: lspCommand,
   mcp: mcpCommand,
+  scan: scanCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -72,6 +74,7 @@ Comandos:
   lsp detect [--json]               linguagens, language servers e plugins LSP recomendados
   mcp profiles | apply <perfil> | check | pin <servidor> [--consent|--from-file f]
                                     MCP só da allowlist, drift e pin de schema das ferramentas
+  scan agents [--consent] [--target p]  Snyk Agent Scan opcional (NOT_RUN sem consentimento/token)
   init [--mode plugin|copy] [--force]  instala o kit no projeto (plugin: só estado do projeto)
   upgrade [--dry-run]               atualiza o motor copiado (modo cópia), com backup
   version [--json]                  versões do motor, schemas e do projeto

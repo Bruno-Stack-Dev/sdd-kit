@@ -192,3 +192,15 @@ export async function checkSupplyChain(report, p) {
   }
   report.fromIssues(G, 'supply.project', `${ext.length} skill(s) externa(s) do projeto com proveniência registrada`, errors, warnings);
 }
+
+/** Snyk Agent Scan: opcional, com consentimento. Mostra o último resultado salvo ou NOT_RUN. */
+export async function checkAgentScan(report, p) {
+  const G = 'Scanners';
+  const { lastAgentScan } = await import('../../commands/scan.mjs');
+  const last = lastAgentScan(p.root);
+  if (!last) {
+    report.notRun(G, 'scanner.agent-scan', 'Snyk Agent Scan nunca executado neste projeto (opcional; exige consentimento e SNYK_TOKEN)', ['`sdd scan agents --consent` num container descartável — ver docs/security/agent-scan.md']);
+    return;
+  }
+  report.add(G, 'scanner.agent-scan', last.status === 'pass' ? 'pass' : 'fail', `Snyk Agent Scan ${last.status.toUpperCase()} em ${last.ran_at} (${last.file})`);
+}

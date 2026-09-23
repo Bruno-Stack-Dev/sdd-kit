@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { Report } from './report.mjs';
 import { loadProject } from '../project.mjs';
 import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns, checkCodeIntelligence } from './project.mjs';
-import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain } from './agents-skills.mjs';
+import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain, checkAgentScan } from './agents-skills.mjs';
 import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
 import { checkMcp } from './mcp.mjs';
 import { checkEngine, isEngineRepo } from './engine.mjs';
@@ -22,8 +22,8 @@ const PLAN = {
   project: ['config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'lsp'],
   security: ['install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
   skills: ['skills', 'supply', 'commands', 'agents', 'scanner'],
-  mcp: ['mcp'],
-  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'lsp', 'agents', 'skills', 'supply', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp'],
+  mcp: ['mcp', 'agentscan'],
+  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'lsp', 'agents', 'skills', 'supply', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp', 'agentscan'],
 };
 
 export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
@@ -54,6 +54,7 @@ export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     policy: () => checkPolicyFile(report, p),
     secrets: () => checkSecrets(report, p),
     mcp: () => checkMcp(report, p),
+    agentscan: () => checkAgentScan(report, p),
   };
   for (const s of PLAN[mode]) {
     try { await steps[s](); } catch (e) {
