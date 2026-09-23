@@ -67,6 +67,14 @@
 | Repomix | npm `repomix` 1.18.1 | MIT | `npx repomix@1.18.1 -o out.md --style markdown` | respeita `.gitignore`; Secretlint ligado por padrão |
 | ContextForge | PyPI `mcp-contextforge-gateway` 1.0.10 | Apache-2.0 | `mcpgateway` (porta 4444) / Docker / Helm | gateway com banco (SQLite/Postgres/Redis): custo operacional real |
 
+### Usados só nos workflows (consultados no registro em 2026-09-23)
+
+| Ferramenta | Versão fixada | Onde |
+|------------|---------------|------|
+| `@anthropic-ai/claude-agent-sdk` (npm) | 0.3.280 | `evals.yml`, instalado com `--no-save --ignore-scripts` só no job de evals |
+| `pytest` (PyPI) | 9.1.1 | `ci.yml`, testes do pack `uiux` |
+| `uv` (PyPI) | 0.12.18 | `agent-scan.yml`, para o `uvx snyk-agent-scan` |
+
 ## Outros clientes (adapters)
 
 - **Codex CLI**: skills em `.agents/skills/` (repo) e `~/.agents/skills`; instruções em `AGENTS.md`
