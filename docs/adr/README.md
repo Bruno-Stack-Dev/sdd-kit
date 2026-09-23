@@ -21,3 +21,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0008](ADR-0008-supply-chain-de-skills.md) | Proveniência e integridade de skills por lockfile | aceito |
 | [0009](ADR-0009-agentes-minimo-privilegio.md) | Agentes de mínimo privilégio, auditores somente leitura | aceito |
 | [0010](ADR-0010-governanca-de-mcp.md) | MCP por allowlist, perfis e lock de schema | aceito |
+| [0011](ADR-0011-evals-deterministicas-e-com-modelo.md) | Evals determinísticas em todo PR; com modelo fora do caminho crítico | aceito |

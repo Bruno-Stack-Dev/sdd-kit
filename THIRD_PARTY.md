@@ -39,6 +39,7 @@ Versões e ressalvas verificadas em [`docs/references/integrations-snapshot.md`]
 | Cisco AI Defense skill-scanner | `sdd skills scan --external` | Apache-2.0 |
 | Snyk Agent Scan | scan de MCP/skills em sandbox, com consentimento | Apache-2.0 |
 | Promptfoo | evals comportamentais (workflow manual/noturno) | MIT |
+| `@anthropic-ai/claude-agent-sdk` | provider do Promptfoo nas evals com modelo — instalado só no job de evals | proprietária (termos da Anthropic) |
 | Context7 MCP | perfil MCP `minimal` | MIT |
 | Playwright MCP | perfil MCP `e2e` | Apache-2.0 |
 | MCP Inspector | captura de schema de ferramentas para o lock de MCP | MIT |

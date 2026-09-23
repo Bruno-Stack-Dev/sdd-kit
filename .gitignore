@@ -17,3 +17,6 @@ graphify-out/
 # config e estado de PROJETO — o repositório do kit não tem (são gerados nos projetos consumidores)
 sdd.config.yaml
 .sdd/
+
+# resultados locais de evals (o baseline em evals/baseline/ é versionado)
+evals/results/

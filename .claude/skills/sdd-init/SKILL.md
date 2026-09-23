@@ -33,9 +33,10 @@ Rode sempre a partir da raiz do projeto. O mesmo comando aparece no contexto da 
 
 ## Passo B — Novo × existente
 
-Classifique pela evidência (código de aplicação, manifestos com dependências, lockfiles, CI, testes,
-histórico git) e **confirme com o usuário** mostrando 2–3 evidências. Se `$ARGUMENTS` disser
-`novo` ou `existente`, use como sugestão, mas ainda confirme.
+Rode `sdd project classify` — classificação determinística por evidência (código de aplicação,
+dependências, lockfiles, testes, CI, histórico git) — e **confirme com o usuário** mostrando as
+evidências. Confiança baixa → pergunte antes de seguir. Se `$ARGUMENTS` disser `novo` ou
+`existente`, use como sugestão, mas ainda confirme.
 
 Registre: `sdd event DISCOVERY_STARTED --mode <greenfield|brownfield>` (se `.sdd/events.jsonl` existir).
 
