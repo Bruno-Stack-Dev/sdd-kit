@@ -17,7 +17,7 @@ export async function doctorCommand({ flags, root }) {
   const chosen = MODES.filter((m) => flags[m]);
   if (chosen.length > 1) throw new UsageError(`escolha um modo só (recebido: ${chosen.join(', ')})`);
   const mode = chosen[0] ?? 'full';
-  const report = runDoctor(root, { mode, ownedPredicate: kitOwnedPredicate(root) });
+  const report = await runDoctor(root, { mode, ownedPredicate: kitOwnedPredicate(root) });
   const strict = !!flags.strict;
   if (flags.json) console.log(JSON.stringify(report.toJSON(strict), null, 2));
   else console.log(report.format({ verbose: !!flags.verbose, strict }));

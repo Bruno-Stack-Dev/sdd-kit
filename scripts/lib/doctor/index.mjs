@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { Report } from './report.mjs';
 import { loadProject } from '../project.mjs';
 import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns } from './project.mjs';
-import { checkAgents, checkSkills, checkSkillScanner, checkCommands } from './agents-skills.mjs';
+import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain } from './agents-skills.mjs';
 import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
 import { checkMcp } from './mcp.mjs';
 import { checkEngine, isEngineRepo } from './engine.mjs';
@@ -21,12 +21,12 @@ const PLAN = {
   fast: ['lint', 'config', 'specs', 'tasks', 'state', 'agents'],
   project: ['config', 'specs', 'tasks', 'adrs', 'state', 'forbidden'],
   security: ['install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
-  skills: ['skills', 'commands', 'agents', 'scanner'],
+  skills: ['skills', 'supply', 'commands', 'agents', 'scanner'],
   mcp: ['mcp'],
-  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'agents', 'skills', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp'],
+  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'agents', 'skills', 'supply', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp'],
 };
 
-export function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
+export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
   if (!MODES.includes(mode)) throw new Error(`modo desconhecido '${mode}'`);
   const report = new Report(mode);
   const p = loadProject(root);
@@ -44,6 +44,7 @@ export function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     agents: () => checkAgents(report, p),
     skills: () => checkSkills(report, p, { ownedPredicate }),
     commands: () => checkCommands(report, p),
+    supply: () => checkSupplyChain(report, p),
     scanner: () => checkSkillScanner(report, p),
     install: () => (engine ? null : checkInstall(report, p)),
     permissions: () => checkPermissions(report, p),
@@ -54,7 +55,7 @@ export function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     mcp: () => checkMcp(report, p),
   };
   for (const s of PLAN[mode]) {
-    try { steps[s](); } catch (e) {
+    try { await steps[s](); } catch (e) {
       report.fail('Doctor', `internal.${s}`, `checagem '${s}' quebrou: ${e.message}`, [e.stack?.split('\n').slice(1, 3).join(' ')]);
     }
   }

@@ -63,10 +63,10 @@ tags: [discovery, entrevista, bootstrap, sdd, portavel]
 > `sdd.config.md` (seções 2, 3, 5). Decisões relevantes → ADRs.
 >
 > **Para decisões arquiteturais não triviais, use as skills `arch-*` em cadeia**, em vez de
-> improvisar. Elas vêm no pack `arch`, **inativo por padrão** em `.claude/skills/_packs/arch/`.
-> **Antes de usá-las, ative o pack**: copie `_packs/arch/` para `.claude/skills/` (a cópia leva
-> junto `_arch-templates/`, então as referências das skills continuam válidas; o allowlist do
-> `/sdd-init` cobre a cópia). Ativado, siga a cadeia: `arch-architecture-option-generator`
+> improvisar. Elas vêm no pack `arch`, **inativo por padrão**. **Antes de usá-las, ative o pack**
+> com `sdd pack activate arch` — a CLI confere hash e licença no `skills.lock.json`, copia as skills
+> e o `_arch-templates/` (as referências continuam válidas) e registra o evento. Ativado, siga a
+> cadeia: `arch-architecture-option-generator`
 > (gera opções) → `arch-quality-attribute-scenario-writer` (transforma "quero performance" em
 > cenários concretos) → `arch-tradeoff-analysis-writer` (compara) → `arch-adr-writer` (registra em
 > `specs/decisions/`). Para o corte monolito×serviços: `arch-monolith-vs-modular-monolith-reviewer`

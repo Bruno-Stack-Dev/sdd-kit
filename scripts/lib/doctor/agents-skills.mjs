@@ -168,3 +168,27 @@ export function checkSkillScanner(report) {
   }
   report.notRun(G, 'scanner.skill-scanner', `skill-scanner encontrado (${bin}) — rode \`node scripts/sdd.mjs skills scan\` para executar`);
 }
+
+/** Supply chain: skills.lock.json do motor (hashes, licença, confiança), packs ativos e externas. */
+export async function checkSupplyChain(report, p) {
+  const G = 'Supply chain de skills';
+  const { verifyEngineLock, activePacks, readLock, projectLockPath, hashDir } = await import('../supply.mjs');
+  const r = verifyEngineLock();
+  report.fromIssues(G, 'supply.lock', 'packs e skills núcleo batem com o skills.lock.json (hash, licença, confiança)', r.errors, r.warnings);
+  const active = activePacks(p.root);
+  const modified = active.flatMap((a) => a.modified.map((s) => `${a.pack}/${s}`));
+  if (active.length) report.add(G, 'supply.active', modified.length ? 'warn' : 'pass', modified.length ? `cópias ativas alteradas localmente: ${modified.join(', ')}` : `packs ativos íntegros: ${active.map((a) => `${a.pack} (${a.skills}/${a.total})`).join(', ')}`);
+  let lock = null;
+  try { lock = readLock(projectLockPath(p.root)); } catch (e) { report.fail(G, 'supply.project', e.message); return; }
+  const ext = Object.entries(lock?.external ?? {});
+  if (!ext.length) return;
+  const errors = [];
+  const warnings = [];
+  for (const [name, e] of ext) {
+    const dir = `${p.root}/${e.location}`;
+    try { if (hashDir(dir) !== e.hash) errors.push(`${name}: conteúdo difere do hash ingerido`); } catch { errors.push(`${name}: ${e.location} não existe`); }
+    if (e.trust === 'quarantine') warnings.push(`${name}: em quarentena (sem revisão humana)`);
+    if (e.trust === 'rejected') warnings.push(`${name}: rejeitada — não ative`);
+  }
+  report.fromIssues(G, 'supply.project', `${ext.length} skill(s) externa(s) do projeto com proveniência registrada`, errors, warnings);
+}

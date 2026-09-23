@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Bruno-Stack-Dev/sdd-kit/schemas/skills-lock.schema.json",
+  "title": "skills.lock.json — proveniência e integridade de skills (SDD Kit)",
+  "description": "Responde: de onde veio a skill, qual versão, sob qual licença, qual o hash, quando foi escaneada, qual o nível de confiança e quantas evals tem.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "packs", "skills"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "version": { "const": 1 },
+    "packs": { "type": "object", "additionalProperties": { "$ref": "#/$defs/pack" } },
+    "skills": { "type": "object", "additionalProperties": { "$ref": "#/$defs/skill" } },
+    "external": { "type": "object", "additionalProperties": { "$ref": "#/$defs/external" } }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "trust": { "enum": ["core", "vendored-reviewed", "reviewed", "quarantine", "rejected"] },
+    "risk": { "enum": ["low", "medium", "high"] },
+    "date": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "error": { "type": "integer" }, "warn": { "type": "integer" }, "info": { "type": "integer" } }
+    },
+    "scan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sdd_static": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": { "status": { "enum": ["pass", "fail", "not_run"] }, "date": { "$ref": "#/$defs/date" }, "findings": { "$ref": "#/$defs/counts" } }
+        },
+        "external": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "tool": { "type": "string" },
+            "version": { "type": ["string", "null"] },
+            "status": { "enum": ["pass", "fail", "not_run"] },
+            "date": { "$ref": "#/$defs/date" },
+            "findings": { "$ref": "#/$defs/counts" }
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "severity", "file"],
+      "properties": { "id": { "type": "string" }, "severity": { "enum": ["error", "warn", "info"] }, "file": { "type": "string" }, "line": { "type": "integer" } }
+    },
+    "pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "license", "trust", "hash", "skills"],
+      "properties": {
+        "name": { "type": "string" },
+        "source": { "type": ["string", "null"] },
+        "ref": { "type": ["string", "null"], "description": "Tag, versão ou commit de origem. null = desconhecido (vendorizado sem registro do commit)." },
+        "license": { "type": ["string", "null"] },
+        "license_notes": { "type": "string" },
+        "attribution": { "type": "string" },
+        "trust": { "$ref": "#/$defs/trust" },
+        "reviewed_at": { "$ref": "#/$defs/date" },
+        "review_notes": { "type": "string" },
+        "hash": { "$ref": "#/$defs/hash" },
+        "skills": { "type": "object", "additionalProperties": { "$ref": "#/$defs/hash" } },
+        "risk": { "$ref": "#/$defs/risk" },
+        "risk_notes": { "type": "string" },
+        "scan": { "$ref": "#/$defs/scan" },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+      }
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "license", "trust", "hash"],
+      "properties": {
+        "source": { "type": "string" },
+        "license": { "type": "string" },
+        "trust": { "$ref": "#/$defs/trust" },
+        "reviewed_at": { "$ref": "#/$defs/date" },
+        "hash": { "$ref": "#/$defs/hash" },
+        "risk": { "$ref": "#/$defs/risk" },
+        "scan": { "$ref": "#/$defs/scan" },
+        "evals": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "external": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "license", "trust", "hash", "location"],
+      "properties": {
+        "source": { "type": "string" },
+        "ref": { "type": ["string", "null"] },
+        "license": { "type": "string" },
+        "location": { "type": "string" },
+        "hash": { "$ref": "#/$defs/hash" },
+        "trust": { "$ref": "#/$defs/trust" },
+        "risk": { "$ref": "#/$defs/risk" },
+        "ingested_at": { "$ref": "#/$defs/date" },
+        "reviewed_at": { "$ref": "#/$defs/date" },
+        "scan": { "$ref": "#/$defs/scan" },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+        "evals": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

@@ -8,7 +8,8 @@ licença **MIT**.
 Adaptações feitas para integração ao SDD Kit:
 - Referências de config trocadas de `.ds-ops-config.yml` para `sdd.config.md` (seção 12).
 - `references:` das skills reapontadas para `../_knowledge-notes/`.
-- Ativação condicional via `/sdd-init` (config seção 12, `ativo`).
+- Ativação condicional: o pack fica inativo em `_packs/ds/` e é ativado com `sdd pack activate ds`
+  (v3; o antigo flag `ativo` da config seção 12 foi removido). Calibração em `design_system` da config.
 
 O conteúdo original das skills e knowledge-notes é preservado. A licença MIT original se aplica
 a esse material derivado.

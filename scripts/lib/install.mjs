@@ -25,6 +25,7 @@ export const ENGINE_OWNED = [
   '.claude/skills/_packs',
   'sdd.config.example.yaml',
   'sdd.config.example.md',
+  'skills.lock.json',
 ];
 
 // Esqueleto de specs/ do projeto (conteúdo do projeto, nunca sobrescrito).
