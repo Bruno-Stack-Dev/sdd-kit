@@ -1,7 +1,7 @@
 {
   "name": "sdd-kit",
   "displayName": "SDD Kit — Spec-Driven Development",
-  "version": "3.0.0-dev",
+  "version": "3.0.0",
   "description": "Control plane de engenharia de software por agentes: specs como fonte da verdade, config executável com schema, estado por eventos, políticas determinísticas (hooks), agentes de mínimo privilégio e doctor para CI.",
   "author": { "name": "Bruno Silveira / Atlan Global Group" },
   "homepage": "https://github.com/Bruno-Stack-Dev/sdd-kit",

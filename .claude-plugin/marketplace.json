@@ -12,35 +12,35 @@
       "name": "sdd-kit",
       "source": "./",
       "description": "Motor do SDD Kit (core): skills, agentes, hooks de política e CLI determinística.",
-      "version": "3.0.0-dev",
+      "version": "3.0.0",
       "category": "development"
     },
     {
       "name": "sdd-architecture",
       "source": "./.claude/skills/_packs/arch",
       "description": "Raciocínio de decisão arquitetural (opções, cenários de qualidade, trade-offs, riscos, views, ADR) integrado ao SDD Kit. Base: software-architecture-pack (MIT).",
-      "version": "3.0.0-dev",
+      "version": "3.0.0",
       "category": "development"
     },
     {
       "name": "sdd-design-system",
       "source": "./.claude/skills/_packs/ds",
       "description": "Operação de design system (tokens, drift, governança, acessibilidade por componente, adoção) calibrada pela config do SDD. Base: Design System Ops (MIT).",
-      "version": "3.0.0-dev",
+      "version": "3.0.0",
       "category": "development"
     },
     {
       "name": "sdd-uiux",
       "source": "./.claude/skills/_packs/uiux",
       "description": "Criação de UI com base consultável de estilos, paletas, tipografia e diretrizes de UX. Base: UI/UX Pro Max v2.11.0 (MIT, com partes Apache-2.0 e OFL-1.1 — ver THIRD_PARTY.md).",
-      "version": "3.0.0-dev",
+      "version": "3.0.0",
       "category": "development"
     },
     {
       "name": "sdd-ai",
       "source": "./.claude/skills/_packs/ai",
       "description": "Pack de IA do SDD Kit para produtos que usam LLM, agentes, RAG ou memória: discovery de IA, avaliação criteriosa de arquitetura, modelos, RAG/memória, saída estruturada, evals, segurança e governança — sem tabela de recomendação fixa, com documentação atual verificada e ADR. Conteúdo próprio do kit (MIT).",
-      "version": "3.0.0-dev",
+      "version": "3.0.0",
       "category": "development"
     }
   ]

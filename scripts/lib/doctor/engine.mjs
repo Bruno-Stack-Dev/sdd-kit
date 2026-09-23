@@ -62,6 +62,9 @@ export function checkPluginManifest(report, root) {
     if (manifest.version !== ENGINE_VERSION) issues.push(`pack ${pl.name}: plugin.json version ${manifest.version} ≠ ${ENGINE_VERSION}`);
     if (manifest.skills !== './') issues.push(`pack ${pl.name}: skills deve ser './' (as skills ficam no próprio diretório do pack)`);
   }
+  const pkg = read('package.json');
+  if (pkg && pkg.version !== ENGINE_VERSION) issues.push(`package.json version ${pkg.version} ≠ ENGINE_VERSION ${ENGINE_VERSION}`);
+  if (pkg && Object.keys({ ...(pkg.dependencies ?? {}), ...(pkg.optionalDependencies ?? {}), ...(pkg.peerDependencies ?? {}) }).length) issues.push('package.json declara dependências de runtime — o core é zero-dependência (CONTRIBUTING.md)');
   if (!hooks?.hooks?.PreToolUse) issues.push('hooks/hooks.json sem PreToolUse');
   else if (!JSON.stringify(hooks).includes('${CLAUDE_PLUGIN_ROOT}/scripts/hooks/sdd-hook.mjs')) issues.push('hooks/hooks.json deve chamar ${CLAUDE_PLUGIN_ROOT}/scripts/hooks/sdd-hook.mjs');
   report.fromIssues(G, 'engine.plugin', `plugin, marketplace e hooks do plugin coerentes (v${ENGINE_VERSION})`, issues);

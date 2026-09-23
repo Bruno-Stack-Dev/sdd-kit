@@ -1,7 +1,7 @@
 {
   "name": "sdd-architecture",
   "displayName": "SDD — Arquitetura",
-  "version": "3.0.0-dev",
+  "version": "3.0.0",
   "description": "Raciocínio de decisão arquitetural (opções, cenários de qualidade, trade-offs, riscos, views, ADR) integrado ao SDD Kit. Base: software-architecture-pack (MIT).",
   "author": {
     "name": "Bruno Silveira / Atlan Global Group (empacotamento); autores originais no ATTRIBUTION"

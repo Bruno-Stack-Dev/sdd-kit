@@ -1,7 +1,7 @@
 {
   "name": "sdd-design-system",
   "displayName": "SDD — Design System Ops",
-  "version": "3.0.0-dev",
+  "version": "3.0.0",
   "description": "Operação de design system (tokens, drift, governança, acessibilidade por componente, adoção) calibrada pela config do SDD. Base: Design System Ops (MIT).",
   "author": {
     "name": "Bruno Silveira / Atlan Global Group (empacotamento); autores originais no ATTRIBUTION"

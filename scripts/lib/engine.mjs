@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
  *  do projeto; no modo plugin é o diretório do plugin instalado. */
 export const ENGINE_ROOT = fileURLToPath(new URL('../../', import.meta.url));
 
-export const ENGINE_VERSION = '3.0.0-dev';
+export const ENGINE_VERSION = '3.0.0';
 
 /** Versão MAJOR do formato de sdd.config.yaml que este motor entende. */
 export const CONFIG_SCHEMA_VERSION = 3;

@@ -1,7 +1,7 @@
 {
   "name": "sdd-ai",
   "displayName": "SDD — Aplicações de IA",
-  "version": "3.0.0-dev",
+  "version": "3.0.0",
   "description": "Pack de IA do SDD Kit para produtos que usam LLM, agentes, RAG ou memória: discovery de IA, avaliação criteriosa de arquitetura, modelos, RAG/memória, saída estruturada, evals, segurança e governança — sem tabela de recomendação fixa, com documentação atual verificada e ADR. Conteúdo próprio do kit (MIT).",
   "author": {
     "name": "Bruno Silveira / Atlan Global Group"

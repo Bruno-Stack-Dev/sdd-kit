@@ -1,7 +1,7 @@
 {
   "name": "sdd-uiux",
   "displayName": "SDD — UI/UX",
-  "version": "3.0.0-dev",
+  "version": "3.0.0",
   "description": "Criação de UI com base consultável de estilos, paletas, tipografia e diretrizes de UX. Base: UI/UX Pro Max v2.11.0 (MIT, com partes Apache-2.0 e OFL-1.1 — ver THIRD_PARTY.md).",
   "author": {
     "name": "Bruno Silveira / Atlan Global Group (empacotamento); autores originais no ATTRIBUTION"
