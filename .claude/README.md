@@ -29,10 +29,20 @@ trabalho auditável e dentro das regras da config.
 > Crie um agente novo só se uma especialidade não existir. Nunca hardcode tecnologia ou regra
 > de projeto num agente — isso pertence ao `sdd.config.md`.
 
-## Comandos
+## Workflows (skills núcleo) e comandos
 
-`/sdd-init` (bootstrap) · `/sdd-status` (dashboard) · `/gerar-projeto` (motor) · `/nova-spec`
-· `/implementar-spec` · `/implementar-tarefa` · `/validar-e2e` · `/gerar-skills` (skills sob medida).
+Os oito workflows do kit são **Agent Skills** em `skills/<nome>/` — `SKILL.md` curto, detalhes em
+`references/`, evals em `evals/evals.json`:
+
+`/sdd-init` · `/sdd-status` · `/gerar-projeto` · `/gerar-skills` · `/nova-spec` · `/implementar-spec`
+· `/implementar-tarefa` · `/validar-e2e`
+
+- Os que têm efeito colateral usam `disable-model-invocation: true` (só o usuário dispara);
+  `/sdd-status` é somente leitura e pode ser acionado pelo modelo.
+- Cada skill chama a CLI do motor por `node "${CLAUDE_SKILL_DIR}/../../../scripts/sdd.mjs"`, que
+  funciona nos modos cópia e plugin.
+- `commands/` guarda **aliases** de compatibilidade v2 com o mesmo nome (a skill tem precedência no
+  Claude Code atual). Remoção prevista para a 4.0.0.
 
 ## Skills (`skills/`)
 

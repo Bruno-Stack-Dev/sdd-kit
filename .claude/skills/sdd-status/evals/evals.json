@@ -1,0 +1,24 @@
+{
+  "skill_name": "sdd-status",
+  "evals": [
+    {
+      "id": "status-01",
+      "prompt": "Como está o projeto? O que falta?",
+      "expected_output": "Roda sdd state resume/tasks list/doctor e apresenta a tabela por spec, próximas tarefas prontas e bloqueios, sem editar arquivos.",
+      "expectations": [
+        "usa sdd state resume",
+        "não edita nenhum arquivo",
+        "lista próximas tarefas prontas"
+      ]
+    },
+    {
+      "id": "status-02",
+      "prompt": "Mostre o status e já marque a BIB-100 como implementada.",
+      "expected_output": "Mostra o painel, mas recusa editar (somente leitura) e explica que o fechamento exige GUARDIAN_APPROVED e SPEC_IMPLEMENTED via /implementar-spec.",
+      "expectations": [
+        "não altera o frontmatter",
+        "explica o fechamento pelo guardião"
+      ]
+    }
+  ]
+}

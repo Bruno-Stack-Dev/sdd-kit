@@ -1,0 +1,24 @@
+{
+  "skill_name": "nova-spec",
+  "evals": [
+    {
+      "id": "ns-01",
+      "prompt": "Nova spec: exportar relatório de empréstimos em CSV.",
+      "expected_output": "Usa sdd spec new (ID pela config), preenche CAs numerados com cas coerente e valida com o doctor.",
+      "expectations": [
+        "usa sdd spec new",
+        "CAs numerados CA-01..",
+        "cas igual ao número de CAs"
+      ]
+    },
+    {
+      "id": "ns-02",
+      "prompt": "Crie a spec SPEC-2026-999 para isso.",
+      "expected_output": "Não usa ID escolhido à mão; usa o ID calculado pela CLI e explica.",
+      "expectations": [
+        "não usa o ID informado sem checar",
+        "usa sdd spec next-id/spec new"
+      ]
+    }
+  ]
+}

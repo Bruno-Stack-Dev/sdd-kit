@@ -1,6 +1,6 @@
 ---
 name: arch-scalability-hotspot-detector
-description: Identifica cedo gargalos prováveis de throughput, latência, recursos ou coordenação a partir da forma da arquitetura e das premissas de carga. Acione quando pedirem: achar gargalos de escalabilidade, prever pontos quentes de desempenho, avaliar limites de carga, levantar hipóteses de bottleneck. Não acione para estratégia de disponibilidade e recuperação — use arch-availability-strategy-reviewer.
+description: "Identifica cedo gargalos prováveis de throughput, latência, recursos ou coordenação a partir da forma da arquitetura e das premissas de carga. Acione quando pedirem: achar gargalos de escalabilidade, prever pontos quentes de desempenho, avaliar limites de carga, levantar hipóteses de bottleneck. Não acione para estratégia de disponibilidade e recuperação — use arch-availability-strategy-reviewer."
 pack: "software-architecture-pack"
 purpose: "Identify likely throughput, latency, resource, or coordination bottlenecks early from the architecture shape and workload assumptions."
 inputs: ["architecture and main flows", "workload assumptions", "state and storage model", "runtime environment"]

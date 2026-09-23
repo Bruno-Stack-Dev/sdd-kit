@@ -15,8 +15,14 @@
   ser subdiretório relativo do mesmo repo. Instalação: `/plugin marketplace add owner/repo` e
   `/plugin install <plugin>@<marketplace>`.
 - **Variáveis**: `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`, `${CLAUDE_PROJECT_DIR}` expandem
-  em hooks e configs MCP. Expansão dentro do Markdown de skills **não é documentada** — por isso o
-  kit informa o caminho do motor ao modelo via `SessionStart` (`additionalContext`).
+  em hooks e configs MCP. No **conteúdo do SKILL.md** o Claude Code substitui `${CLAUDE_SKILL_DIR}` e
+  `${CLAUDE_PROJECT_DIR}` (e, em skills de plugin, `${CLAUDE_PLUGIN_ROOT}`) — não nos arquivos de
+  `references/`. O kit usa `node "${CLAUDE_SKILL_DIR}/../../../scripts/sdd.mjs"`, que resolve a CLI do
+  motor nos modos cópia e plugin; o `SessionStart` também informa o comando.
+- **Comandos × skills**: comandos de `.claude/commands/` e skills foram unificados; com o mesmo nome,
+  **a skill tem precedência**. Skills de plugin: `/plugin:nome`, e o `/nome` curto funciona se não
+  houver outro comando com o mesmo nome. `disable-model-invocation: true` = só o usuário invoca;
+  `user-invocable: false` = só o modelo invoca.
 - **Hooks**: `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`,
   `PostToolUseFailure`, `PermissionRequest`, `Stop`, `SubagentStart`, `SubagentStop`, entre outros.
   `PreToolUse` recebe `tool_name`, `tool_input`, `cwd`, `session_id`, `permission_mode` e, quando a

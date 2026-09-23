@@ -18,6 +18,27 @@ function frontmatterBlock(text) {
   return m ? m[1] : null;
 }
 
+/**
+ * Valores que o parser do kit tolera mas um parser YAML padrão rejeita — escalar simples com ': '
+ * ou ' #' no meio (ex.: `description: Faça X: depois Y`). O Claude Code descarta um frontmatter assim
+ * e a skill/comando/agente perde nome e descrição. Devolve as chaves problemáticas.
+ */
+export function strictYamlIssues(block) {
+  const issues = [];
+  for (const line of String(block ?? '').split(/\r?\n/)) {
+    const kv = line.match(/^([A-Za-z0-9_-]+):[ \t]+(.+)$/);
+    if (!kv) continue;
+    const v = kv[2].trim();
+    if (/^["'[{|>]/.test(v)) continue;
+    if (v.includes(': ') || / #/.test(v)) issues.push(kv[1]);
+  }
+  return issues;
+}
+
+export function frontmatterOf(text) {
+  return frontmatterBlock(text);
+}
+
 /** Diretórios de skill: `.claude/skills/<nome>/` (ativas) e `_packs/<pack>/<nome>/` (inativas). */
 export function listSkillDirs(root) {
   const base = join(root, '.claude', 'skills');
@@ -55,6 +76,9 @@ export function validateSkill(dir, { owned = false, root = dir } = {}) {
   const text = readFileSync(file, 'utf8');
   const block = frontmatterBlock(text);
   if (!block) { res.errors.push('sem frontmatter YAML'); return res; }
+  for (const k of strictYamlIssues(block)) {
+    res.errors.push(`'${k}' tem ': ' ou ' #' sem aspas — YAML inválido para parsers padrão (o Claude Code ignoraria o frontmatter); ponha o valor entre aspas`);
+  }
   let fm;
   try { fm = parseYaml(block); } catch (e) { res.errors.push(`frontmatter fora do subconjunto YAML suportado: ${e.message}`); return res; }
   if (!fm || typeof fm !== 'object' || Array.isArray(fm)) { res.errors.push('frontmatter não é um mapa'); return res; }

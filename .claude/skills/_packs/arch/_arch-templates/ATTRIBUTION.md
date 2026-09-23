@@ -9,6 +9,8 @@ Adaptações feitas para integração ao SDD Kit:
 - Skills de view (runtime/deployment) marcadas como complemento do C4 de `ARQUITETURA.md`.
 - Skills de camadas/fronteiras ligadas ao `@agente-arquiteto-guardian`.
 - Cadeia de opções→tradeoff→ADR acionada pelo Bloco 3 do `DISCOVERY.md`.
+- SDD Kit v3: `description` passou a ficar entre aspas (o texto continha `: ` e era YAML inválido
+  para parsers padrão, o que fazia o Claude Code ignorar o frontmatter). Texto inalterado.
 
 O conteúdo original das skills e templates é preservado. A licença MIT original se aplica a
 esse material derivado.

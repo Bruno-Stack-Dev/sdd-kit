@@ -2,7 +2,7 @@
 // (ferramentas válidas, mínimo privilégio, auditores sem escrita).
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { listSkillDirs, validateSkill } from '../skills.mjs';
+import { listSkillDirs, validateSkill, hasEvals, strictYamlIssues, frontmatterOf } from '../skills.mjs';
 import { parseYaml } from '../yaml.mjs';
 import { findOnPath } from '../files.mjs';
 
@@ -45,6 +45,7 @@ export function validateAgent(a, { skillNames }) {
   const warnings = [];
   if (a.parseError) return { errors: [`frontmatter inválido: ${a.parseError}`], warnings };
   if (!a.fm) return { errors: ['sem frontmatter'], warnings };
+  for (const k of strictYamlIssues(frontmatterOf(a.body))) errors.push(`'${k}' com ': ' sem aspas — YAML inválido para parsers padrão`);
   if (a.fm.name !== a.base) errors.push(`'name' (${a.fm.name}) difere do arquivo`);
   if (!a.fm.description) errors.push("falta 'description'");
   const tools = toolList(a.fm.tools);
@@ -100,8 +101,10 @@ export function checkSkills(report, p, { ownedPredicate = () => false } = {}) {
   const warnings = [];
   let ext = 0;
   for (const d of dirs) {
-    const v = validateSkill(d.dir, { owned: ownedPredicate(d), root: p.root });
+    const owned = ownedPredicate(d) || isCoreSkill(d.dir);
+    const v = validateSkill(d.dir, { owned, root: p.root });
     const where = d.pack ? `_packs/${d.pack}/${d.name}` : d.name;
+    if (owned && !hasEvals(d.dir)) errors.push({ path: where, message: 'skill núcleo sem evals/evals.json' });
     for (const e of v.errors) errors.push({ path: where, message: e });
     for (const w of v.warnings) warnings.push({ path: where, message: w });
     if (v.info.length) ext++;
@@ -129,6 +132,30 @@ export function checkSkills(report, p, { ownedPredicate = () => false } = {}) {
     }
     report.fromIssues(G, 'skills.attribution', 'packs vendorizados com ATTRIBUTION e LICENSE', missing);
   }
+}
+
+/** Skill núcleo do kit: `metadata.sdd-core: "true"` no SKILL.md. */
+export function isCoreSkill(dir) {
+  try {
+    const block = frontmatterOf(readFileSync(join(dir, 'SKILL.md'), 'utf8'));
+    return /^\s+sdd-core:\s*["']?true["']?\s*$/m.test(block ?? '');
+  } catch { return false; }
+}
+
+/** Comandos (.claude/commands): description presente e YAML válido para parsers padrão. */
+export function checkCommands(report, p) {
+  const G = 'Comandos';
+  const dir = join(p.root, '.claude', 'commands');
+  if (!existsSync(dir)) { report.skip(G, 'commands', 'sem .claude/commands/'); return; }
+  const errors = [];
+  let n = 0;
+  for (const f of readdirSync(dir).filter((x) => x.endsWith('.md') && !x.startsWith('_'))) {
+    n++;
+    const block = frontmatterOf(readFileSync(join(dir, f), 'utf8'));
+    if (!block || !/^description:/m.test(block)) errors.push({ path: `.claude/commands/${f}`, message: "sem 'description' no frontmatter" });
+    for (const k of strictYamlIssues(block)) errors.push({ path: `.claude/commands/${f}`, message: `'${k}' com ': ' sem aspas — YAML inválido para parsers padrão` });
+  }
+  report.fromIssues(G, 'commands.valid', `${n} comando(s) com frontmatter válido`, errors);
 }
 
 /** Scanner externo de skills (Cisco skill-scanner): opcional; ausente = NOT_RUN, nunca PASS. */

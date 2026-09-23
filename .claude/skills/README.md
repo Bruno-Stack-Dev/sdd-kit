@@ -6,7 +6,11 @@ conhecimento de uma vez, em vez de redescobri-lo a cada spec.
 
 ## De onde vêm
 
-Há **dois tipos**, e eles chegam de formas diferentes:
+Há **três tipos**, e eles chegam de formas diferentes:
+
+- **Skills núcleo do kit** — os workflows (`sdd-init`, `sdd-status`, `gerar-projeto`, `gerar-skills`,
+  `nova-spec`, `implementar-spec`, `implementar-tarefa`, `validar-e2e`). Vêm com o motor, trazem
+  `metadata.sdd-core: "true"`, evals e são validadas estritamente pela spec Agent Skills.
 
 - **Skills de domínio** — *não* vêm prontas. São **geradas sob medida** pelo
   `@agente-gerador-skills` (via `/gerar-skills`), lendo o `specs/discovery/` e o `sdd.config.md`
@@ -48,8 +52,10 @@ original continua intacto em `_packs/`, pronto para reativar.
 ## Regras
 
 - Skill descreve; a **config governa**. Não hardcode na skill o que pertence ao `sdd.config.md`.
-- Toda skill traz `gerada-de:` (rastreabilidade) e uma `description` com **gatilhos** de quando
-  carregá-la — é o que faz a skill certa aparecer na hora certa.
+- Frontmatter só com campos da spec Agent Skills (`name`, `description`, `license`,
+  `compatibility`, `metadata`, `allowed-tools`); rastreabilidade em `metadata.gerada-de`. A
+  `description` traz **gatilhos** de quando carregá-la. Valores com `: ` vão entre aspas.
+- Valide com `sdd doctor --skills`.
 - Áreas ainda em `<TODO>` no discovery não viram skill até serem resolvidas.
 
 ---

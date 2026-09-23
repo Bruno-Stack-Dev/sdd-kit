@@ -11,7 +11,7 @@ import { ENGINE_VERSION } from './lib/engine.mjs';
 import { parseArgs, fail, UsageError } from './lib/cli.mjs';
 import { configCommand } from './commands/config.mjs';
 import { eventCommand, stateCommand } from './commands/state.mjs';
-import { tasksCommand, specCommand } from './commands/tasks.mjs';
+import { tasksCommand, specCommand, templateCommand } from './commands/tasks.mjs';
 import { doctorCommand, checkCommand } from './commands/doctor.mjs';
 import { policyCommand, securityCommand } from './commands/security.mjs';
 import { initCommand, upgradeCommand, versionCommand } from './commands/init.mjs';
@@ -22,6 +22,7 @@ const COMMANDS = {
   state: stateCommand,
   tasks: tasksCommand,
   spec: specCommand,
+  template: templateCommand,
   doctor: doctorCommand,
   check: checkCommand,
   policy: policyCommand,
@@ -48,6 +49,9 @@ Comandos:
   tasks list|ready|show <id>|graph  grafo de tarefas (DAG) validado
   tasks sync [--dry-run]            registra specs/tarefas no estado e reescreve checkboxes
   spec next-id [--new-block]        próximo ID de spec pela config (numbering)
+  spec new --slug s --title t [--pipeline p] [--new-block] [--depends A,B]
+                                    cria spec + plano + tarefas (uma por etapa da pipeline)
+  template list | show <nome>       templates do motor (spec, plano, adr, visao, config, skill...)
   doctor [--fast|--project|--security|--skills|--mcp|--full] [--json] [--strict] [--verbose]
                                     saúde do projeto; exit 1 se NOT_READY (pronto para CI)
   check forbidden [--json]          roda os padrões proibidos da config (grep de ausência)

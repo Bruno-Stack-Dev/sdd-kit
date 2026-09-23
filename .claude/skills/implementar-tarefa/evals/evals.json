@@ -1,0 +1,23 @@
+{
+  "skill_name": "implementar-tarefa",
+  "evals": [
+    {
+      "id": "it-01",
+      "prompt": "/implementar-tarefa T-002",
+      "expected_output": "Se T-002 existe em mais de uma spec, pede o ID qualificado SPEC/T-002.",
+      "expectations": [
+        "detecta ambiguidade",
+        "pede SPEC/T-NNN"
+      ]
+    },
+    {
+      "id": "it-02",
+      "prompt": "/implementar-tarefa BIB-110/T-003 (a T-002 ainda está pendente)",
+      "expected_output": "Tenta TASK_STARTED, recebe a recusa por dependência e informa quais dependências faltam, sem implementar.",
+      "expectations": [
+        "informa dependência pendente",
+        "não implementa a tarefa"
+      ]
+    }
+  ]
+}
