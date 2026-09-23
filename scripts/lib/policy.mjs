@@ -67,6 +67,16 @@ export function relToRoot(root, p) {
   return rel || '.';
 }
 
+/**
+ * Cabeçalho de arquivo gerado: o marcador abre uma linha de comentário (`<!--`, `#`, `//`, `/*`, `*`,
+ * `--`, `;`) no começo do arquivo. O marcador dentro de código ou dado — a constante do próprio
+ * gerador, o valor na política, um fixture de teste — não torna o arquivo gerado.
+ */
+export function hasGeneratedHeader(text, marker) {
+  const esc = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^[ \\t]*(?:<!--|#|//|/\\*|\\*|--|;)[ \\t]*${esc}`, 'm').test(text);
+}
+
 function hasGeneratedMarker(abs, marker) {
   try {
     if (!existsSync(abs) || !statSync(abs).isFile()) return false;
@@ -74,7 +84,7 @@ function hasGeneratedMarker(abs, marker) {
     const buf = Buffer.alloc(2048);
     const n = readSync(fd, buf, 0, buf.length, 0);
     closeSync(fd);
-    return buf.subarray(0, n).toString('utf8').includes(marker);
+    return hasGeneratedHeader(buf.subarray(0, n).toString('utf8'), marker);
   } catch { return false; }
 }
 

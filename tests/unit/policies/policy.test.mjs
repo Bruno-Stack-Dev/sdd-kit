@@ -1,13 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { loadPolicy, effectivePolicy, evaluateToolCall, evaluateCommand, globToRegex } from '../../../scripts/lib/policy.mjs';
+import { loadPolicy, effectivePolicy, evaluateToolCall, evaluateCommand, globToRegex, hasGeneratedHeader } from '../../../scripts/lib/policy.mjs';
 import { parseCommand, ShellParseError } from '../../../scripts/lib/shell.mjs';
 import { tempProject, cleanup } from '../../helpers.mjs';
 
 const ROOT = tempProject({
   'sdd.config.md': '<!-- AUTO-GENERATED — DO NOT EDIT DIRECTLY. Fonte: sdd.config.yaml -->\n',
   'notes.md': 'livre\n',
+  'gerado.yaml': '# AUTO-GENERATED — DO NOT EDIT DIRECTLY. Fonte: x\nchave: 1\n',
+  'gerador.mjs': "// Renderizador da visão.\nexport const GENERATED_MARKER = 'AUTO-GENERATED — DO NOT EDIT DIRECTLY';\n",
+  'politica.json': '{\n  "generated_marker": "AUTO-GENERATED — DO NOT EDIT DIRECTLY"\n}\n',
 });
 process.on('exit', () => cleanup(ROOT));
 
@@ -134,8 +137,22 @@ test('ferramentas de arquivo: segredos, estado, gerados, guardrails, fora do pro
   assert.equal(tool('Edit', { file_path: join(ROOT, '.sdd/events.jsonl') }), 'deny');
   assert.equal(tool('Write', { file_path: join(ROOT, 'sdd.config.md') }), 'deny', 'arquivo com marcador AUTO-GENERATED');
   assert.equal(tool('Write', { file_path: join(ROOT, 'notes.md') }), 'allow');
+  assert.equal(tool('Edit', { file_path: join(ROOT, 'gerado.yaml') }), 'deny', 'cabeçalho # AUTO-GENERATED');
+  assert.equal(tool('Edit', { file_path: join(ROOT, 'gerador.mjs') }), 'allow', 'marcador como constante do gerador não é cabeçalho');
+  assert.equal(tool('Edit', { file_path: join(ROOT, 'politica.json') }), 'allow', 'marcador como valor de dado não é cabeçalho');
   assert.equal(tool('Edit', { file_path: join(ROOT, '.claude/settings.json') }), 'ask');
   assert.equal(tool('Write', { file_path: join(ROOT, '..', 'fora-do-projeto.txt') }), 'ask');
+});
+
+test('cabeçalho de arquivo gerado: marcador abrindo linha de comentário, não em código ou dado', () => {
+  const M = 'AUTO-GENERATED — DO NOT EDIT DIRECTLY';
+  for (const text of [`<!-- ${M}. Fonte: y -->`, `---\ntitulo: x\n---\n\n<!-- ${M} -->`, `# ${M}`, `  // ${M}`, `/* ${M} */`, ` * ${M}`, `-- ${M}`, `; ${M}`]) {
+    assert.ok(hasGeneratedHeader(text, M), text);
+  }
+  for (const text of [`export const X = '${M}';`, `"marker": "${M}"`, `texto que cita \`${M}\` em prosa`, `"a.md": "<!-- ${M} -->"`, 'sem marcador']) {
+    assert.ok(!hasGeneratedHeader(text, M), text);
+  }
+  assert.ok(!hasGeneratedHeader('# AUTO-GENERATED', M), 'marcador incompleto');
 });
 
 test('auditor (guardião) não escreve, exceto relatórios em .sdd/reports', () => {
