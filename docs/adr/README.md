@@ -19,3 +19,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0006](ADR-0006-plugin-e-modo-copia.md) | Motor como plugin do Claude Code, modo cópia mantido | aceito |
 | [0007](ADR-0007-workflows-como-agent-skills.md) | Workflows como Agent Skills; comandos v2 como aliases | aceito |
 | [0008](ADR-0008-supply-chain-de-skills.md) | Proveniência e integridade de skills por lockfile | aceito |
+| [0009](ADR-0009-agentes-minimo-privilegio.md) | Agentes de mínimo privilégio, auditores somente leitura | aceito |

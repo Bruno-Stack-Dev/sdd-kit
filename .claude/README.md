@@ -26,6 +26,10 @@ trabalho auditável e dentro das regras da config.
 > Cada agente traz, além das regras, um **protocolo de raciocínio** ("Como este agente
 > raciocina") — a ordem em que carrega contexto, como se autoverifica e quando parar e escalar.
 >
+> **v3:** todo agente declara `tools` mínimas e tem contrato de saída e de falha; os três auditores
+> (`spec-guardian`, `arquiteto-guardian`, `revisor-ux`) são somente leitura (`disallowedTools` +
+> hook). Matriz completa e decisões sobre memória/skills: `docs/architecture/agents.md`.
+>
 > Crie um agente novo só se uma especialidade não existir. Nunca hardcode tecnologia ou regra
 > de projeto num agente — isso pertence ao `sdd.config.md`.
 
