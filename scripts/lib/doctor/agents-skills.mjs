@@ -238,5 +238,9 @@ export async function checkAgentScan(report, p) {
     report.notRun(G, 'scanner.agent-scan', 'Snyk Agent Scan nunca executado neste projeto (opcional; exige consentimento e SNYK_TOKEN)', ['`sdd scan agents --consent` num container descartável — ver docs/security/agent-scan.md']);
     return;
   }
+  if (last.status === 'not_run') {
+    report.notRun(G, 'scanner.agent-scan', `Snyk Agent Scan não conseguiu analisar em ${last.ran_at} (${last.file})`, [last.reason ?? 'erro de execução do scanner, sem achados']);
+    return;
+  }
   report.add(G, 'scanner.agent-scan', last.status === 'pass' ? 'pass' : 'fail', `Snyk Agent Scan ${last.status.toUpperCase()} em ${last.ran_at} (${last.file})`);
 }

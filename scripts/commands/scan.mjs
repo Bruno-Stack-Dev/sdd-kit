@@ -36,14 +36,27 @@ export function runAgentScan(root, { consent = false, runMcpServers = false, tar
   if (!bin) return { status: 'not_run', cmd, reason: 'uvx não instalado (https://docs.astral.sh/uv/)' };
   const r = spawnSync(bin, plan.args, { encoding: 'utf8', timeout: 900_000, maxBuffer: 64 * 1024 * 1024, shell: process.platform === 'win32' && /\.(cmd|bat)$/i.test(bin) });
   if (r.error) return { status: 'not_run', cmd, reason: `falha ao executar: ${r.error.message}` };
+  const cls = classifyScan(r.status, r.stdout);
   const dir = join(root, '.sdd', 'reports');
   mkdirSync(dir, { recursive: true });
   const file = join(dir, `agent-scan-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
-  writeFileSync(file, JSON.stringify({ tool: AGENT_SCAN, target: plan.target, exit_code: r.status, ran_at: new Date().toISOString(), stdout: r.stdout, stderr: (r.stderr || '').slice(0, 20000) }, null, 2));
-  const res = { status: r.status === 0 ? 'pass' : 'fail', cmd, report: file, exit_code: r.status };
-  // Num runner descartável o relatório some com a máquina: na falha, o diagnóstico vai para a saída.
-  if (res.status === 'fail') res.diagnostic = tailOutput(r.stderr, r.stdout);
+  writeFileSync(file, JSON.stringify({ tool: AGENT_SCAN, target: plan.target, exit_code: r.status, status: cls.status, reason: cls.reason ?? null, ran_at: new Date().toISOString(), stdout: r.stdout, stderr: (r.stderr || '').slice(0, 20000) }, null, 2));
+  const res = { ...cls, cmd, report: file, exit_code: r.status };
+  // Num runner descartável o relatório some com a máquina: sem PASS, o diagnóstico vai para a saída.
+  if (res.status !== 'pass') res.diagnostic = tailOutput(r.stderr, r.stdout);
   return res;
+}
+
+/**
+ * PASS = exit 0. FAIL = achados reais (ou saída que não dá para interpretar). NOT_RUN = o scanner saiu
+ * com erro de execução (cota, autenticação, rede) sem nenhum achado: não houve análise, então não é
+ * aprovação nem reprovação.
+ */
+export function classifyScan(exitCode, stdout) {
+  if (exitCode === 0) return { status: 'pass' };
+  const { errors, issues } = parseScanJson(stdout);
+  if (errors.length && !issues.length) return { status: 'not_run', reason: `o scanner não conseguiu analisar: ${redact(errors[0].message)}` };
+  return { status: 'fail' };
 }
 
 // Progresso do uv/uvx no stderr (instalação da ferramenta) não diz nada sobre o resultado do scan.
@@ -64,13 +77,17 @@ export function tailOutput(stderr, stdout, lines = 40) {
   return parts.join('\n') || '(o scanner não produziu saída)';
 }
 
-/** Extrai mensagens de erro e achados (`issues`) de qualquer ponto do JSON. Vazio se não for JSON. */
-export function summarizeScanJson(text, max = 25) {
+/**
+ * Mensagens de erro e achados (`issues`) de qualquer ponto do JSON, sem depender do schema exato.
+ * Devolve { parsed, data, errors: [{path, message}], issues: [{code, message, where}] }.
+ */
+export function parseScanJson(text) {
+  const empty = { parsed: false, data: null, errors: [], issues: [] };
   const t = String(text ?? '');
   const start = t.search(/[[{]/);
-  if (start < 0) return [];
+  if (start < 0) return empty;
   let data;
-  try { data = JSON.parse(t.slice(start)); } catch { return []; }
+  try { data = JSON.parse(t.slice(start)); } catch { return empty; }
   const errors = [];
   const issues = [];
   const cut = (s) => String(s).replace(/\s+/g, ' ').slice(0, 200);
@@ -78,26 +95,31 @@ export function summarizeScanJson(text, max = 25) {
     if (Array.isArray(v)) { v.forEach((x, i) => walk(x, `${path}[${i}]`)); return; }
     if (!v || typeof v !== 'object') return;
     for (const [k, val] of Object.entries(v)) {
-      if (/^(error|errors|error_message|message)$/i.test(k) && typeof val === 'string' && val.trim() && !path.includes('issues')) errors.push(`${path ? `${path}.` : ''}${k}: ${cut(val)}`);
+      if (/^(error|errors|error_message|message)$/i.test(k) && typeof val === 'string' && val.trim()) errors.push({ path: `${path ? `${path}.` : ''}${k}`, message: cut(val) });
       if (/^issues$/i.test(k) && Array.isArray(val)) {
         for (const is of val) {
-          const code = is?.code ?? is?.id ?? is?.type ?? '?';
-          const msg = is?.message ?? is?.description ?? is?.title ?? '';
           const where = is?.reference ?? is?.location ?? is?.server ?? is?.tool ?? '';
-          issues.push(`[${code}] ${cut(msg)}${where ? ` (${cut(typeof where === 'string' ? where : JSON.stringify(where))})` : ''}`);
+          issues.push({ code: is?.code ?? is?.id ?? is?.type ?? '?', message: cut(is?.message ?? is?.description ?? is?.title ?? ''), where: where ? cut(typeof where === 'string' ? where : JSON.stringify(where)) : '' });
         }
       } else walk(val, path ? `${path}.${k}` : k);
     }
   };
   walk(data, '');
+  return { parsed: true, data, errors, issues };
+}
+
+/** Resumo legível de parseScanJson. Vazio se não for JSON. */
+export function summarizeScanJson(text, max = 25) {
+  const { parsed, data, errors, issues } = parseScanJson(text);
+  if (!parsed) return [];
   const out = [];
-  if (errors.length) out.push(`erros (${errors.length}):`, ...errors.slice(0, max).map((e) => `  ${e}`));
-  if (issues.length) out.push(`achados (${issues.length}):`, ...issues.slice(0, max).map((e) => `  ${e}`));
+  if (errors.length) out.push(`erros (${errors.length}):`, ...errors.slice(0, max).map((e) => `  ${e.path}: ${e.message}`));
+  if (issues.length) out.push(`achados (${issues.length}):`, ...issues.slice(0, max).map((e) => `  [${e.code}] ${e.message}${e.where ? ` (${e.where})` : ''}`));
   if (!out.length) out.push(`JSON sem erros nem achados reconhecíveis; chaves de topo: ${Object.keys(Array.isArray(data) ? data[0] ?? {} : data).join(', ') || '(nenhuma)'}`);
   return out;
 }
 
-/** Último relatório salvo (para o doctor): { status, ran_at, file } ou null. */
+/** Último relatório salvo (para o doctor): { status, reason, ran_at, file } ou null. */
 export function lastAgentScan(root) {
   const dir = join(root, '.sdd', 'reports');
   if (!existsSync(dir)) return null;
@@ -105,7 +127,8 @@ export function lastAgentScan(root) {
   if (!files.length) return null;
   try {
     const r = JSON.parse(readFileSync(join(dir, files.at(-1)), 'utf8'));
-    return { status: r.exit_code === 0 ? 'pass' : 'fail', ran_at: r.ran_at, file: files.at(-1) };
+    // Relatórios antigos não têm `status`: vale o exit code.
+    return { status: r.status ?? (r.exit_code === 0 ? 'pass' : 'fail'), reason: r.reason ?? null, ran_at: r.ran_at, file: files.at(-1) };
   } catch { return null; }
 }
 
