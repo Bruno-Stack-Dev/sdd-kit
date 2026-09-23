@@ -15,7 +15,8 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 - `sdd scan agents`: o agent-scan 0.6.4 em modo `--ci` exige `--dangerously-run-mcp-servers`; o kit
   passa a pedir uma segunda confirmação (`--run-mcp-servers`), separada do `--consent` do envio à Snyk,
   e o workflow manual a usa (runner descartável). Sem ela, `NOT_RUN`.
-- `sdd scan agents`: na falha, imprime as últimas linhas da saída do scanner (segredos redigidos).
+- `sdd scan agents`: na falha, imprime um diagnóstico com segredos redigidos — resumo do JSON do
+  stdout (erros e achados) e as últimas linhas úteis do stderr, sem o ruído de instalação do `uvx`.
   Num runner descartável do CI o relatório em `.sdd/reports/` se perdia e só restava o exit code.
 
 ## [3.0.0] — 2026-09-23

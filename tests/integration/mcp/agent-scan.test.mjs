@@ -103,3 +103,32 @@ test('falha do scanner: o diagnóstico sai na saída (runner descartável perde 
     assert.doesNotMatch(r.out, new RegExp(fakeToken));
   } finally { cleanup(bin); cleanup(dir); }
 });
+
+test('resumo do JSON do scanner: erros e achados em qualquer nível, sem depender do schema', async () => {
+  const { summarizeScanJson } = await import('../../../scripts/commands/scan.mjs');
+  const json = JSON.stringify({ paths: [{ path: '/x/.mcp.json', error: 'falha ao iniciar o servidor', servers: [{ name: 's1', issues: [{ code: 'W001', message: 'descrição de ferramenta com instrução oculta', reference: 's1/tool' }] }] }] });
+  const out = summarizeScanJson(`log antes do json\n${json}`).join('\n');
+  assert.match(out, /erros \(1\)/);
+  assert.match(out, /falha ao iniciar o servidor/);
+  assert.match(out, /achados \(1\)/);
+  assert.match(out, /\[W001\] descrição de ferramenta com instrução oculta \(s1\/tool\)/);
+  assert.deepEqual(summarizeScanJson('sem json aqui'), []);
+  assert.match(summarizeScanJson('{"ok":true}').join(' '), /sem erros nem achados reconhecíveis; chaves de topo: ok/);
+});
+
+test('falha com stderr só de instalação do uvx: o diagnóstico traz o resultado do stdout', async () => {
+  const json = JSON.stringify({ issues: [{ code: 'E002', message: 'skill com prompt injection' }] });
+  const files = win
+    ? { 'out.json': json, 'uvx.cmd': `@echo off\r\necho Downloading pydantic-core (2.0MiB) 1>&2\r\necho Installed 55 packages in 16ms 1>&2\r\ntype "%~dp0out.json"\r\nexit /b 1\r\n` }
+    : { 'out.json': json, uvx: `#!/bin/sh\necho 'Downloading pydantic-core (2.0MiB)' 1>&2\necho 'Installed 55 packages in 16ms' 1>&2\ncat "$(dirname "$0")/out.json"\nexit 1\n` };
+  const bin = tempProject(files);
+  const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
+  try {
+    if (!win) await runChmod(join(bin, 'uvx'));
+    const r = runSdd(['scan', 'agents', '--consent', '--run-mcp-servers', '--root', dir], { env: env(bin, true) });
+    assert.equal(r.status, 1);
+    assert.match(r.out, /agent-scan FAIL \(exit 1\)/);
+    assert.match(r.out, /\[E002\] skill com prompt injection/);
+    assert.doesNotMatch(r.out, /Downloading pydantic-core/, 'ruído de instalação do uv é filtrado');
+  } finally { cleanup(bin); cleanup(dir); }
+});
