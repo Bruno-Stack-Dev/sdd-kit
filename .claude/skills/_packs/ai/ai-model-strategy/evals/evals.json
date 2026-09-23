@@ -1,0 +1,24 @@
+{
+  "skill_name": "ai-model-strategy",
+  "evals": [
+    {
+      "id": "ams-01",
+      "prompt": "Qual modelo devemos usar? Me dá o ranking atual.",
+      "expected_output": "Não entrega ranking de memória: levanta requisitos por tarefa, monta lista curta a partir da documentação atual com versão e data, e decide com eval do próprio produto.",
+      "expectations": [
+        "não entrega ranking fixo de memória",
+        "decide com eval do produto",
+        "fixa versão do modelo"
+      ]
+    },
+    {
+      "id": "ams-02",
+      "prompt": "Os dados de saúde dos pacientes não podem sair do país. Queremos fallback para outro provedor se o principal cair.",
+      "expected_output": "Garante que o fallback respeita a residência; considera self-hosted ou região adequada; fallback avaliado pela mesma suíte.",
+      "expectations": [
+        "fallback respeita a residência",
+        "fallback avaliado"
+      ]
+    }
+  ]
+}

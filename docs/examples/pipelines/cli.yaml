@@ -1,0 +1,32 @@
+# Pipeline de CLI. Cole em `pipelines:` do sdd.config.yaml e ajuste.
+# Cada etapa vira uma tarefa em `sdd spec new --pipeline cli`, na ordem, com o agente da etapa.
+cli:
+  - id: contract
+    name: Contrato da CLI
+    agent: agente-arquiteto-contratos
+    output: comandos, flags, códigos de saída e formato de saída
+  - id: domain
+    name: Domínio
+    agent: agente-backend
+    output: regras puras, sem I/O
+  - id: command
+    name: Comandos
+    agent: agente-backend
+    output: parsing e orquestração por comando
+  - id: adapter
+    name: Adaptadores
+    agent: agente-backend
+    output: arquivo, rede e SO atrás de interfaces
+  - id: unit-test
+    name: Testes unitários
+    agent: agente-qa-testes
+    output: domínio e comandos, incluindo erros de uso
+  - id: integration-test
+    name: Testes de integração
+    agent: agente-qa-testes
+    output: binário real contra diretório temporário
+  - id: guardian
+    name: Guardião
+    agent: agente-spec-guardian
+    output: evidência por CA
+    guardian: true

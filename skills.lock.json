@@ -1,0 +1,552 @@
+{
+  "version": 1,
+  "packs": {
+    "arch": {
+      "name": "software-architecture-skills (software-architecture-pack)",
+      "source": null,
+      "ref": "v0.1.0",
+      "license": "MIT",
+      "attribution": ".claude/skills/_packs/arch/_arch-templates/ATTRIBUTION.md",
+      "trust": "vendored-reviewed",
+      "reviewed_at": null,
+      "review_notes": "Vendorizado e adaptado pelo mantenedor no v2 (commits fe95df7, 5108f2d). URL e commit de origem não foram registrados na vendorização. v3: descrições postas entre aspas (YAML inválido).",
+      "hash": "sha256:3f9b590cdf821a84fac0abcd3598554d904abc4b37e9e4a2b8cf7f1018029aa9",
+      "skills": {
+        "arch-adr-writer": "sha256:0b2df389eedb750b563ed3beaededf072fd92077d07e259ada5d2cca05e3de90",
+        "arch-architecture-option-generator": "sha256:273e5bbd5d1843dbbf4ab6dabb2673996d11874c3d43692ffe84daf51c303148",
+        "arch-architecture-risk-assessor": "sha256:294fe571ca3f49124b0cc204601be2770084c372e42d8df07c0436807fbc741c",
+        "arch-availability-strategy-reviewer": "sha256:6668535f6ec91ac6b204627e74ac53033fd2946a329543b0d3177e8e39806af5",
+        "arch-component-boundary-reviewer": "sha256:4898cde56d2a5f4d5b81f26bf8053ecdca353dbd51260d958f56697f0facaa6e",
+        "arch-deployment-view-writer": "sha256:4d209764067a541ffe4d7af3aac1803dc38a684bfd399460c3ae169cd051df6e",
+        "arch-integration-boundary-mapper": "sha256:28d0a63a573121c1e56790efc5f9b67763dd9e5acc330260917d7f610b63c552",
+        "arch-layered-architecture-designer": "sha256:21cd0c79539a460bf70a7c45abf98744752bf14418aae7c241a54e4107adf167",
+        "arch-monolith-vs-modular-monolith-reviewer": "sha256:488a3859825367a0f9a9744f193b2888eb49c3b53d4f4d803bf35b3bbd0fc543",
+        "arch-quality-attribute-scenario-writer": "sha256:642a5a8717780dffffb2a2d8a373fe4c81badd32aed90c55e0d8442c97bf281a",
+        "arch-runtime-view-writer": "sha256:9bc0e239ec94c56f74cedd8a914c00f3c7d1a5f89bcb817979d08dbbbfbacdeb",
+        "arch-scalability-hotspot-detector": "sha256:c002260d9a478bb48f755896327c2d9a3569019f89fdb78142f108caaa2c4606",
+        "arch-service-decomposition-advisor": "sha256:2f4ef89f36970c516bdb7ae8885f82d3a5c3aaa66febd80bf72d12aac8db0f64",
+        "arch-tradeoff-analysis-writer": "sha256:27fd77bcb47842e728c6a325102acd4189fd0fdd0953d14635cbb06acdd07ae9"
+      },
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "findings": []
+    },
+    "ds": {
+      "name": "Design System Ops (Murphy Trueman)",
+      "source": "https://github.com/murphytrueman/design-system-ops",
+      "ref": null,
+      "license": "MIT",
+      "attribution": ".claude/skills/_packs/ds/_knowledge-notes/ATTRIBUTION.md",
+      "trust": "vendored-reviewed",
+      "reviewed_at": null,
+      "review_notes": "Vendorizado e adaptado pelo mantenedor no v2 (config via sdd.config seção 12). Commit de origem não registrado.",
+      "hash": "sha256:94a77803d030d615fcb3e9521ead52dfef8c3a927f61db8c9299496f79f2462a",
+      "skills": {
+        "ds-accessibility-per-component": "sha256:22478b61d95f451ef6c2dc945d62aa9701ff77f1776e86c52951d999c23d0777",
+        "ds-adoption-report": "sha256:c8ff3a0e9b66ba073d25d49f61bcf8759d453b245cd8f543d7d6a890dd66514d",
+        "ds-ai-component-description": "sha256:0f622eb812a2bdbd0285de341294d0b35f4039283d58f681bacbb206c8c15aa7",
+        "ds-backlog-generator": "sha256:83408a88bdee771e2548ae872ad90bcfdf4a748576dc58a1b45c3610d541aa75",
+        "ds-change-communication": "sha256:b2fad3449ed8d3bc2406e30dbcabda0cd8becb57a1112f26ef62db311756898d",
+        "ds-cicd-integration": "sha256:5d5a6376bf19e2ce9836f089a903f92d81275cd78cdc128b425bbe8fc83d7e24",
+        "ds-codebase-index": "sha256:97654bebaf38c5760cf5dc9e1c42e90fe8823635f30fb460d7cd7612eab3e5dd",
+        "ds-codemod-generator": "sha256:b14f28b8d0dccbf1e9235466c3c5dfd97baa3a2ca3de9c6b19e9419bbd9893a0",
+        "ds-component-api-validator": "sha256:703c9a7618e03edb0ab811fa5e9504c76b74db8f96a6d67d052cf78497bcc53a",
+        "ds-component-audit": "sha256:203098e9840ab91a60d14308877920ba659a78a9d361d87327ba83248e8958f1",
+        "ds-component-decision-tree": "sha256:7c36bfb2dec9f27dbbd9a95fc4c212918c17fc9738cc97bf78661dc99d3f13cf",
+        "ds-component-to-release-agent": "sha256:cdc6c34f4b821bbe7644126924230a17b97785ceb2477ced4a3d43ab44dcb234",
+        "ds-context-engine-builder": "sha256:e57e55f6f40c275aed02465c54de2d590525d011117a2436e97a5f807d63a74a",
+        "ds-contribution-workflow": "sha256:0f7d51666d819b3d58dd72050621d86fb2fdf725e81de6444cc7608e0e73bee3",
+        "ds-decision-record": "sha256:36e9e80faa4dba30cd442449f016e7206be73f67a7fa74ef53618c91ceba7a6e",
+        "ds-deprecation-process": "sha256:329defb7672d59da02b4b98da08d81e69931b1fa633e76318f4aa44dff07dc47",
+        "ds-design-to-code-check": "sha256:8765e6c63962d4ac581ad9418a7417fa863f7e70beb5eff9ab0ebf24742a9580",
+        "ds-designer-onboarding": "sha256:09b42438bf83790accd0fd92892a9b75f5e55fa1a39c14b7e5242fd3fec8500f",
+        "ds-docs-coverage": "sha256:5abfcf6d873da74390a3b65abe716c263b50982b8a58ea560e406f85fbf168b2",
+        "ds-drift-detection": "sha256:c54e26ed6d70b3d09ecf8df86adce05ea8492900a17fb6505d610ac182c2f1ee",
+        "ds-engineering-onboarding": "sha256:33f04b88e6fb5988d1521c2bd4bb40bbbdeb3af9b3c8aa1835c7783f3eddf56e",
+        "ds-figma-variable-audit": "sha256:d2e098703a9f8a4f1015bfe362d7bad8bb5d80fd43ce96f3f4d659738f0ebade",
+        "ds-full-system-diagnostic-agent": "sha256:7997c65df332d841508fd29e3cad813dcc9080a673452456e37cd04aa6a7a4d1",
+        "ds-governance-encoder": "sha256:e9b905eb6a5a26415d23ad7d7099c2903ac5c25704efb8b0e5fe0a3dcc42e631",
+        "ds-governance-review-agent": "sha256:f982ee2d8bc64815e1adde7bc4119e727010f205b566aa20276cbe1b1d19873c",
+        "ds-metadata-schema-generator": "sha256:e397146cc280b420103859415ab38d8308360ee0f8e42f70316ef3c6cedaca3b",
+        "ds-migration-agent": "sha256:bb14661e36f00294e97ad1d523cbef9cf99f8e152e8d2b4f75780eb0a5c1fd1a",
+        "ds-naming-audit": "sha256:0ebabf2165047df17d0bddb58cb7e4037cbcb7b426f2bab8016164e60d6cfe42",
+        "ds-pattern-documentation": "sha256:79389d1e084f0385c3ff4a40879a0f491b436d9087b2dcbb0031116702cfa562",
+        "ds-release-retrospective": "sha256:0c0fdee93b7ecf7077635b8df1808969ab36c97e3241c4af436e04de35c27abf",
+        "ds-schema-validator": "sha256:e794c4fe4d9ac48abdcf20f6ce0b28e7a3943e67d4da396691063fe5c9172ced",
+        "ds-session-memory": "sha256:be09627661818a5f7c562dcf13d598a7307c418c743b24e88153e839cc3d1bb7",
+        "ds-stakeholder-brief": "sha256:b72db732712253a8c7f2230f42aed51572f01fe07a09d82853627d13825373bd",
+        "ds-system-benchmark": "sha256:a7d72d7fd6e0bb020859aef4f4d072abe57f377d1b3f7af59752768346125984",
+        "ds-system-health": "sha256:57beb7d9ab1028880b022240156bcd7b389c8004b8c268b4a8c641081ca9c42c",
+        "ds-system-pitch": "sha256:591ed95acebcf431bfb7f6451e1d5d5bbba73e8ceaaadb38782e26c175276029",
+        "ds-theme-audit": "sha256:3022ece43904419d0c28ddcbc62dc60a1aba12a7e1801e2d4bc1de40e1491a7f",
+        "ds-token-audit": "sha256:506dee6a41ce398103e4ab3c56f6f3ce6bfdab4b95b599712ccde97a1fa0b0a9",
+        "ds-token-compliance": "sha256:8fb5524900ef56b4c932c896b2c0ca1194291b03f6d69c4d59245db193de7bae",
+        "ds-token-documentation": "sha256:a9a727ddc2b025fe1fdd4b3b0d73bce471a0fdf749ccfd2f915103aae341f984",
+        "ds-triage": "sha256:956da69c81bd10d5e00f5873a287e9c6ebd16eec15490cea8b1472eac1b28fba",
+        "ds-usage-guidelines": "sha256:8f59a61e099354548dafe17be00f047e2764846695146b6ee6d726867cf26319",
+        "ds-version-bump-advisor": "sha256:88e2b2c95dd3dfd5a2f3e88ae8cc748d194d3b5448f36b6390210b5058b364c9",
+        "ds-visual-report": "sha256:c3267ec50f3d6524f60471b183faf384e71cd77ab927b0b77fc97242f7f64cb5"
+      },
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "findings": []
+    },
+    "uiux": {
+      "name": "UI/UX Pro Max (NextLevelBuilder)",
+      "source": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "ref": "v2.11.0",
+      "license": "MIT AND Apache-2.0 AND OFL-1.1",
+      "license_notes": "uiux-ui-styling declara MIT no frontmatter mas traz LICENSE.txt Apache-2.0; canvas-fonts/ com fontes OFL-1.1. Divergência a esclarecer com a origem.",
+      "attribution": ".claude/skills/_packs/uiux/uiux-ui-ux-pro-max/ATTRIBUTION-SDD-KIT.md",
+      "trust": "vendored-reviewed",
+      "reviewed_at": null,
+      "review_notes": "Vendorizado pelo mantenedor no v2 (prefixo uiux-, paths do search.py). Commit de origem não registrado.",
+      "risk_notes": "uiux-design/scripts/{cip,icon,logo}/generate.py leem .env (pasta da skill e ~/.claude) e chamam a API Gemini do Google (externa, exige GEMINI_API_KEY).",
+      "hash": "sha256:77603ba37aa6d26d0aec471547e650f824bf14e247c56abeac434f47a001dadc",
+      "skills": {
+        "uiux-banner-design": "sha256:6e644d3df7d9f6204d2405584975d6f30130e89e5fdcd74f63e5d487589f9e01",
+        "uiux-brand": "sha256:197f86ea8a34a94fe2b5d7093d81b1bfa00f4e1ce5ae368721c0f42e4259ec08",
+        "uiux-design": "sha256:a0fb409804a972b475a2d383e8ea11cc0676b4d7c843b7e1d6c9485396295a04",
+        "uiux-design-system": "sha256:a0685ceb447a0ccb534fc29b1e6b7ceb313311c4323677791373268faf232d2f",
+        "uiux-slides": "sha256:e9f936ca8dd69a1077c4b992e07fe35a9bffaea2f523358039244da003e8e689",
+        "uiux-ui-styling": "sha256:e3b5376c768ea838c7e606cdef111f310f7dcb3b9d0a1d7796f15d0598afa2f0",
+        "uiux-ui-ux-pro-max": "sha256:d8edc7e3acc50803feec18ff208c5a0367adcc4c96830cc59fc2d2dc57f56ae8"
+      },
+      "risk": "high",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 20,
+            "info": 12
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "findings": [
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/cip/generate.py",
+          "line": 70
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/cip/generate.py",
+          "line": 72
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/cip/generate.py",
+          "line": 73
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/cip/generate.py",
+          "line": 74
+        },
+        {
+          "id": "env-dump",
+          "severity": "warn",
+          "file": "uiux-design/scripts/cip/generate.py",
+          "line": 83
+        },
+        {
+          "id": "network-call",
+          "severity": "warn",
+          "file": "uiux-design/scripts/cip/generate.py",
+          "line": 217
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 28
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 30
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 31
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 32
+        },
+        {
+          "id": "env-dump",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 41
+        },
+        {
+          "id": "network-call",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 198
+        },
+        {
+          "id": "network-call",
+          "severity": "warn",
+          "file": "uiux-design/scripts/icon/generate.py",
+          "line": 294
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/logo/generate.py",
+          "line": 30
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/logo/generate.py",
+          "line": 32
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/logo/generate.py",
+          "line": 33
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-design/scripts/logo/generate.py",
+          "line": 34
+        },
+        {
+          "id": "env-dump",
+          "severity": "warn",
+          "file": "uiux-design/scripts/logo/generate.py",
+          "line": 44
+        },
+        {
+          "id": "network-call",
+          "severity": "warn",
+          "file": "uiux-design/scripts/logo/generate.py",
+          "line": 151
+        },
+        {
+          "id": "secret-access",
+          "severity": "warn",
+          "file": "uiux-ui-ux-pro-max/data/stacks/nextjs.csv",
+          "line": 38
+        }
+      ]
+    },
+    "ai": {
+      "name": "sdd-ai (conteúdo próprio do SDD Kit)",
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "ref": null,
+      "license": "MIT",
+      "attribution": ".claude/skills/_packs/ai/_ai-references/ATTRIBUTION.md",
+      "trust": "core",
+      "reviewed_at": "2026-09-23",
+      "review_notes": "Escrito pelo mantenedor no v3 (Fase 17). Sem scripts; só instruções, templates e evals. Frameworks citados apenas como candidatos a verificar.",
+      "hash": "sha256:38ee37a65679cd4a7c7c54661979fe4c4311d43b570fd30a9a2ff3b8efcb866a",
+      "skills": {
+        "ai-architecture-evaluator": "sha256:b9094f144a433b3fd22cf0aabe392f91d2256d9db01e5e0265a49925c8a9b447",
+        "ai-discovery": "sha256:ac3fd00ea886bef0cbf32d97b60d1b4555278cf0760329b47db05fedd888fd6e",
+        "ai-evals-designer": "sha256:c103b7dba937ff3dc85b4ded4f7abdbecd4dae2a953540a970a958fd00562b4c",
+        "ai-model-strategy": "sha256:e986e0dcbe5b6bf9d08863cef9c555928a5a332be96f70da985139ae624806a4",
+        "ai-observability-governance": "sha256:51608f4198e2197fecc1d9fd1cc5c92e46c784f8f21aa787e5e25c9096f98186",
+        "ai-rag-memory-designer": "sha256:48e8f91ad5275e0eb6c17635651a34c419fb88d69182050552552eee443e716c",
+        "ai-security-reviewer": "sha256:e198b409527b17751d57934fdece5d613f79fd9dd22973cfe234555eed7854a3",
+        "ai-structured-output-designer": "sha256:e752e0542afa55e599aecfde4c721e2c01ce56c8f62b719f1f4d16da1c553b14"
+      },
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "findings": []
+    }
+  },
+  "skills": {
+    "gerar-projeto": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:7973cae4e0721085c287221757972a016811bbe6f1292c792386b16b8915173d",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 3
+    },
+    "gerar-skills": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:96f238c65e4e610c9583d6f122e1fe25a103acd3c7c6112a2c1c2bc85790845a",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 2
+    },
+    "implementar-spec": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:9c6a421063356e5ac1fd85c5e90f4c53ff35659a402fe8ad26ab7239e6027374",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 3
+    },
+    "implementar-tarefa": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:a8f53c559d65acd0fa5d68936881b1248635a7fbc4ba6de023d5052c2cce0e3b",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 2
+    },
+    "nova-spec": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:91c84462675b7786627bc2342d828c3a6dd2a3a216b6a8d2d23ff642805648e1",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 2
+    },
+    "sdd-init": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:fd21578bfbd45b35e1f10bfec9a8b700369351ea326f1709f011e23bf109f302",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 1,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 3
+    },
+    "sdd-status": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:967b39c5c1f21eecd3b0aa3ace9a567e86394034bb213bc0bec08a834e4b45e3",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 2
+    },
+    "validar-e2e": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:80f363e0ba897455825a5fc85b1c7b39057193c46593de840a77c90e99a5db76",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 2
+    },
+    "sdd-export-context": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:49e1c162c4c5bf28d131457579578f21a05512eda49252edd4aaf5f8d7bf0be1",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-23",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 3
+    }
+  }
+}

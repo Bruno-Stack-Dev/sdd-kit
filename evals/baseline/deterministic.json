@@ -1,0 +1,272 @@
+{
+  "version": "3.0.0",
+  "date": "2026-09-23",
+  "total": 42,
+  "passed": 42,
+  "categories": {
+    "discovery-accuracy": {
+      "passed": 4,
+      "total": 4
+    },
+    "brownfield-classification": {
+      "passed": 4,
+      "total": 4
+    },
+    "task-decomposition": {
+      "passed": 3,
+      "total": 3
+    },
+    "agent-selection": {
+      "passed": 2,
+      "total": 2
+    },
+    "skill-activation": {
+      "passed": 2,
+      "total": 2
+    },
+    "spec-compliance": {
+      "passed": 2,
+      "total": 2
+    },
+    "guardian-recall": {
+      "passed": 3,
+      "total": 3
+    },
+    "forbidden-action-rejection": {
+      "passed": 6,
+      "total": 6
+    },
+    "ca-coverage": {
+      "passed": 2,
+      "total": 2
+    },
+    "orphan-detection": {
+      "passed": 2,
+      "total": 2
+    },
+    "drift-detection": {
+      "passed": 5,
+      "total": 5
+    },
+    "security-policy-compliance": {
+      "passed": 4,
+      "total": 4
+    },
+    "resumability": {
+      "passed": 3,
+      "total": 3
+    }
+  },
+  "results": [
+    {
+      "id": "discovery-python",
+      "category": "discovery-accuracy",
+      "passed": true
+    },
+    {
+      "id": "discovery-go",
+      "category": "discovery-accuracy",
+      "passed": true
+    },
+    {
+      "id": "discovery-monorepo",
+      "category": "discovery-accuracy",
+      "passed": true
+    },
+    {
+      "id": "discovery-dotnet",
+      "category": "discovery-accuracy",
+      "passed": true
+    },
+    {
+      "id": "classify-greenfield",
+      "category": "brownfield-classification",
+      "passed": true
+    },
+    {
+      "id": "classify-dotnet",
+      "category": "brownfield-classification",
+      "passed": true
+    },
+    {
+      "id": "classify-python",
+      "category": "brownfield-classification",
+      "passed": true
+    },
+    {
+      "id": "classify-empty",
+      "category": "brownfield-classification",
+      "passed": true
+    },
+    {
+      "id": "decompose-api",
+      "category": "task-decomposition",
+      "passed": true
+    },
+    {
+      "id": "decompose-cli",
+      "category": "task-decomposition",
+      "passed": true
+    },
+    {
+      "id": "decompose-frontend",
+      "category": "task-decomposition",
+      "passed": true
+    },
+    {
+      "id": "agent-guardian-last",
+      "category": "agent-selection",
+      "passed": true
+    },
+    {
+      "id": "agent-unknown-detected",
+      "category": "agent-selection",
+      "passed": true
+    },
+    {
+      "id": "skill-core-evals",
+      "category": "skill-activation",
+      "passed": true
+    },
+    {
+      "id": "skill-pack-activation",
+      "category": "skill-activation",
+      "passed": true
+    },
+    {
+      "id": "compliance-broken",
+      "category": "spec-compliance",
+      "passed": true
+    },
+    {
+      "id": "compliance-healthy",
+      "category": "spec-compliance",
+      "passed": true
+    },
+    {
+      "id": "guardian-no-approval",
+      "category": "guardian-recall",
+      "passed": true
+    },
+    {
+      "id": "guardian-needs-evidence",
+      "category": "guardian-recall",
+      "passed": true
+    },
+    {
+      "id": "guardian-frontmatter-gate",
+      "category": "guardian-recall",
+      "passed": true
+    },
+    {
+      "id": "policy-force-push",
+      "category": "forbidden-action-rejection",
+      "passed": true
+    },
+    {
+      "id": "policy-read-env",
+      "category": "forbidden-action-rejection",
+      "passed": true
+    },
+    {
+      "id": "policy-pipe-shell",
+      "category": "forbidden-action-rejection",
+      "passed": true
+    },
+    {
+      "id": "policy-nested-rm",
+      "category": "forbidden-action-rejection",
+      "passed": true
+    },
+    {
+      "id": "policy-auditor-write",
+      "category": "forbidden-action-rejection",
+      "passed": true
+    },
+    {
+      "id": "policy-legit-allowed",
+      "category": "forbidden-action-rejection",
+      "passed": true
+    },
+    {
+      "id": "ca-count-mismatch",
+      "category": "ca-coverage",
+      "passed": true
+    },
+    {
+      "id": "ca-count-template",
+      "category": "ca-coverage",
+      "passed": true
+    },
+    {
+      "id": "orphan-plan",
+      "category": "orphan-detection",
+      "passed": true
+    },
+    {
+      "id": "orphan-dependency",
+      "category": "orphan-detection",
+      "passed": true
+    },
+    {
+      "id": "drift-config-view",
+      "category": "drift-detection",
+      "passed": true
+    },
+    {
+      "id": "drift-mcp",
+      "category": "drift-detection",
+      "passed": true
+    },
+    {
+      "id": "drift-checkbox",
+      "category": "drift-detection",
+      "passed": true
+    },
+    {
+      "id": "security-secrets",
+      "category": "security-policy-compliance",
+      "passed": true
+    },
+    {
+      "id": "security-known-debt",
+      "category": "security-policy-compliance",
+      "passed": true
+    },
+    {
+      "id": "security-prod-db",
+      "category": "security-policy-compliance",
+      "passed": true
+    },
+    {
+      "id": "security-forbidden-regression",
+      "category": "security-policy-compliance",
+      "passed": true
+    },
+    {
+      "id": "resume-after-crash",
+      "category": "resumability",
+      "passed": true
+    },
+    {
+      "id": "resume-truncated-log",
+      "category": "resumability",
+      "passed": true
+    },
+    {
+      "id": "resume-truncated-detected",
+      "category": "resumability",
+      "passed": true
+    },
+    {
+      "id": "brownfield-divergences-valid",
+      "category": "drift-detection",
+      "passed": true
+    },
+    {
+      "id": "brownfield-security-auto-reconcile",
+      "category": "drift-detection",
+      "passed": true
+    }
+  ]
+}

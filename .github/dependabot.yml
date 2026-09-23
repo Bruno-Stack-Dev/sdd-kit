@@ -1,0 +1,8 @@
+# Mantém os SHAs das Actions atualizados por PR revisável (nada é mesclado automaticamente).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5

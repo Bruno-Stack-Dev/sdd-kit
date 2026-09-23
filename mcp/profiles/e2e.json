@@ -1,0 +1,8 @@
+{
+  "name": "e2e",
+  "description": "Validação de CAs navegáveis com evidência (screenshots/trace em .sdd/reports/e2e).",
+  "servers": [
+    "context7",
+    "playwright"
+  ]
+}

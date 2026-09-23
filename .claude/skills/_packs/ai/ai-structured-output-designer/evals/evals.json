@@ -1,0 +1,22 @@
+{
+  "skill_name": "ai-structured-output-designer",
+  "evals": [
+    {
+      "id": "aso-01",
+      "prompt": "O modelo precisa extrair nome, CPF e valor de notas fiscais para gravar no banco.",
+      "expected_output": "Define schema versionado, usa structured output nativo verificado para o modelo, valida sempre no código antes de gravar e trata falha após N tentativas.",
+      "expectations": [
+        "schema versionado",
+        "valida no código antes de usar"
+      ]
+    },
+    {
+      "id": "aso-02",
+      "prompt": "Vamos usar DSPy para melhorar nossos prompts; ainda não temos dataset.",
+      "expected_output": "Explica que sem dataset rotulado e métrica automática a otimização programática não se justifica; propõe construir a eval primeiro.",
+      "expectations": [
+        "exige dataset e métrica antes de otimizar"
+      ]
+    }
+  ]
+}

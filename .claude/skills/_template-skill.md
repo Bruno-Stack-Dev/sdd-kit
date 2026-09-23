@@ -1,9 +1,16 @@
 ---
 name: <slug-da-skill>
-description: <3ª pessoa, com GATILHOS claros — quando um agente deve carregar esta skill. Ex.: "Perícia de cadastro de produtos: entidades, variações, estoque e regras de publicação. Carregue ao trabalhar em qualquer spec que toque produtos, catálogo ou estoque.">
-gerada-de: [specs/discovery/MODELO-DADOS.md, ...]   # rastreabilidade: de onde saiu
-atualizado-em: AAAA-MM-DD
+description: <3ª pessoa, com GATILHOS claros — quando um agente deve carregar esta skill. Ex.: "Perícia de cadastro de produtos: entidades, variações, estoque e regras de publicação. Use ao trabalhar em qualquer spec que toque produtos, catálogo ou estoque.">
+license: <licença do projeto>
+metadata:
+  gerada-de: "specs/discovery/MODELO-DADOS.md, specs/discovery/ARQUITETURA.md"
+  atualizado-em: "AAAA-MM-DD"
+  gerada-por: agente-gerador-skills
 ---
+
+<!-- Frontmatter só com campos da spec Agent Skills (name, description, license, compatibility,
+     metadata, allowed-tools). Rastreabilidade vai em `metadata` (valores texto). Detalhes longos vão
+     para references/ (progressive disclosure). Valide com `sdd doctor --skills`. -->
 
 # Skill — <Nome legível>
 

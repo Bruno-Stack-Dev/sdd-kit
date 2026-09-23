@@ -1,0 +1,19 @@
+# Evals comportamentais (com modelo) do SDD Kit — rodam SÓ no workflow manual/noturno/release.
+#   node scripts/sdd.mjs eval run --suite model     (exige ANTHROPIC_API_KEY; ausente = NOT_RUN)
+#
+# Provider: Claude Agent SDK via Promptfoo (versão fixada em scripts/commands/eval.mjs). Com
+# working_dir definido o provider usa só ferramentas de leitura (Read, Grep, Glob, LS): a eval mede o
+# que o agente decide e responde, sem alterar arquivos. setting_sources carrega as skills e agentes do
+# kit. O pacote @anthropic-ai/claude-agent-sdk é instalado só no job de evals (não é dependência do kit).
+description: SDD Kit — skills e agentes seguem as regras quando tentados a pular
+providers:
+  - id: anthropic:claude-agent-sdk
+    config:
+      working_dir: ../..
+      setting_sources: ["project"]
+prompts:
+  - "{{prompt}}"
+tests: file://generated-tests.yaml
+defaultTest:
+  options:
+    provider: anthropic:messages:claude-sonnet-5

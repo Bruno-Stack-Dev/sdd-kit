@@ -1,6 +1,6 @@
 ---
 name: arch-quality-attribute-scenario-writer
-description: Converte metas de qualidade vagas como performance ou manutenibilidade em cenários concretos que direcionam a arquitetura. Acione quando pedirem: escrever cenários de atributos de qualidade, transformar requisitos não-funcionais em cenários mensuráveis, priorizar metas de qualidade, definir métricas arquiteturais. Não acione para avaliar riscos — use arch-architecture-risk-assessor.
+description: "Converte metas de qualidade vagas como performance ou manutenibilidade em cenários concretos que direcionam a arquitetura. Acione quando pedirem: escrever cenários de atributos de qualidade, transformar requisitos não-funcionais em cenários mensuráveis, priorizar metas de qualidade, definir métricas arquiteturais. Não acione para avaliar riscos — use arch-architecture-risk-assessor."
 pack: "software-architecture-pack"
 purpose: "Convert vague quality goals like performance or maintainability into concrete architecture-driving scenarios."
 inputs: ["non-functional goals", "stakeholders", "critical scenarios", "constraints"]

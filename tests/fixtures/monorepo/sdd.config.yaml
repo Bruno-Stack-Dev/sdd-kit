@@ -1,0 +1,69 @@
+# Fixture sintética do SDD Kit (sem código proprietário).
+version: 3
+project:
+  name: Escola
+  type: monorepo web + API
+  domain: fixture sintética (monorepo web + API)
+  stage: MVP
+  updated_at: 2026-09-23
+commands:
+  test: pnpm -r test
+  e2e: pnpm --filter web e2e
+paths:
+  specs: specs/
+numbering:
+  prefix: ESC-
+  increment: 10
+  start: auto
+pipelines:
+  frontend:
+    - id: contratos
+      name: Contratos/tipos
+      agent: agente-arquiteto-contratos
+    - id: mocks
+      name: Dados mockados
+      agent: agente-mock-data
+    - id: store
+      name: Estado/store
+      agent: agente-frontend
+    - id: ui
+      name: UI + rotas + menu
+      agent: agente-frontend
+    - id: testes
+      name: Testes de componente
+      agent: agente-qa-testes
+    - id: e2e
+      name: Testes e2e
+      agent: agente-e2e
+    - id: guardiao
+      name: Guardião
+      agent: agente-spec-guardian
+      guardian: true
+  api:
+    - id: contract
+      name: Contrato de API
+      agent: agente-arquiteto-contratos
+    - id: migration
+      name: Migration
+      agent: agente-backend
+    - id: repository
+      name: Repositório
+      agent: agente-backend
+    - id: service
+      name: Serviço
+      agent: agente-backend
+    - id: handler
+      name: Handler + RBAC
+      agent: agente-backend
+    - id: integration-test
+      name: Testes de integração
+      agent: agente-qa-testes
+    - id: guardian
+      name: Guardião
+      agent: agente-spec-guardian
+      guardian: true
+rules:
+  - "Spec-driven: todo trabalho deriva de uma spec."
+forbidden_patterns: []
+human_gates: []
+blocked_topics: []

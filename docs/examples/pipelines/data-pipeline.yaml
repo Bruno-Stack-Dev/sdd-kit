@@ -1,0 +1,28 @@
+# Pipeline de dados/ETL. Cole em `pipelines:` do sdd.config.yaml e ajuste.
+# Cada etapa vira uma tarefa em `sdd spec new --pipeline data`, na ordem, com o agente da etapa.
+data:
+  - id: contract
+    name: Contrato de dados
+    agent: agente-arquiteto-contratos
+    output: schemas de entrada/saída e regras de qualidade
+  - id: ingestion
+    name: Ingestão
+    agent: agente-backend
+    output: leitura idempotente com checkpoint
+  - id: transform
+    name: Transformação
+    agent: agente-backend
+    output: transformações puras e testáveis
+  - id: load
+    name: Carga
+    agent: agente-backend
+    output: escrita transacional; nunca em produção a partir do agente
+  - id: data-test
+    name: Testes de dados
+    agent: agente-qa-testes
+    output: amostras sintéticas, casos de borda e contagem de linhas
+  - id: guardian
+    name: Guardião
+    agent: agente-spec-guardian
+    output: evidência por CA
+    guardian: true

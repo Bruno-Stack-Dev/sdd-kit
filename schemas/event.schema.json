@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Bruno-Stack-Dev/sdd-kit/schemas/event.schema.json",
+  "title": "Evento do log de estado do SDD (.sdd/events.jsonl), versão 1",
+  "description": "Uma linha JSON por evento, append-only. O estado (.sdd/state.json) e o LEDGER são derivados destes eventos por um reducer determinístico.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["v", "id", "ts", "type"],
+  "properties": {
+    "v": { "const": 1 },
+    "id": { "type": "string", "format": "uuid" },
+    "ts": { "type": "string", "format": "date-time" },
+    "type": {
+      "enum": [
+        "SESSION_STARTED", "SESSION_FINISHED",
+        "DISCOVERY_STARTED", "DISCOVERY_COMPLETED",
+        "SPEC_CREATED", "SPEC_UPDATED", "SPEC_IMPLEMENTED", "SPEC_ARCHIVED",
+        "PLAN_CREATED",
+        "TASK_CREATED", "TASK_STARTED", "TASK_BLOCKED", "TASK_COMPLETED", "TASK_CANCELLED", "TASK_REOPENED",
+        "TEST_STARTED", "TEST_PASSED", "TEST_FAILED",
+        "GUARDIAN_STARTED", "GUARDIAN_REJECTED", "GUARDIAN_APPROVED",
+        "GATE_BLOCKED", "GATE_PASSED",
+        "LEDGER_IMPORTED", "CONFIG_MIGRATED",
+        "PACK_ACTIVATED", "PACK_DEACTIVATED"
+      ]
+    },
+    "session": { "type": ["string", "null"], "maxLength": 200 },
+    "trace": { "type": ["string", "null"], "maxLength": 200 },
+    "spec": { "type": ["string", "null"], "maxLength": 200 },
+    "plan": { "type": ["string", "null"], "maxLength": 200 },
+    "task": { "type": ["string", "null"], "maxLength": 200 },
+    "agent": { "type": ["string", "null"], "maxLength": 200 },
+    "gate": { "type": ["string", "null"], "maxLength": 200 },
+    "result": { "type": ["string", "null"], "maxLength": 200 },
+    "key": { "type": ["string", "null"], "maxLength": 300, "description": "Chave de idempotência: um segundo evento com a mesma chave é ignorado." },
+    "meta": {
+      "type": "object",
+      "description": "Metadado pequeno (evidências, contagens, motivo). Nunca segredos nem conteúdo de arquivo.",
+      "maxProperties": 20
+    }
+  }
+}

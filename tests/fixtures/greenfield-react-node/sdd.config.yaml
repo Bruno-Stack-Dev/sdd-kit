@@ -1,0 +1,74 @@
+# Fixture sintética do SDD Kit (sem código proprietário).
+version: 3
+project:
+  name: Loja de Livros
+  type: SaaS web (React + Node)
+  domain: fixture sintética (SaaS web (React + Node))
+  stage: MVP
+  updated_at: 2026-09-23
+commands:
+  test: npx vitest run
+  e2e: npx playwright test
+  typecheck: npx tsc --noEmit
+paths:
+  specs: specs/
+numbering:
+  prefix: LOJ-
+  increment: 10
+  start: auto
+pipelines:
+  frontend:
+    - id: contratos
+      name: Contratos/tipos
+      agent: agente-arquiteto-contratos
+    - id: mocks
+      name: Dados mockados
+      agent: agente-mock-data
+    - id: store
+      name: Estado/store
+      agent: agente-frontend
+    - id: ui
+      name: UI + rotas + menu
+      agent: agente-frontend
+    - id: testes
+      name: Testes de componente
+      agent: agente-qa-testes
+    - id: e2e
+      name: Testes e2e
+      agent: agente-e2e
+    - id: guardiao
+      name: Guardião
+      agent: agente-spec-guardian
+      guardian: true
+  api:
+    - id: contract
+      name: Contrato de API
+      agent: agente-arquiteto-contratos
+    - id: migration
+      name: Migration
+      agent: agente-backend
+    - id: repository
+      name: Repositório
+      agent: agente-backend
+    - id: service
+      name: Serviço
+      agent: agente-backend
+    - id: handler
+      name: Handler + RBAC
+      agent: agente-backend
+    - id: integration-test
+      name: Testes de integração
+      agent: agente-qa-testes
+    - id: guardian
+      name: Guardião
+      agent: agente-spec-guardian
+      guardian: true
+rules:
+  - "Spec-driven: todo trabalho deriva de uma spec."
+forbidden_patterns: []
+human_gates: []
+blocked_topics: []
+stack:
+  framework: React 19 + TypeScript
+  backend: Node 22 + Fastify
+  package_manager: npm

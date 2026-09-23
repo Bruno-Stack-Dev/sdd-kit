@@ -1,6 +1,6 @@
 ---
 name: arch-integration-boundary-mapper
-description: Mapeia onde sistemas, módulos ou serviços se integram e identifica propriedade, contratos, movimento de dados e risco de coordenação. Acione quando pedirem: mapear integrações, identificar contratos entre sistemas, analisar fluxos de dados e eventos, avaliar acoplamento entre serviços. Não acione para decidir quais serviços criar — use arch-service-decomposition-advisor.
+description: "Mapeia onde sistemas, módulos ou serviços se integram e identifica propriedade, contratos, movimento de dados e risco de coordenação. Acione quando pedirem: mapear integrações, identificar contratos entre sistemas, analisar fluxos de dados e eventos, avaliar acoplamento entre serviços. Não acione para decidir quais serviços criar — use arch-service-decomposition-advisor."
 pack: "software-architecture-pack"
 purpose: "Map where systems, modules, or services integrate and identify ownership, contracts, data movement, and coordination risk."
 inputs: ["system context", "internal and external integrations", "data and event flows", "ownership boundaries"]

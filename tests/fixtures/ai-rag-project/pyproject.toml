@@ -1,0 +1,3 @@
+[project]
+name = "assistente-juridico"
+dependencies = ["anthropic", "qdrant-client", "pydantic"]

@@ -1,34 +1,107 @@
+# CI do SDD Kit — roda em todo PR e em push na main. Sem segredos, sem rede além do checkout/setup,
+# sem tokens de modelo. Evals com modelo e scanners externos ficam em workflows manuais/noturnos.
+# Actions fixadas por SHA (tags em comentário; ver docs/references/integrations-snapshot.md).
 name: CI
 
 on:
-  push:
   pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  lint-and-node-tests:
-    name: Lint + testes do linter (node)
+  checks:
+    name: Lint, doctor, lock, evals determinísticas, segredos
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: "22"
       - name: sdd-lint (specs/ + .claude/)
         run: node scripts/sdd-lint.mjs
-      - name: Testes do linter (node:test, zero-dep)
-        # Forma com glob (expandida pelo shell) — funciona em qualquer versão do Node.
-        # A forma de diretório `node --test scripts/tests/` só recorre em Node >= 21.
-        run: node --test scripts/tests/*.test.mjs
+      - name: Doctor completo (motor, schemas, skills, plugin, MCP, segurança)
+        run: node scripts/sdd.mjs doctor --full
+      - name: Segredos e arquivos sensíveis versionados
+        run: node scripts/sdd.mjs doctor --security
+      - name: Integridade das skills e packs (skills.lock.json)
+        run: node scripts/sdd.mjs skills verify
+      - name: Testes do Promptfoo em dia com as evals das skills
+        run: |
+          node scripts/sdd.mjs eval export-promptfoo
+          git diff --exit-code -- evals/promptfoo/generated-tests.yaml
+      - name: Visão da config de exemplo em dia com o YAML
+        run: node scripts/sdd.mjs config render --from sdd.config.example.yaml --to sdd.config.example.md --check
+      - name: Evals determinísticas contra o baseline
+        run: node scripts/sdd.mjs eval run
 
-  python-skill-tests:
-    name: Testes Python das skills uiux-*
-    runs-on: ubuntu-latest
+  node-tests:
+    name: Testes (node ${{ matrix.node }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ["22"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ matrix.node }}
+      - name: node:test (zero dependências)
+        # Glob entre aspas: expandido pelo próprio node --test (Node >= 21), igual em Linux e Windows.
+        run: node --test "tests/**/*.test.mjs"
+
+  runtime-node20:
+    name: Runtime mínimo (Node 20) — instalação e doctor num projeto novo
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "20"
+      - name: CLI no Node 20
+        run: node scripts/sdd.mjs version
+      - name: Instala em modo cópia, aplica um projeto de exemplo e roda o doctor
+        # Logo após o init a config ainda tem placeholders (o /sdd-init os preenche); a fixture
+        # greenfield faz o papel de um projeto já configurado.
+        run: |
+          P="$RUNNER_TEMP/projeto"
+          mkdir -p "$P"
+          node scripts/sdd.mjs init --mode copy --root "$P"
+          cp -r tests/fixtures/greenfield-react-node/. "$P/"
+          node "$P/scripts/sdd.mjs" doctor --fast --root "$P"
+          node "$P/scripts/sdd.mjs" tasks sync --root "$P"
+          node "$P/scripts/sdd.mjs" state verify --root "$P"
+
+  python-packs:
+    name: Testes Python do pack uiux
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.12"
-      - name: Instalar pytest
-        run: pip install pytest
+      - name: Instalar pytest (versão fixada)
+        run: python -m pip install pytest==9.1.1
       - name: pytest .claude/skills
-        run: pytest .claude/skills
+        run: python -m pytest .claude/skills -q

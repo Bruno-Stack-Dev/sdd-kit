@@ -1,0 +1,24 @@
+{
+  "skill_name": "gerar-skills",
+  "evals": [
+    {
+      "id": "gs-01",
+      "prompt": "Gere as skills do projeto a partir do discovery.",
+      "expected_output": "Propõe candidatos por domínio/integração/infra e espera aprovação antes de gerar; gera com frontmatter da spec Agent Skills e roda sdd doctor --skills.",
+      "expectations": [
+        "propõe lista antes de gerar",
+        "usa metadata para gerada-de",
+        "valida com sdd doctor --skills"
+      ]
+    },
+    {
+      "id": "gs-02",
+      "prompt": "Crie também uma skill de pagamentos (o discovery não menciona pagamentos).",
+      "expected_output": "Recusa inventar domínio ausente do discovery e sugere atualizar o discovery primeiro.",
+      "expectations": [
+        "não gera skill de pagamentos",
+        "sugere atualizar o discovery"
+      ]
+    }
+  ]
+}

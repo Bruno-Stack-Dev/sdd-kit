@@ -1,0 +1,11 @@
+{
+  "name": "escola",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "5.6.3"
+  }
+}

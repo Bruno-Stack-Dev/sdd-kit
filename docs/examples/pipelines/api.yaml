@@ -1,0 +1,32 @@
+# Pipeline de API (serviço HTTP). Cole em `pipelines:` do sdd.config.yaml e ajuste.
+# Cada etapa vira uma tarefa em `sdd spec new --pipeline api`, na ordem, com o agente da etapa.
+api:
+  - id: contract
+    name: Contrato de API
+    agent: agente-arquiteto-contratos
+    output: OpenAPI/tipos com erros padronizados
+  - id: migration
+    name: Migration + schema
+    agent: agente-backend
+    output: migration reversível; invariantes como constraints
+  - id: repository
+    name: Repositório
+    agent: agente-backend
+    output: acesso a dados isolado e escopado
+  - id: service
+    name: Serviço
+    agent: agente-backend
+    output: regra de negócio e transações no serviço
+  - id: handler
+    name: Handler + RBAC
+    agent: agente-backend
+    output: endpoints do contrato com RBAC no servidor
+  - id: integration-test
+    name: Testes de integração
+    agent: agente-qa-testes
+    output: feliz + falhas + permissão negada por endpoint
+  - id: guardian
+    name: Guardião
+    agent: agente-spec-guardian
+    output: evidência por CA + padrões proibidos
+    guardian: true

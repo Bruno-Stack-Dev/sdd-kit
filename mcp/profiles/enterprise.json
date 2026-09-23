@@ -1,0 +1,7 @@
+{
+  "name": "enterprise",
+  "description": "Organizações com muitos MCPs: um único endpoint via gateway ContextForge (auth, política, auditoria). Ver docs/mcp/enterprise-contextforge.md.",
+  "servers": [
+    "contextforge"
+  ]
+}

@@ -1,0 +1,60 @@
+# Fixture sintética do SDD Kit (sem código proprietário).
+version: 3
+project:
+  name: Assistente Jurídico
+  type: API com RAG
+  domain: fixture sintética (API com RAG)
+  stage: MVP
+  updated_at: 2026-09-23
+commands:
+  test: pytest -q
+paths:
+  specs: specs/
+numbering:
+  prefix: JUR-
+  increment: 10
+  start: auto
+pipelines:
+  api:
+    - id: contract
+      name: Contrato de API
+      agent: agente-arquiteto-contratos
+    - id: migration
+      name: Migration
+      agent: agente-backend
+    - id: repository
+      name: Repositório
+      agent: agente-backend
+    - id: service
+      name: Serviço
+      agent: agente-backend
+    - id: handler
+      name: Handler + RBAC
+      agent: agente-backend
+    - id: integration-test
+      name: Testes de integração
+      agent: agente-qa-testes
+    - id: guardian
+      name: Guardião
+      agent: agente-spec-guardian
+      guardian: true
+rules:
+  - "Spec-driven: todo trabalho deriva de uma spec."
+forbidden_patterns: []
+human_gates: []
+blocked_topics: []
+stack:
+  language: Python 3.12
+  framework: FastAPI
+  llm: Claude (API Anthropic)
+  vector_db: Qdrant
+integrations:
+  packs:
+    - ai
+ai:
+  llm: cloud
+  agents: single-agent
+  rag: vector
+  memory: session
+  pii: true
+  data_residency: dados de clientes não saem da região BR

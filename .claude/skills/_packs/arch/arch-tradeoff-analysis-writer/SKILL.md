@@ -1,6 +1,6 @@
 ---
 name: arch-tradeoff-analysis-writer
-description: Analisa opções concorrentes de arquitetura contra critérios explícitos e mostra o que se ganha e se perde em cada caminho. Acione quando pedirem: analisar trade-offs, comparar opções de arquitetura por critérios, montar uma matriz de decisão, justificar a escolha entre alternativas. Não acione para registrar a decisão final — use arch-adr-writer depois.
+description: "Analisa opções concorrentes de arquitetura contra critérios explícitos e mostra o que se ganha e se perde em cada caminho. Acione quando pedirem: analisar trade-offs, comparar opções de arquitetura por critérios, montar uma matriz de decisão, justificar a escolha entre alternativas. Não acione para registrar a decisão final — use arch-adr-writer depois."
 pack: "software-architecture-pack"
 purpose: "Analyze competing architecture options against explicit criteria and show what is gained and lost with each path."
 inputs: ["candidate options", "evaluation criteria", "context and priorities", "known risks"]

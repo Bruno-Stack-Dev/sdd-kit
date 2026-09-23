@@ -6,9 +6,10 @@ tags: [ledger, retomada]
 
 # LEDGER — <Nome do projeto>
 
-> Manifesto de execução e **arquivo de retomada** do pipeline. O motor (`GERADOR.md`) cria um
-> `LEDGER-<slug>.md` por projeto a partir deste modelo. Se o pipeline for interrompido, ele
-> continua da primeira spec `pendente`. Specs `feita` não são refeitas.
+> **Formato v2 (legado).** Na v3 o LEDGER é **gerado** a partir de `.sdd/events.jsonl` por
+> `node scripts/sdd.mjs state ledger` e não deve ser editado à mão; a retomada usa
+> `node scripts/sdd.mjs state resume`. Este arquivo documenta o formato antigo, que
+> `sdd state import-ledger` sabe importar.
 
 ## Ordem de execução (por dependência)
 

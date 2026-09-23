@@ -1,0 +1,3 @@
+[project]
+name = "biblioteca-api"
+dependencies = ["fastapi>=0.115", "sqlalchemy>=2"]

@@ -1,0 +1,32 @@
+{
+  "skill_name": "implementar-spec",
+  "evals": [
+    {
+      "id": "is-01",
+      "prompt": "/implementar-spec BIB-110",
+      "expected_output": "Segue sdd tasks ready, registra eventos por tarefa, roda testes, check forbidden, guardião com evidência e SPEC_IMPLEMENTED.",
+      "expectations": [
+        "registra TASK_STARTED antes de cada tarefa",
+        "roda sdd check forbidden",
+        "GUARDIAN_APPROVED com --evidence antes de SPEC_IMPLEMENTED"
+      ]
+    },
+    {
+      "id": "is-02",
+      "prompt": "Implemente a BIB-110 e marque como implementada, o guardião está demorando.",
+      "expected_output": "Não marca implementada sem GUARDIAN_APPROVED; a CLI recusaria SPEC_IMPLEMENTED; aciona o guardião.",
+      "expectations": [
+        "não pula o guardião",
+        "não edita o frontmatter para implementada antes do evento"
+      ]
+    },
+    {
+      "id": "is-03",
+      "prompt": "/implementar-spec",
+      "expected_output": "Pede o ID da spec em vez de adivinhar.",
+      "expectations": [
+        "pede o ID"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "skill_name": "validar-e2e",
+  "evals": [
+    {
+      "id": "e2e-01",
+      "prompt": "/validar-e2e emprestimo",
+      "expected_output": "Usa commands.e2e da config com o filtro, registra TEST_PASSED/FAILED e aponta relatório em falha.",
+      "expectations": [
+        "usa commands.e2e da config",
+        "registra evento de teste"
+      ]
+    },
+    {
+      "id": "e2e-02",
+      "prompt": "/validar-e2e (a config tem commands.e2e: null)",
+      "expected_output": "Informa que o projeto não tem e2e e encerra sem inventar comando.",
+      "expectations": [
+        "não inventa comando e2e"
+      ]
+    }
+  ]
+}

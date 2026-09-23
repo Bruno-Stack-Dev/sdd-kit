@@ -1,0 +1,237 @@
+# sdd.config.yaml — configuração executável do projeto para o SDD Kit v3.
+#
+# É o ÚNICO arquivo com fatos deste projeto (stack, paths, comandos, regras, proibições, gates).
+# O motor e os agentes são genéricos e leem daqui. Para começar: copie para a raiz do projeto como
+# `sdd.config.yaml` e preencha (ou rode /sdd-init). Valide com:
+#
+#   node scripts/sdd.mjs config validate
+#
+# A visão legível `sdd.config.md` é GERADA a partir deste arquivo (`config render`). Não a edite.
+#
+# Placeholders `<ex.: ...>` e `<TODO>` são avisos; nas seções críticas (forbidden_patterns,
+# human_gates, blocked_topics) são ERRO — preencha com valores reais ou use `[]` (= nenhum).
+# Subconjunto de YAML aceito: ver docs/adr/ADR-0002 (sem âncoras, tags ou escalares multilinha soltos).
+
+version: 3
+
+# 1. Identidade
+project:
+  name: "<ex.: Educational AI Hub>"
+  type: "<ex.: SaaS B2B web · CLI · API · biblioteca>"
+  domain: "<ex.: o que o produto faz, em uma frase>"
+  stage: "<ex.: mock-first · MVP · produção>"        # governa se as pipelines de backend se aplicam
+  updated_at: "<ex.: 2026-09-23>"
+
+# 2. Stack (chaves livres) e comandos (o motor roda exatamente estes; null = n/a)
+stack:
+  framework: "<ex.: Vue 3 + TypeScript>"
+  ui_library: "<ex.: Lyceo Design System via `@/ui`>"   # ou null
+  state: "<ex.: Pinia>"
+  package_manager: "<ex.: npm>"
+commands:
+  test: "<ex.: cd apps/web-frontend && npx vitest run>"
+  e2e: "<ex.: cd apps/web-frontend && npx playwright test>"   # ou null
+  typecheck: "<ex.: npm run typecheck>"                        # ou null
+
+# 3. Paths — onde cada artefato é escrito (null = não se aplica; <modulo> é marcador)
+paths:
+  specs: specs/
+  contracts: "<ex.: packages/types-contracts/>"
+  module: "<ex.: apps/web-frontend/src/modules/<modulo>/>"
+  mocks: "<ex.: <modulo>/mocks/*.mock.ts>"
+  stores: "<ex.: <modulo>/stores/*.ts>"
+  views: "<ex.: <modulo>/views/*.vue>"
+  routes: "<ex.: <modulo>/routes/index.ts>"
+  navigation: "<ex.: src/layouts/AppShell.vue>"   # registro do menu, ou null
+  tests: "<ex.: <modulo>/__tests__/>"
+  e2e: "<ex.: apps/web-frontend/e2e/>"
+  # 3-B. Só se houver backend real (remova o bloco num projeto mock-first)
+  backend:
+    root: "<ex.: apps/api/>"
+    handlers: "<ex.: apps/api/src/routes/>"
+    services: "<ex.: apps/api/src/services/>"
+    repositories: "<ex.: apps/api/src/repositories/>"
+    migrations: "<ex.: apps/api/migrations/>"
+    openapi: "<ex.: specs/apis/openapi.yaml>"
+    integration_tests: "<ex.: apps/api/tests/integration/>"
+
+# 4. Numeração de specs — `sdd spec new` calcula o próximo ID a partir daqui
+numbering:
+  prefix: "<ex.: SPEC-2026->"
+  increment: 10
+  start: auto            # auto = próximo bloco de centena livre em specs/
+
+# 5. Pipelines — etapas que o motor executa, uma por vez até o verde. `sdd spec new` gera uma tarefa
+# por etapa. Troque livremente por projeto (ver docs/examples/pipelines/ para API, CLI, frontend).
+# `guardian: true` marca a etapa que precisa aprovar (evento GUARDIAN_APPROVED) antes de fechar a spec.
+pipelines:
+  frontend:
+    - id: contratos
+      name: Contratos/tipos
+      agent: agente-arquiteto-contratos
+      output: tipos no path de contratos; literais p/ gates; Patch omite imutáveis
+    - id: mocks
+      name: Dados mockados
+      agent: agente-mock-data
+      output: ≥5 itens cobrindo todos os estados; sem relógio real
+    - id: store
+      name: Estado/store + invariantes
+      agent: agente-frontend
+      output: gate na store, escopo em todo getter/escrita, estados terminais
+    - id: ui
+      name: UI + rotas + menu
+      agent: agente-frontend
+      output: telas + rota + entrada no menu
+      when: se houver UI
+    - id: testes
+      name: Testes unit/componente
+      agent: agente-qa-testes
+      output: 1 teste por CA + 1 invariante por regra crítica
+    - id: e2e
+      name: Testes e2e
+      agent: agente-e2e
+      output: fluxo navegável real, entrando pelo menu
+      when: se houver UI navegável
+    - id: guardiao
+      name: Guardião
+      agent: agente-spec-guardian
+      output: cada CA com evidência + padrões proibidos = esperado
+      guardian: true
+  backend:
+    - id: contrato-api
+      name: Contrato de API
+      agent: agente-arquiteto-contratos
+      output: OpenAPI/tipos; erros padronizados
+    - id: migrations
+      name: Migrations + schema
+      agent: agente-backend
+      output: migrations reversíveis; invariantes como constraints
+    - id: repositorios
+      name: Repositórios
+      agent: agente-backend
+      output: acesso a dados isolado; escopo multi-tenant aplicado
+    - id: servicos
+      name: Serviços (regra de negócio)
+      agent: agente-backend
+      output: invariantes e transações no serviço
+    - id: handlers
+      name: Handlers + RBAC + validação
+      agent: agente-backend
+      output: endpoints da API.md; auth/RBAC/rate-limit no servidor
+    - id: integracao
+      name: Testes de integração
+      agent: agente-qa-testes
+      output: 1 teste por endpoint (feliz + falhas + permissão)
+    - id: conformidade
+      name: Conformidade de contrato
+      agent: agente-spec-guardian
+      output: respostas batem com OpenAPI; RBAC negado testado
+      guardian: true
+  delivery:
+    - id: arquitetura
+      name: Fidelidade à arquitetura
+      agent: agente-arquiteto-guardian
+      output: código respeita os ADRs; sem dependência proibida entre camadas
+      guardian: true
+    - id: ci-cd
+      name: CI/CD + empacotamento
+      agent: agente-devops
+      output: pipeline (build→test→deploy) conforme INFRA.md
+
+# 6. Regras inegociáveis — o guardião recusa entregas que violem qualquer item
+rules:
+  - "**Spec-driven.** Todo trabalho deriva de uma spec em `specs/`. Sem spec → `/nova-spec` antes."
+  - "<ex.: **UI só via `@/ui`**; nunca outra lib de componentes.>"
+  - "<ex.: **Mock-first** — sem banco, sem relógio real (`Date.now()`); datas mockadas fixas.>"
+  - "<ex.: **Contrato é a fonte da verdade** — backends se conformam aos tipos.>"
+  - "<ex.: **Toda tela navegável está no menu** — rota sem menu é bug de entrega.>"
+  - "<ex.: **1 teste por CA + 1 invariante por regra crítica** (provar ausência).>"
+
+# 7. Padrões proibidos (CRÍTICO) — `sdd check forbidden` roda cada linha; resultado = expected.
+# Sem proibições: `forbidden_patterns: []`
+forbidden_patterns:
+  - pattern: "<ex.: primeicons|<i class=\"pi\">>"
+    scope: "<ex.: apps/web-frontend/src>"
+    expected: 0
+    reason: "<ex.: lib de ícones concorrente do design system>"
+  - pattern: "<ex.: Date\\.now\\(\\)>"
+    scope: "<ex.: src/modules/>"
+    expected: 0
+
+# 8. Gates de controle humano (CRÍTICO) — onde uma sugestão nunca vira decisão sem confirmação.
+# Sem gates de IA sobre pessoas: `human_gates: []`
+human_gates:
+  - decision: "<ex.: situação final do aluno>"
+    entity: "<ex.: ConselhoClasse>"
+    setter: "<ex.: registrarDecisao()>"
+    invariant: nenhum setter alternativo existe
+
+# 9. Tópicos bloqueados (CRÍTICO) — pare e avise. Nenhum: `blocked_topics: []`
+blocked_topics:
+  - "<ex.: biometria, reconhecimento facial, detecção de comportamento/armas>"
+
+# 10. Defaults para campos opcionais do brief
+defaults:
+  multi_tenant: "<ex.: escopo por `unidadeId` em todo getter/escrita>"
+  sensitive_data: "<ex.: nome de menores é sensível; sem PII extra>"
+  non_goals: "<ex.: sem backend/banco (mock-first)>"
+  technical_constraints: "<ex.: stack da seção 2>"
+
+# 11. Portões de engenharia (opcionais) — o doctor reporta; `blocking: true` bloqueia
+engineering_gates:
+  coverage:
+    enabled: false
+    blocking: false
+    command: "<ex.: npx vitest run --coverage>"
+    threshold: 80
+  dependency_audit:
+    enabled: false
+    blocking: false
+    command: "<ex.: npm audit --audit-level=high>"
+  security_lint:
+    enabled: false
+    blocking: false
+    command: "<ex.: semgrep --config auto>"
+  reversible_migrations:
+    enabled: false
+    blocking: false
+    command: "<ex.: comando que testa up+down>"
+  contract_conformance:
+    enabled: false
+    blocking: false
+    command: "<ex.: validar respostas contra specs/apis/openapi.yaml>"
+
+# Segurança — soma-se às políticas núcleo do kit (policies/sdd-policy.json); nunca relaxa o piso.
+security:
+  protected_paths: []                # globs extras que agentes não podem ler/editar
+  production:
+    db_write: deny                   # deny | ask
+    markers: []                      # trechos que identificam produção em comandos (ex.: "prod-db.internal")
+  destructive_git: deny              # deny | ask
+  network:
+    mode: sandbox                    # sandbox | ask | unrestricted
+    allowed_domains: []              # domínios extras liberados no sandbox
+
+# Integrações opcionais
+integrations:
+  mcp_profile: minimal               # mcp/profiles/<nome>.json · null = sem MCP
+  packs: []                          # arch | ds | uiux | ai — ative com `sdd pack activate <pack>`
+  lsp:
+    enabled: false
+
+# 12. Design System (opcional) — só se o projeto mantém um DS; calibra as skills ds-*.
+# design_system:
+#   identity:
+#     name: Apex
+#     components: 24
+#     framework: react
+#     styling: css-vars
+#     theming: true
+#     tokens_root: packages/tokens/
+#     components_root: packages/ui/src/
+#   severity:
+#     hardcoded_color: high
+#     missing_aria: critical
+#   release_gates:
+#     wrong_tier: true
+#     contrast: true

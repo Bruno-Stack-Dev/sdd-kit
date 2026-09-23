@@ -1,0 +1,7 @@
+{
+  "name": "backend",
+  "description": "API/serviços: documentação. Integrações específicas (fila, cloud) só depois de aprovadas na allowlist.",
+  "servers": [
+    "context7"
+  ]
+}

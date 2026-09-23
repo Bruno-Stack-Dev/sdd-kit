@@ -1,0 +1,114 @@
+{
+  "$comment": "Política núcleo do SDD Kit — fonte ÚNICA das regras de segurança aplicadas pelos hooks (scripts/hooks/sdd-hook.mjs) e explicadas por `sdd policy check`. A config do projeto (sdd.config.yaml → security) só pode ENDURECER: acrescentar caminhos protegidos, marcadores de produção e domínios; nunca remover regras daqui. Decisões: deny (bloqueia), ask (pede confirmação humana). Ausência de regra = segue as permissões normais do Claude Code.",
+  "version": 1,
+  "paths": {
+    "sensitive": {
+      "decision": "deny",
+      "reason": "arquivo de segredo/credencial: agentes não leem, editam nem copiam (use .env.example para nomes de variáveis)",
+      "extra_globs": []
+    },
+    "state": {
+      "decision": "deny",
+      "globs": [".sdd/events.jsonl", ".sdd/state.json"],
+      "reason": "estado do SDD: grave com `node scripts/sdd.mjs event ...` / `state rebuild`, nunca editando o arquivo"
+    },
+    "generated_marker": "AUTO-GENERATED — DO NOT EDIT DIRECTLY",
+    "generated": {
+      "decision": "deny",
+      "reason": "arquivo gerado (cabeçalho AUTO-GENERATED): edite a fonte indicada no cabeçalho e regenere"
+    },
+    "guardrails": {
+      "decision": "ask",
+      "globs": [".claude/settings.json", ".claude/settings.local.json", "policies/**", "scripts/hooks/**", "hooks/hooks.json", ".mcp.json", "mcp/policies/**", "mcp/mcp.lock.json", "skills.lock.json"],
+      "reason": "altera permissões, hooks, política ou governança de MCP/skills — exige confirmação humana"
+    },
+    "outside_project": {
+      "decision": "ask",
+      "reason": "escrita fora do diretório do projeto"
+    }
+  },
+  "auditors": {
+    "agents": ["agente-spec-guardian", "agente-arquiteto-guardian", "agente-revisor-ux"],
+    "suffix": "-guardian",
+    "writable_globs": [".sdd/reports/**"],
+    "decision": "deny",
+    "reason": "auditor não altera o que audita: relate o achado; a correção volta ao agente da camada"
+  },
+  "bash": {
+    "git": {
+      "push_force": { "decision": "deny", "reason": "force-push reescreve histórico remoto" },
+      "push": { "decision": "deny", "config_override": "destructive_git", "reason": "push publica código: só com pedido explícito do usuário, feito por ele" },
+      "reset_hard": { "decision": "deny", "config_override": "destructive_git", "reason": "descarta alterações locais sem volta" },
+      "clean_force": { "decision": "deny", "config_override": "destructive_git", "reason": "apaga arquivos não versionados sem volta" },
+      "discard_changes": { "decision": "ask", "reason": "descarta alterações locais (checkout/restore de caminhos)" },
+      "branch_force_delete": { "decision": "ask", "reason": "apaga branch sem checar merge" },
+      "history_rewrite": { "decision": "deny", "reason": "reescrita de histórico (filter-branch/filter-repo, reflog expire, gc --prune=now)" },
+      "stash_drop": { "decision": "ask", "reason": "descarta stash" }
+    },
+    "rm": {
+      "dangerous_targets": ["/", "/*", "~", "~/", "~/*", ".", "./", "./*", "..", "../", "*", ".git", ".git/", "$HOME", "${HOME}", "C:\\", "C:/", "%USERPROFILE%", ".sdd", ".sdd/"],
+      "dangerous": { "decision": "deny", "reason": "remoção recursiva de raiz, home, diretório atual, .git ou .sdd" },
+      "recursive_force": { "decision": "ask", "reason": "remoção recursiva forçada" }
+    },
+    "privilege": { "commands": ["sudo", "doas", "su", "runas", "pkexec"], "decision": "deny", "reason": "elevação de privilégio" },
+    "system": {
+      "commands": ["mkfs", "fdisk", "diskpart", "format", "shutdown", "reboot", "halt", "poweroff", "init"],
+      "decision": "deny",
+      "reason": "comando de sistema destrutivo"
+    },
+    "pipe_to_interpreter": {
+      "sources": ["curl", "wget", "iwr", "invoke-webrequest", "irm", "invoke-restmethod", "fetch"],
+      "interpreters": ["sh", "bash", "zsh", "dash", "ksh", "python", "python3", "node", "perl", "ruby", "php", "iex", "invoke-expression", "pwsh", "powershell"],
+      "decision": "deny",
+      "reason": "baixar e executar código remoto sem revisão"
+    },
+    "network": {
+      "commands": ["curl", "wget", "iwr", "invoke-webrequest", "irm", "invoke-restmethod", "nc", "ncat", "netcat", "telnet", "ftp", "sftp", "scp", "ssh", "rsync", "socat"],
+      "decision": "ask",
+      "reason": "acesso à rede: negar curl/wget não bloqueia rede (node, python, npm também acessam) — a barreira real é o sandbox; aqui só explicitamos a intenção"
+    },
+    "install": {
+      "patterns": [
+        "^npm (i|install|add) +[^-]",
+        "^npm (i|install) +.*(-g|--global)",
+        "^npx +(-y|--yes) ",
+        "^pnpm (add|dlx) ",
+        "^yarn (add|dlx) ",
+        "^bun (add|x) ",
+        "^bunx ",
+        "^(pip|pip3) install +(?!-r |--requirement|-e \\.|\\.)",
+        "^python3? -m pip install +(?!-r |--requirement|-e \\.|\\.)",
+        "^uv (add|pip install) ",
+        "^uvx ",
+        "^pipx (install|run) ",
+        "^poetry add ",
+        "^go (get|install) ",
+        "^cargo (add|install) ",
+        "^gem install ",
+        "^composer require ",
+        "^dotnet add .* package ",
+        "^brew install ",
+        "^(apt|apt-get|yum|dnf|apk|choco|winget|scoop) (install|add) "
+      ],
+      "decision": "ask",
+      "reason": "instala dependência nova (supply chain): confirme a necessidade, a licença e a versão"
+    },
+    "env_dump": { "commands": ["printenv", "env", "set", "export", "get-childitem env:", "gci env:"], "decision": "ask", "reason": "imprime variáveis de ambiente (podem conter segredos)" },
+    "database": {
+      "clients": ["psql", "pg_restore", "pg_dump", "mysql", "mariadb", "mongosh", "mongo", "sqlcmd", "redis-cli", "cqlsh", "clickhouse-client", "sqlplus"],
+      "migrators": ["prisma migrate deploy", "prisma db push", "knex migrate:latest", "alembic upgrade", "flyway migrate", "liquibase update", "rails db:migrate", "rake db:migrate", "sequelize db:migrate", "typeorm migration:run", "dotnet ef database update", "goose up", "migrate -path", "atlas migrate apply"],
+      "write_sql": "\\b(INSERT|UPDATE|DELETE|DROP|TRUNCATE|ALTER|CREATE|GRANT|REVOKE|MERGE|REPLACE)\\b",
+      "destructive_sql": "\\b(DROP\\s+(DATABASE|SCHEMA|TABLE)|TRUNCATE)\\b",
+      "production_markers": ["prod", "production", "prd", "live"],
+      "production_write": { "decision": "deny", "config_override": "production.db_write", "reason": "escrita em banco de PRODUÇÃO" },
+      "destructive": { "decision": "ask", "reason": "SQL destrutivo (DROP/TRUNCATE)" }
+    },
+    "infra": {
+      "patterns": ["^kubectl (delete|drain|cordon|scale)", "^terraform (destroy|apply)", "^tofu (destroy|apply)", "^pulumi (destroy|up)", "^helm (uninstall|delete|upgrade)", "^aws s3 (rm|rb)", "^gcloud .* delete", "^az .* delete", "^docker (system prune|volume rm|rm -f)"],
+      "decision": "ask",
+      "production_decision": "deny",
+      "reason": "altera ou destrói infraestrutura"
+    },
+    "unparseable": { "decision": "ask", "reason": "comando não analisável com segurança (aspas desbalanceadas ou construção dinâmica)" }
+  }
+}

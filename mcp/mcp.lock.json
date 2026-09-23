@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "$comment": "Pins revisados dos servidores da allowlist. tools/schema_hash são capturados com `sdd mcp pin <servidor> --consent` (executa o servidor via MCP Inspector num ambiente isolado); null = ainda não capturado.",
+  "servers": {
+    "context7": {
+      "package": "@upstash/context7-mcp",
+      "version": "4.1.1",
+      "tools": [
+        "resolve-library-id",
+        "query-docs"
+      ],
+      "tools_source": "documentação oficial (não capturado)",
+      "schema_hash": null,
+      "captured_at": null
+    },
+    "playwright": {
+      "package": "@playwright/mcp",
+      "version": "0.0.82",
+      "tools": null,
+      "tools_source": null,
+      "schema_hash": null,
+      "captured_at": null
+    },
+    "contextforge": {
+      "package": "mcp-contextforge-gateway",
+      "version": "1.0.10",
+      "tools": null,
+      "tools_source": "depende dos servidores federados no gateway",
+      "schema_hash": null,
+      "captured_at": null
+    }
+  }
+}

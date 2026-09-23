@@ -21,9 +21,10 @@ Esta pasta guarda os artefatos de **descoberta** gerados pelo `/sdd-init` quando
 ## Dois modos de geração
 
 - **Projeto novo** (`DISCOVERY.md`): a fonte é a **entrevista** com o usuário.
-- **Projeto existente** (`AUDITORIA.md`): a fonte primária é o **código** (engenharia reversa);
-  cada fato leva proveniência `[código]`/`[inferido]`/`[usuário]`, e divergências ficam no
-  `AUDITORIA-DIVERGENCIAS.md` (o código prevalece).
+- **Projeto existente** (auditoria do `/sdd-init`): a fonte primária de evidência é o **código**
+  (engenharia reversa); cada fato leva proveniência (`[CODE]`, `[DOC]`, `[USER_CONFIRMED]`...), e o
+  `AUDITORIA-DIVERGENCIAS.md` separa OBSERVED × INTENDED × RUNTIME — o código existir não prova que
+  está certo; drift de segurança nunca é reconciliado sem evidência.
 
 ## Regras
 
