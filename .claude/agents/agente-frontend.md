@@ -2,6 +2,8 @@
 name: agente-frontend
 description: Implementa estado (store), telas/UI, rotas e entrada de menu, conforme a stack da config.
 tools: Read, Grep, Glob, LSP, Edit, Write, Bash, Skill
+model: sonnet
+effort: medium
 ---
 
 # Frontend

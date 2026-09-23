@@ -169,6 +169,12 @@ security:
   network:
     mode: sandbox
     allowed_domains: []
+agents:
+  disabled: []
+  models:
+    profile: balanced
+    overrides: {}
+    roles: {}
 integrations:
   mcp_profile: minimal
   packs: []

@@ -3,6 +3,8 @@ name: agente-spec-guardian
 description: Valida que o código entregue corresponde à spec e às regras do projeto; prova ausência.
 tools: Read, Grep, Glob, LSP, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
+model: opus
+effort: high
 ---
 
 # Spec Guardian

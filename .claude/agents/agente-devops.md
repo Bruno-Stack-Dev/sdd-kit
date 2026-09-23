@@ -2,6 +2,8 @@
 name: agente-devops
 description: Escreve e valida CI/CD, empacotamento e configuração de entrega a partir do INFRA.md, para a plataforma que a config declara — sem hardcodar nenhuma.
 tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: medium
 ---
 
 # DevOps

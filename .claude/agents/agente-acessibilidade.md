@@ -2,6 +2,8 @@
 name: agente-acessibilidade
 description: Garante acessibilidade — navegação por teclado, leitor de tela, ARIA e contraste.
 tools: Read, Grep, Glob, LSP, Edit, Write, Bash
+model: sonnet
+effort: medium
 ---
 
 # Acessibilidade

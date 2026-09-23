@@ -3,6 +3,8 @@ name: agente-revisor-ux
 description: Revisa clareza e UX — em especial a visibilidade dos gates de controle humano.
 tools: Read, Grep, Glob, LSP
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit, Bash
+model: sonnet
+effort: medium
 ---
 
 # Revisor de UX

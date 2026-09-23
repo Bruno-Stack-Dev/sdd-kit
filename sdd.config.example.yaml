@@ -219,6 +219,19 @@ integrations:
   lsp:
     enabled: false
 
+# Agentes e modelos — o kit escolhe o modelo de cada agente pelo papel (policies/model-routing.json):
+# guardiões e contratos no topo (opus), implementação e testes no padrão (sonnet), dados mockados no
+# leve (haiku). Reprovação no guardião, reabertura e spec grande/crítica sobem um nível.
+# `sdd models list` mostra o resultado; `sdd models resolve --task <ID>` explica uma tarefa.
+agents:
+  disabled: []                       # agentes que o motor não pode usar
+  models:
+    profile: balanced                # quality (+1 nível) | balanced | economy (-1, sem furar o piso do papel)
+    overrides: {}                    # ex.: agente-backend: deep · ou { model: opus, effort: high }
+    roles: {}                        # papel de agentes próprios do projeto: audit|design|build|verify|review|support
+# Por etapa, a pipeline aceita `model:` (light|standard|deep, opus|sonnet|haiku|inherit ou claude-...)
+# e `effort:` (low|medium|high|xhigh|max) — explícito, vence a política.
+
 # 12. Design System (opcional) — só se o projeto mantém um DS; calibra as skills ds-*.
 # design_system:
 #   identity:

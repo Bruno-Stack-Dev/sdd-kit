@@ -296,6 +296,67 @@
             "type": "string",
             "pattern": "^agente-[a-z0-9-]+$"
           }
+        },
+        "models": {
+          "description": "Roteamento de modelos por papel (policies/model-routing.json). Tudo opcional: sem este bloco o kit usa o perfil balanced.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "profile": {
+              "description": "quality sobe um nível, economy desce um (sem furar o piso do papel; guardiões ficam no topo).",
+              "enum": [
+                "quality",
+                "balanced",
+                "economy"
+              ]
+            },
+            "overrides": {
+              "description": "Modelo/esforço fixos por agente (explícito: não é ajustado por perfil nem por sinais).",
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^agente-[a-z0-9-]+$"
+              },
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/modelChoice"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "minProperties": 1,
+                    "properties": {
+                      "model": {
+                        "$ref": "#/$defs/modelChoice"
+                      },
+                      "effort": {
+                        "$ref": "#/$defs/effortLevel"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "roles": {
+              "description": "Papel de agentes próprios do projeto (ou reclassificação de um agente do kit).",
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^agente-[a-z0-9-]+$"
+              },
+              "additionalProperties": {
+                "enum": [
+                  "audit",
+                  "design",
+                  "build",
+                  "verify",
+                  "review",
+                  "support"
+                ]
+              }
+            }
+          }
         }
       }
     },
@@ -447,6 +508,14 @@
         "guardian": {
           "type": "boolean",
           "description": "Etapa de validação: exige aprovação (GUARDIAN_APPROVED) antes de fechar a spec."
+        },
+        "model": {
+          "$ref": "#/$defs/modelChoice",
+          "description": "Modelo desta etapa (explícito: vence a política e o override por agente). Omitido = o kit escolhe pelo papel do agente (`sdd models`)."
+        },
+        "effort": {
+          "$ref": "#/$defs/effortLevel",
+          "description": "Esforço desta etapa. O Agent tool não recebe esforço por chamada: vale quando igual ao do frontmatter do agente; senão, `sdd models resolve` avisa."
         }
       }
     },
@@ -541,6 +610,21 @@
           ]
         }
       }
+    },
+    "modelChoice": {
+      "description": "Nível da política de roteamento (light | standard | deep), alias de modelo do Claude Code (inherit | opus | sonnet | haiku | fable) ou ID completo (claude-...).",
+      "type": "string",
+      "pattern": "^(light|standard|deep|inherit|opus|sonnet|haiku|fable|claude-[a-z0-9][a-z0-9.-]*)$"
+    },
+    "effortLevel": {
+      "description": "Nível de esforço de raciocínio do subagente.",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ]
     }
   }
 }

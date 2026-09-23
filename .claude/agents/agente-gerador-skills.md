@@ -2,6 +2,8 @@
 name: agente-gerador-skills
 description: Lê o discovery do projeto e gera skills sob medida (por domínio, integração e banco) na pasta do projeto, sem hardcodar domínio no kit.
 tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+effort: medium
 ---
 
 # Gerador de Skills

@@ -2,6 +2,8 @@
 name: agente-qa-testes
 description: Escreve testes unit/componente cobrindo cada Critério de Aceitação e os invariantes.
 tools: Read, Grep, Glob, LSP, Edit, Write, Bash, Skill
+model: sonnet
+effort: medium
 ---
 
 # QA / Testes

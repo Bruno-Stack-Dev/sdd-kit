@@ -121,8 +121,11 @@ cada uma pelo agente declarado, **até o verde antes da próxima spec**.
 Equivale a `/implementar-spec`. Escolha a próxima tarefa com `sdd tasks ready`
 (respeita dependências) e registre o ciclo de vida de cada uma:
 
-- antes: `sdd event TASK_STARTED --task <SPEC>/T-NNN --agent <agente>` (recusado se
-  houver dependência não concluída);
+- modelo: `sdd models resolve --task <SPEC>/T-NNN --json` — o kit escolhe `model`/`effort` pelo
+  papel do agente (guardiões e contratos no nível mais alto, implementação no padrão, dados mockados
+  no leve; reprovação no guardião sobe o nível da nova tentativa). Passe o `model` ao delegar;
+- antes: `sdd event TASK_STARTED --task <SPEC>/T-NNN --agent <agente> --model <model> --effort <effort>`
+  (recusado se houver dependência não concluída);
 - travou: `event TASK_BLOCKED --task ... --reason "<motivo>"`;
 - verde: `event TASK_COMPLETED --task ...`.
 

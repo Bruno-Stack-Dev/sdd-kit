@@ -154,6 +154,8 @@ export function applyEvent(state, ev, ctx = {}) {
       t.status = 'in_progress';
       t.started = ev.ts;
       if (ev.agent) t.agent = ev.agent;
+      if (ev.meta?.model) t.model = String(ev.meta.model);
+      if (ev.meta?.effort) t.effort = String(ev.meta.effort);
       if (s && ['draft', 'planned', 'approved'].includes(s.status)) s.status = 'in_progress';
       break;
     }
@@ -199,6 +201,7 @@ export function applyEvent(state, ev, ctx = {}) {
       if (!t) return `tarefa ${ev.task} não existe no estado`;
       if (!TERMINAL_TASK.includes(t.status)) return `tarefa ${ev.task} não está concluída/cancelada`;
       t.status = 'pending';
+      t.reopened = (t.reopened ?? 0) + 1;
       const s = spec(t.spec);
       if (s && ['approved', 'implemented'].includes(s.status)) { s.status = 'in_progress'; s.approval_invalidated = ev.ts; }
       break;

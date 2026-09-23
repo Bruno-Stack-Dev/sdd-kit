@@ -1,0 +1,91 @@
+{
+  "$comment": "Roteamento de modelos do SDD Kit — fonte ÚNICA de qual modelo cada agente usa por padrão. A CLI (`sdd models`) resolve de forma determinística: etapa da pipeline (explícita) > agents.models.overrides da config (explícito) > esta política (papel do agente → nível, ajustado pelo perfil e pelos sinais do contexto, limitado pelo piso do papel). Os `model`/`effort` do frontmatter dos agentes do kit são a materialização desta política no perfil `balanced` (um teste garante que batem). Aliases (opus/sonnet/haiku) em vez de IDs: o Claude Code resolve para a versão atual, e a política não envelhece a cada lançamento.",
+  "version": 1,
+  "tiers": {
+    "light": {
+      "model": "haiku",
+      "effort": "low",
+      "description": "trabalho estruturado e de baixo risco: o formato da saída já está definido e o erro aparece logo na etapa seguinte"
+    },
+    "standard": {
+      "model": "sonnet",
+      "effort": "medium",
+      "description": "implementação e testes conformes a contrato, spec e regras explícitas"
+    },
+    "deep": {
+      "model": "opus",
+      "effort": "high",
+      "description": "decisões que se propagam (contratos) e verificação final (guardiões): errar aqui custa mais do que os tokens"
+    }
+  },
+  "order": ["light", "standard", "deep"],
+  "roles": {
+    "audit": {
+      "tier": "deep",
+      "floor": "deep",
+      "description": "auditores que aprovam ou reprovam a entrega — a última rede de segurança; uma aprovação falsa fecha a spec com defeito"
+    },
+    "design": {
+      "tier": "deep",
+      "floor": "standard",
+      "description": "define a fonte da verdade (tipos, contratos, OpenAPI); todas as etapas seguintes herdam o erro"
+    },
+    "build": {
+      "tier": "standard",
+      "floor": "standard",
+      "description": "implementa código de produção contra contrato e regras da config"
+    },
+    "verify": {
+      "tier": "standard",
+      "floor": "standard",
+      "description": "escreve os testes que o guardião usa como evidência — teste fraco vira evidência falsa"
+    },
+    "review": {
+      "tier": "standard",
+      "floor": "light",
+      "description": "revisa ou ajusta um aspecto delimitado (UX, acessibilidade) e relata"
+    },
+    "support": {
+      "tier": "light",
+      "floor": "light",
+      "description": "gera artefatos de apoio de formato fixo (dados mockados determinísticos)"
+    }
+  },
+  "agents": {
+    "agente-spec-guardian": "audit",
+    "agente-arquiteto-guardian": "audit",
+    "agente-arquiteto-contratos": "design",
+    "agente-backend": "build",
+    "agente-frontend": "build",
+    "agente-devops": "build",
+    "agente-gerador-skills": "build",
+    "agente-qa-testes": "verify",
+    "agente-e2e": "verify",
+    "agente-revisor-ux": "review",
+    "agente-acessibilidade": "review",
+    "agente-mock-data": "support"
+  },
+  "inference": {
+    "$comment": "Papel de um agente que não está em `agents` (ex.: agente próprio do projeto) nem em agents.models.roles da config. Avaliado em ordem; a primeira regra que casa vence.",
+    "rules": [
+      { "if": "name-suffix", "value": "-guardian", "role": "audit" },
+      { "if": "read-only", "role": "review" }
+    ],
+    "fallback": "build"
+  },
+  "profiles": {
+    "quality": { "shift": 1, "description": "sobe um nível em todos os papéis (limitado ao topo)" },
+    "balanced": { "shift": 0, "description": "o nível de cada papel, como declarado acima" },
+    "economy": { "shift": -1, "description": "desce um nível, sem furar o piso do papel — guardiões continuam no topo" }
+  },
+  "default_profile": "balanced",
+  "signals": {
+    "$comment": "Sinais do contexto (estado e spec) que sobem o nível de uma tarefa resolvida pela política. A soma é limitada por `max_escalation`; valores explícitos da config não são ajustados.",
+    "guardian_step": { "floor": "deep", "description": "etapa com `guardian: true` roda no topo, qualquer que seja o agente" },
+    "rework": { "shift": 1, "description": "a spec já foi reprovada pelo guardião: refazer com um modelo mais forte, não repetir a mesma tentativa" },
+    "reopened": { "shift": 1, "description": "a tarefa foi reaberta depois de concluída" },
+    "large_spec": { "shift": 1, "min_cas": 10, "roles": ["build", "verify"], "description": "spec com muitos Critérios de Aceitação exige mais contexto e raciocínio" },
+    "critical_tags": { "shift": 1, "tags": ["critico", "critical", "seguranca", "security"], "description": "spec marcada como crítica ou de segurança nas `tags`" },
+    "max_escalation": 1
+  }
+}
