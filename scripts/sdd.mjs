@@ -24,6 +24,7 @@ import { evalCommand } from './commands/eval.mjs';
 import { traceCommand } from './commands/trace.mjs';
 import { aiCommand } from './commands/ai.mjs';
 import { adaptersCommand } from './commands/adapters.mjs';
+import { exportContextCommand } from './commands/export-context.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -46,6 +47,7 @@ const COMMANDS = {
   trace: traceCommand,
   ai: aiCommand,
   adapters: adaptersCommand,
+  'export-context': exportContextCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -90,6 +92,9 @@ Comandos:
   adapters build <codex|opencode|cline|generic> [--install] [--packs a,b]
                                     exporta skills (Agent Skills puro) + AGENTS.md para outros clientes
   adapters status [--json]          adapters instalados e se estão em dia com as skills
+  export-context [--dry-run] [--out F] [--format markdown|xml] [--include g] [--exclude g] [--redact]
+                                    pacote local e sanitizado do código (sem segredos; respeita .gitignore)
+  export-context --repomix --consent  alternativa opcional via Repomix (baixa do npm; Secretlint ligado)
   eval run [--suite deterministic|model] [--update-baseline]   evals (fixtures; modelo opcional)
   trace show [--session|--spec|--task|--agent|--trace]   linha do tempo (trace local + eventos)
   trace export --otlp <url>         exporta para um backend OTLP (ex.: Phoenix), fail-open

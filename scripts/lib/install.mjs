@@ -43,7 +43,7 @@ comandos, regras inegociáveis, padrões proibidos e gates DESTE projeto.
 
 - Todo trabalho deriva de uma spec em \`specs/\`. Sem spec → \`/nova-spec\` antes de codar.
 - Workflows: \`/sdd-init\` · \`/sdd-status\` · \`/gerar-projeto\` · \`/gerar-skills\` · \`/nova-spec\` ·
-  \`/implementar-spec\` · \`/implementar-tarefa\` · \`/validar-e2e\`.
+  \`/implementar-spec\` · \`/implementar-tarefa\` · \`/validar-e2e\` · \`/sdd-export-context\`.
 - CLI determinística (IDs, estado, tarefas, doctor): o comando exato aparece no contexto da sessão
   ("CLI determinística: ..."); no modo cópia é \`node scripts/sdd.mjs\`.
 - Estado do pipeline = \`.sdd/events.jsonl\` (grave com \`sdd event ...\`; nunca edite à mão).

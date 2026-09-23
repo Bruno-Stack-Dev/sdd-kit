@@ -19,6 +19,7 @@ const SDD_GITIGNORE = [
   'reports/',
   'trace/',
   'backup/',
+  'context/',
   '*.lock',
   '',
 ].join('\n');
