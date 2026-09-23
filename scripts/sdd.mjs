@@ -23,6 +23,7 @@ import { projectCommand } from './commands/project.mjs';
 import { evalCommand } from './commands/eval.mjs';
 import { traceCommand } from './commands/trace.mjs';
 import { aiCommand } from './commands/ai.mjs';
+import { adaptersCommand } from './commands/adapters.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -44,6 +45,7 @@ const COMMANDS = {
   eval: evalCommand,
   trace: traceCommand,
   ai: aiCommand,
+  adapters: adaptersCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -85,6 +87,9 @@ Comandos:
   scan agents [--consent] [--target p]  Snyk Agent Scan opcional (NOT_RUN sem consentimento/token)
   project classify [--json]         projeto novo × existente, com evidência
   ai detect [--json]                o produto usa IA? sinais e artefatos AI-* sugeridos (pack ai)
+  adapters build <codex|opencode|cline|generic> [--install] [--packs a,b]
+                                    exporta skills (Agent Skills puro) + AGENTS.md para outros clientes
+  adapters status [--json]          adapters instalados e se estão em dia com as skills
   eval run [--suite deterministic|model] [--update-baseline]   evals (fixtures; modelo opcional)
   trace show [--session|--spec|--task|--agent|--trace]   linha do tempo (trace local + eventos)
   trace export --otlp <url>         exporta para um backend OTLP (ex.: Phoenix), fail-open

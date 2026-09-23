@@ -143,6 +143,21 @@ ou `/nova-spec` para um incremento. Referência de comandos e agentes: `README.m
 
 ---
 
+## Outros clientes (Codex, OpenCode, Cline)
+
+Com o kit em modo cópia, exporte skills e instruções para o cliente do time:
+
+```bash
+node scripts/sdd.mjs adapters build codex --install   # ou opencode | cline | generic
+```
+
+As skills saem no padrão aberto Agent Skills (sem campos exclusivos do Claude Code) e o
+`AGENTS.md` (ou `.clinerules/`) recebe as regras da config. Hooks e permissões do Claude Code **não**
+viajam: nesses clientes os guardrails viram instrução, e a CLI continua determinística. Detalhes e
+limites em [`docs/adapters/README.md`](docs/adapters/README.md).
+
+---
+
 ## Solução de problemas
 
 | Sintoma | Causa provável | O que fazer |

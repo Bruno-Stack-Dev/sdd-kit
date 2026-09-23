@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { Report } from './report.mjs';
 import { loadProject } from '../project.mjs';
 import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns, checkCodeIntelligence, checkBrownfield } from './project.mjs';
-import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain, checkAgentScan } from './agents-skills.mjs';
+import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain, checkAgentScan, checkAdapters } from './agents-skills.mjs';
 import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
 import { checkMcp } from './mcp.mjs';
 import { checkEngine, isEngineRepo } from './engine.mjs';
@@ -21,9 +21,9 @@ const PLAN = {
   fast: ['lint', 'config', 'specs', 'tasks', 'state', 'agents'],
   project: ['config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'brownfield', 'lsp'],
   security: ['install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
-  skills: ['skills', 'supply', 'commands', 'agents', 'scanner'],
+  skills: ['skills', 'supply', 'adapters', 'commands', 'agents', 'scanner'],
   mcp: ['mcp', 'agentscan'],
-  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'brownfield', 'lsp', 'agents', 'skills', 'supply', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp', 'agentscan'],
+  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'brownfield', 'lsp', 'agents', 'skills', 'supply', 'adapters', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp', 'agentscan'],
 };
 
 export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
@@ -47,6 +47,7 @@ export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     skills: () => checkSkills(report, p, { ownedPredicate }),
     commands: () => checkCommands(report, p),
     supply: () => checkSupplyChain(report, p),
+    adapters: () => checkAdapters(report, p),
     scanner: () => checkSkillScanner(report, p),
     install: () => (engine ? null : checkInstall(report, p)),
     permissions: () => checkPermissions(report, p),

@@ -218,6 +218,17 @@ export async function checkSupplyChain(report, p) {
   report.fromIssues(G, 'supply.project', `${ext.length} skill(s) externa(s) do projeto com proveniência registrada`, errors, warnings);
 }
 
+/** Adapters para outros clientes (Codex, OpenCode, Cline, genérico): em dia com as skills de origem? */
+export async function checkAdapters(report, p) {
+  const G = 'Supply chain de skills';
+  const { adapterStatus } = await import('../adapters.mjs');
+  for (const s of adapterStatus(p.root)) {
+    report.add(G, `adapters.${s.target}`, s.stale.length ? 'warn' : 'pass', s.stale.length
+      ? `adapter ${s.target} desatualizado: ${s.stale.join(', ')} — rode \`sdd adapters build ${s.target} --install\``
+      : `adapter ${s.target} em dia (${s.skills} skill(s))`);
+  }
+}
+
 /** Snyk Agent Scan: opcional, com consentimento. Mostra o último resultado salvo ou NOT_RUN. */
 export async function checkAgentScan(report, p) {
   const G = 'Scanners';

@@ -131,6 +131,13 @@ function withLock(root, fn) {
   let fd;
   for (;;) {
     try { fd = openSync(lock, 'wx'); break; } catch (e) {
+      // No Windows, abrir o lock enquanto outro processo o apaga dá EPERM/EACCES (exclusão pendente),
+      // não EEXIST: também é disputa pelo lock, não erro.
+      if (['EPERM', 'EACCES', 'EBUSY'].includes(e.code)) {
+        if (Date.now() > deadline) throw new EventRejected(`events.lock inacessível há mais de 10s (${e.code})`);
+        sleep(20);
+        continue;
+      }
       if (e.code !== 'EEXIST') throw e;
       try { if (Date.now() - statSync(lock).mtimeMs > LOCK_STALE_MS) { unlinkSync(lock); continue; } } catch { continue; }
       if (Date.now() > deadline) throw new EventRejected('events.lock ocupado há mais de 10s (outro processo gravando?)');

@@ -149,10 +149,12 @@ test('appends concorrentes (5 processos) não perdem nem corrompem eventos', asy
     const before = events(dir).length;
     const run = (i) => new Promise((res) => {
       const p = spawn(process.execPath, [SDD_CLI, 'event', 'TEST_PASSED', '--spec', 'BIB-100', '--command', `run-${i}`, '--root', dir]);
-      p.on('close', res);
+      let err = '';
+      p.stderr.on('data', (d) => { err += d; });
+      p.on('close', (code) => res({ code, err }));
     });
-    const codes = await Promise.all([0, 1, 2, 3, 4].map(run));
-    assert.deepEqual(codes, [0, 0, 0, 0, 0]);
+    const results = await Promise.all([0, 1, 2, 3, 4].map(run));
+    assert.deepEqual(results.map((r) => r.code), [0, 0, 0, 0, 0], results.map((r) => r.err).join(' | '));
     const after = events(dir);
     assert.equal(after.length, before + 5);
     assert.equal(new Set(after.map((e) => e.id)).size, after.length);
