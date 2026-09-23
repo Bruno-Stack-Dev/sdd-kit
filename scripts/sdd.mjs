@@ -86,7 +86,8 @@ Comandos:
   lsp detect [--json]               linguagens, language servers e plugins LSP recomendados
   mcp profiles | apply <perfil> | check | pin <servidor> [--consent|--from-file f]
                                     MCP só da allowlist, drift e pin de schema das ferramentas
-  scan agents [--consent] [--target p]  Snyk Agent Scan opcional (NOT_RUN sem consentimento/token)
+  scan agents --consent --run-mcp-servers [--target p]
+                                    Snyk Agent Scan opcional (NOT_RUN sem as duas confirmações/token)
   project classify [--json]         projeto novo × existente, com evidência
   ai detect [--json]                o produto usa IA? sinais e artefatos AI-* sugeridos (pack ai)
   adapters build <codex|opencode|cline|generic> [--install] [--packs a,b]

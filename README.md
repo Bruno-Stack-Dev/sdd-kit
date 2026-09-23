@@ -67,7 +67,7 @@ principais:
 | Specs e tarefas | `spec next-id · spec new` · `tasks list · ready · show · graph · sync` · `template list · show` |
 | Estado | `event <TIPO>` · `state show · resume · verify · rebuild · repair · ledger · import-ledger` |
 | Saúde | `doctor [--fast\|--project\|--security\|--skills\|--mcp\|--full] [--json]` · `check forbidden` |
-| Segurança | `policy check` · `security sandbox` · `scan agents --consent` |
+| Segurança | `policy check` · `security sandbox` · `scan agents --consent --run-mcp-servers` |
 | Skills e packs | `skills verify · info · scan · add · review · lock` · `pack list · activate · deactivate` |
 | MCP | `mcp profiles · apply · check · pin` |
 | Projeto | `project classify` · `ai detect` · `lsp detect` |

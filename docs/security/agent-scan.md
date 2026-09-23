@@ -13,14 +13,17 @@ configurações MCP e skills. No kit ele é **opcional** e nunca roda sozinho.
 
 ## Política
 
-1. Rode só com **consentimento explícito**: `sdd scan agents --consent`. Sem `--consent`, sem
-   `SNYK_TOKEN` ou sem `uvx`, o resultado é `NOT_RUN` e nada é executado.
+1. Rode só com **duas confirmações explícitas**: `sdd scan agents --consent --run-mcp-servers`.
+   `--consent` autoriza o envio à API da Snyk; `--run-mcp-servers` autoriza a ferramenta a executar os
+   servidores MCP stdio do alvo (em modo `--ci` ela exige `--dangerously-run-mcp-servers`, que o kit
+   só passa com essa confirmação). Sem qualquer uma delas, sem `SNYK_TOKEN` ou sem `uvx`, o resultado
+   é `NOT_RUN` e nada é executado.
 2. Configuração **não confiável** (PR de terceiro, template baixado) só dentro de container
    descartável, sem credenciais além do `SNYK_TOKEN`:
 
    ```bash
    docker run --rm -it -e SNYK_TOKEN -v "$PWD:/repo:ro" -w /repo ghcr.io/astral-sh/uv:python3.12-bookworm-slim \
-     uvx snyk-agent-scan@0.6.4 scan /repo/.mcp.json --json --ci
+     uvx snyk-agent-scan@0.6.4 scan /repo/.mcp.json --json --ci --dangerously-run-mcp-servers
    ```
 
 3. Versão fixada (`snyk-agent-scan@0.6.4`); atualizar é mudança revisada.

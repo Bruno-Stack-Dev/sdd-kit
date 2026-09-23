@@ -36,4 +36,6 @@ jobs:
       - name: Instalar uv (versão fixada)
         run: python -m pip install uv==0.12.18
       - name: Agent scan
-        run: node scripts/sdd.mjs scan agents --consent
+        # --run-mcp-servers: o agent-scan em modo CI executa os servidores MCP stdio do alvo; aqui o
+        # runner é descartável e sem outros segredos, que é a condição para confirmar isso.
+        run: node scripts/sdd.mjs scan agents --consent --run-mcp-servers

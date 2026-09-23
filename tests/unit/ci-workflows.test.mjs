@@ -48,4 +48,5 @@ test('segredos só nos workflows manuais/noturnos, com NOT_RUN sem eles', () => 
   assert.match(WF['agent-scan.yml'], /secrets\.SNYK_TOKEN/);
   assert.doesNotMatch(WF['agent-scan.yml'], /schedule:|pull_request|push:/, 'agent scan só manual');
   assert.match(WF['agent-scan.yml'], /if: inputs\.consent/);
+  assert.match(WF['agent-scan.yml'], /scan agents --consent --run-mcp-servers/);
 });
