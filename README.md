@@ -36,7 +36,7 @@ sdd-kit/
    - `sdd.config.example.md` também.
 2. **Rode `/sdd-init`** no Claude Code. Ele confirma que está na raiz certa, detecta se o
    projeto é **novo** ou **já em produção** e roteia:
-   - **Já em produção:** engenharia reversa do repositório (stack, DER, C4, endpoints, RBAC, infra) → reconstrói toda a documentação em `specs/discovery/` com proveniência por fato, gera ADRs retroativos, um relatório de divergências (código prevalece) e o `sdd.config.md`.
+   - **Já em produção:** engenharia reversa do repositório (stack, DER, C4, endpoints, RBAC, infra) → reconstrói toda a documentação em `specs/discovery/` com proveniência por fato, gera ADRs retroativos, um relatório de divergências que separa o que existe (OBSERVED), o que deveria existir (INTENDED) e o que roda de fato (RUNTIME), e o `sdd.config.yaml`.
    - **Novo:** entrevista de **discovery em blocos** (produto → dados → arquitetura/stack → planejamento → infra) → gera toda a documentação técnica em `specs/discovery/`, os ADRs, o `sdd.config.md`, o `CLAUDE.md` e um brief pronto em `specs/_entrada/`.
 3. Pronto. Para incrementos, coloque um brief em `specs/_entrada/` e rode **`/gerar-projeto`**.
 

@@ -149,3 +149,17 @@ export async function checkCodeIntelligence(report, p) {
   const undeclared = languages.filter((l) => !(lsp.plugins ?? []).includes(l.plugin)).map((l) => `${l.label}: ${l.plugin} não está em integrations.lsp.plugins`);
   report.fromIssues(G, 'lsp', `code intelligence habilitado para ${names}`, [], [...missing, ...undeclared, ...unsupported.map((u) => `${u}: sem plugin oficial (Serena como alternativa)`)]);
 }
+
+/** Brownfield: relatório de divergências no modelo OBSERVED/INTENDED/RUNTIME e proveniência. */
+export async function checkBrownfield(report, p) {
+  const G = 'Auditoria brownfield';
+  const { readDivergences, provenanceTags } = await import('../divergences.mjs');
+  const r = readDivergences(p.root, p.specsDir);
+  if (!r) { report.skip(G, 'brownfield.divergences', 'sem specs/discovery/AUDITORIA-DIVERGENCIAS.md (projeto novo ou auditoria não feita)'); return; }
+  report.fromIssues(G, 'brownfield.divergences', `${r.rows.length} divergência(s) classificadas (OBSERVED × INTENDED × RUNTIME)`, r.errors, r.warnings);
+  const dir = join(p.root, p.specsDir, 'discovery');
+  const docs = readdirSync(dir).filter((f) => f.endsWith('.md') && !['README.md', 'AUDITORIA-DIVERGENCIAS.md'].includes(f));
+  const untagged = docs.filter((f) => !provenanceTags(readFileSync(join(dir, f), 'utf8')).length);
+  if (untagged.length) report.warn(G, 'brownfield.provenance', `${untagged.length} doc(s) de discovery sem tags de proveniência ([CODE], [DOC], [USER_CONFIRMED]...)`, untagged);
+  else if (docs.length) report.pass(G, 'brownfield.provenance', `${docs.length} doc(s) de discovery com proveniência`);
+}

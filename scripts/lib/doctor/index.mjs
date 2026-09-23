@@ -9,7 +9,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Report } from './report.mjs';
 import { loadProject } from '../project.mjs';
-import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns, checkCodeIntelligence } from './project.mjs';
+import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns, checkCodeIntelligence, checkBrownfield } from './project.mjs';
 import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain, checkAgentScan } from './agents-skills.mjs';
 import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
 import { checkMcp } from './mcp.mjs';
@@ -19,11 +19,11 @@ export const MODES = ['fast', 'project', 'security', 'skills', 'mcp', 'full'];
 
 const PLAN = {
   fast: ['lint', 'config', 'specs', 'tasks', 'state', 'agents'],
-  project: ['config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'lsp'],
+  project: ['config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'brownfield', 'lsp'],
   security: ['install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
   skills: ['skills', 'supply', 'commands', 'agents', 'scanner'],
   mcp: ['mcp', 'agentscan'],
-  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'lsp', 'agents', 'skills', 'supply', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp', 'agentscan'],
+  full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'brownfield', 'lsp', 'agents', 'skills', 'supply', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp', 'agentscan'],
 };
 
 export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
@@ -42,6 +42,7 @@ export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     state: () => checkState(report, p),
     forbidden: () => checkForbiddenPatterns(report, p),
     lsp: () => (engine ? null : checkCodeIntelligence(report, p)),
+    brownfield: () => checkBrownfield(report, p),
     agents: () => checkAgents(report, p),
     skills: () => checkSkills(report, p, { ownedPredicate }),
     commands: () => checkCommands(report, p),
