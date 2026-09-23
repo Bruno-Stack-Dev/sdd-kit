@@ -46,11 +46,55 @@ export function runAgentScan(root, { consent = false, runMcpServers = false, tar
   return res;
 }
 
-/** Fim da saída do scanner (stderr primeiro), com segredos redigidos, para diagnosticar a falha. */
+// Progresso do uv/uvx no stderr (instalação da ferramenta) não diz nada sobre o resultado do scan.
+const UV_NOISE = /^\s*(Downloading|Downloaded|Installed|Resolved|Prepared|Building|Built|Uninstalled|Audited)\b/;
+
+/**
+ * Diagnóstico da falha, com segredos redigidos: resumo do JSON do stdout (erros e achados, sem depender
+ * do schema exato, que muda entre versões) + as últimas linhas úteis do stderr.
+ */
 export function tailOutput(stderr, stdout, lines = 40) {
-  const pick = (t) => redact(String(t ?? '')).split(/\r?\n/).filter((l) => l.trim()).slice(-lines);
-  const err = pick(stderr);
-  return (err.length ? err : pick(stdout)).join('\n');
+  const clean = (t) => redact(String(t ?? '')).split(/\r?\n/).filter((l) => l.trim() && !UV_NOISE.test(l));
+  const parts = [];
+  const summary = summarizeScanJson(stdout);
+  if (summary.length) parts.push('stdout (resumo do JSON):', ...summary.map((l) => `  ${redact(l)}`));
+  else if (clean(stdout).length) parts.push('stdout (últimas linhas):', ...clean(stdout).slice(-lines).map((l) => `  ${l}`));
+  const err = clean(stderr).slice(-lines);
+  if (err.length) parts.push('stderr (últimas linhas):', ...err.map((l) => `  ${l}`));
+  return parts.join('\n') || '(o scanner não produziu saída)';
+}
+
+/** Extrai mensagens de erro e achados (`issues`) de qualquer ponto do JSON. Vazio se não for JSON. */
+export function summarizeScanJson(text, max = 25) {
+  const t = String(text ?? '');
+  const start = t.search(/[[{]/);
+  if (start < 0) return [];
+  let data;
+  try { data = JSON.parse(t.slice(start)); } catch { return []; }
+  const errors = [];
+  const issues = [];
+  const cut = (s) => String(s).replace(/\s+/g, ' ').slice(0, 200);
+  const walk = (v, path) => {
+    if (Array.isArray(v)) { v.forEach((x, i) => walk(x, `${path}[${i}]`)); return; }
+    if (!v || typeof v !== 'object') return;
+    for (const [k, val] of Object.entries(v)) {
+      if (/^(error|errors|error_message|message)$/i.test(k) && typeof val === 'string' && val.trim() && !path.includes('issues')) errors.push(`${path ? `${path}.` : ''}${k}: ${cut(val)}`);
+      if (/^issues$/i.test(k) && Array.isArray(val)) {
+        for (const is of val) {
+          const code = is?.code ?? is?.id ?? is?.type ?? '?';
+          const msg = is?.message ?? is?.description ?? is?.title ?? '';
+          const where = is?.reference ?? is?.location ?? is?.server ?? is?.tool ?? '';
+          issues.push(`[${code}] ${cut(msg)}${where ? ` (${cut(typeof where === 'string' ? where : JSON.stringify(where))})` : ''}`);
+        }
+      } else walk(val, path ? `${path}.${k}` : k);
+    }
+  };
+  walk(data, '');
+  const out = [];
+  if (errors.length) out.push(`erros (${errors.length}):`, ...errors.slice(0, max).map((e) => `  ${e}`));
+  if (issues.length) out.push(`achados (${issues.length}):`, ...issues.slice(0, max).map((e) => `  ${e}`));
+  if (!out.length) out.push(`JSON sem erros nem achados reconhecíveis; chaves de topo: ${Object.keys(Array.isArray(data) ? data[0] ?? {} : data).join(', ') || '(nenhuma)'}`);
+  return out;
 }
 
 /** Último relatório salvo (para o doctor): { status, ran_at, file } ou null. */
@@ -71,6 +115,6 @@ export async function scanCommand({ positional, flags, root }) {
   if (flags.json) { console.log(JSON.stringify(r, null, 2)); return r.status === 'fail' ? 1 : 0; }
   if (r.status === 'not_run') console.log(`${ICON.notRun} NOT_RUN — ${r.reason}\n  comando: ${r.cmd}`);
   else console.log(`${r.status === 'pass' ? ICON.ok : ICON.error} agent-scan ${r.status.toUpperCase()} (exit ${r.exit_code}) — relatório em ${r.report}`);
-  if (r.diagnostic) console.log(`  saída do scanner (últimas linhas, segredos redigidos):\n${r.diagnostic.replace(/^/gm, '    ')}`);
+  if (r.diagnostic) console.log(`  saída do scanner (segredos redigidos):\n${r.diagnostic.replace(/^/gm, '    ')}`);
   return r.status === 'fail' ? 1 : 0;
 }
