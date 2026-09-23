@@ -33,7 +33,8 @@ implementação* declaradas em `sdd.config.md` (seção 5), com testes, validaç
    "rode `/sdd-init` primeiro"**. Se o comando sair com erro, **pare e mostre os erros**: config
    inválida (schema, placeholders em `forbidden_patterns`/`human_gates`/`blocked_topics`, agente
    inexistente) não pode sustentar geração de código.
-   - Rode `node scripts/sdd-lint.mjs` (fast path: frontmatter das specs + config + `.claude/`).
+   - Rode `node scripts/sdd.mjs doctor --fast` (config, specs, grafo de tarefas, estado, agentes). Se
+     sair `NOT_READY`, **pare e mostre as falhas** antes de gerar qualquer coisa.
 2. Leia o `CLAUDE.md`. As regras inegociáveis (config seção 6) valem para tudo que for gerado.
 3. Rode o **comando de testes** (config seção 2) e confirme verde. Se houver vermelho
    pré-existente, **pare e avise** — não gere sobre base quebrada.
@@ -148,7 +149,8 @@ Após cada spec:
 
 1. Rode o **comando de testes** e o **comando e2e** da config (seção 2). Tudo verde é obrigatório.
    Registre o resultado: `event TEST_PASSED` ou `event TEST_FAILED` com `--spec <SPEC> --command "<cmd>"`.
-2. Rode `scripts/sdd-lint.mjs` (frontmatter íntegro: CAs numerados, status coerente; seções
+2. Rode `node scripts/sdd.mjs check forbidden` (padrões proibidos da config: cada contagem tem de
+   ficar no esperado — é a evidência que o guardião cita) e `scripts/sdd-lint.mjs` (frontmatter íntegro: CAs numerados, status coerente; seções
    críticas da config preenchidas; portões de engenharia ativos reportados). Para cada **portão
    ativo** (config seção 11), rode o comando declarado e reporte — bloqueie se marcado como tal.
 3. Se vermelho: **pare nessa spec**, investigue, corrija. Não esconda com flags.

@@ -12,6 +12,7 @@ import { parseArgs, fail, UsageError } from './lib/cli.mjs';
 import { configCommand } from './commands/config.mjs';
 import { eventCommand, stateCommand } from './commands/state.mjs';
 import { tasksCommand, specCommand } from './commands/tasks.mjs';
+import { doctorCommand, checkCommand } from './commands/doctor.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -19,6 +20,8 @@ const COMMANDS = {
   state: stateCommand,
   tasks: tasksCommand,
   spec: specCommand,
+  doctor: doctorCommand,
+  check: checkCommand,
   version: async (args) => {
     if (args.flags.json) console.log(JSON.stringify({ engine: ENGINE_VERSION }));
     else console.log(`sdd-kit ${ENGINE_VERSION}`);
@@ -43,6 +46,9 @@ Comandos:
   tasks list|ready|show <id>|graph  grafo de tarefas (DAG) validado
   tasks sync [--dry-run]            registra specs/tarefas no estado e reescreve checkboxes
   spec next-id [--new-block]        próximo ID de spec pela config (numbering)
+  doctor [--fast|--project|--security|--skills|--mcp|--full] [--json] [--strict] [--verbose]
+                                    saúde do projeto; exit 1 se NOT_READY (pronto para CI)
+  check forbidden [--json]          roda os padrões proibidos da config (grep de ausência)
   version [--json]                  versão do motor
 
 Opções globais: --root <dir> (padrão: diretório atual), --json`;

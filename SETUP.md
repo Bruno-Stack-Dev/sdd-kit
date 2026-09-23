@@ -88,7 +88,9 @@ Se preferir (ou se o comando não aparecer), basta pedir no chat:
 
 ```bash
 node scripts/sdd.mjs config validate   # sdd.config.yaml contra o schema (+ checagens semânticas)
-node scripts/sdd-lint.mjs              # specs/discovery + config + artefatos de .claude/
+node scripts/sdd.mjs doctor --fast     # saúde rápida: config, specs, grafo de tarefas, estado, agentes
+node scripts/sdd.mjs doctor --full     # tudo: + ADRs, padrões proibidos, segurança, skills, MCP
+node scripts/sdd-lint.mjs              # fast path legado: specs/discovery + config + .claude/
 ```
 
 > Após o `/sdd-init`, o linter também verifica se as seções **7 (Padrões proibidos)** e
