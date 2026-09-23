@@ -42,7 +42,7 @@ test('com --consent mas sem SNYK_TOKEN: NOT_RUN e nada é executado', async () =
   const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
   try {
     if (!win) await runChmod(join(bin, 'uvx'));
-    const r = runSdd(['scan', 'agents', '--consent', '--root', dir], { env: env(bin, false) });
+    const r = runSdd(['scan', 'agents', '--consent', '--run-mcp-servers', '--root', dir], { env: env(bin, false) });
     assert.match(r.out, /SNYK_TOKEN ausente/);
     assert.ok(!existsSync(marker));
   } finally { cleanup(bin); cleanup(dir); }
@@ -53,15 +53,27 @@ test('com consentimento e token: executa a versão fixada, guarda a saída crua 
   const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
   try {
     if (!win) await runChmod(join(bin, 'uvx'));
-    const r = runSdd(['scan', 'agents', '--consent', '--json', '--root', dir], { env: env(bin, true) });
+    const r = runSdd(['scan', 'agents', '--consent', '--run-mcp-servers', '--json', '--root', dir], { env: env(bin, true) });
     const out = JSON.parse(r.stdout);
     assert.equal(out.status, 'pass', r.out);
-    assert.match(out.cmd, /snyk-agent-scan@0\.6\.4 scan .*\.mcp\.json --json --ci/);
+    assert.match(out.cmd, /snyk-agent-scan@0\.6\.4 scan .*\.mcp\.json --json --ci --dangerously-run-mcp-servers/);
     assert.ok(existsSync(marker));
     const reports = readdirSync(join(dir, '.sdd', 'reports')).filter((f) => f.startsWith('agent-scan-'));
     assert.equal(reports.length, 1);
     const d = JSON.parse(runSdd(['doctor', '--mcp', '--json', '--root', dir]).stdout);
     assert.equal(d.checks.find((c) => c.id === 'scanner.agent-scan').status, 'pass');
+  } finally { cleanup(bin); cleanup(dir); }
+});
+
+test('com --consent mas sem --run-mcp-servers: NOT_RUN e nada é executado', async () => {
+  const { dir: bin, marker } = fakeUvx();
+  const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
+  try {
+    if (!win) await runChmod(join(bin, 'uvx'));
+    const r = runSdd(['scan', 'agents', '--consent', '--root', dir], { env: env(bin, true) });
+    assert.equal(r.status, 0);
+    assert.match(r.out, /NOT_RUN — requer também --run-mcp-servers/);
+    assert.ok(!existsSync(marker));
   } finally { cleanup(bin); cleanup(dir); }
 });
 
@@ -83,7 +95,7 @@ test('falha do scanner: o diagnóstico sai na saída (runner descartável perde 
   const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
   try {
     if (!win) await runChmod(join(bin, 'uvx'));
-    const r = runSdd(['scan', 'agents', '--consent', '--root', dir], { env: env(bin, true) });
+    const r = runSdd(['scan', 'agents', '--consent', '--run-mcp-servers', '--root', dir], { env: env(bin, true) });
     assert.equal(r.status, 1);
     assert.match(r.out, /agent-scan FAIL \(exit 2\)/);
     assert.match(r.out, /autenticacao recusada/);

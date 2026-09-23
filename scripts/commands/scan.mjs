@@ -1,10 +1,10 @@
-// `sdd scan agents [--consent] [--target <caminho>]` — Snyk Agent Scan (opcional).
+// `sdd scan agents [--consent] [--run-mcp-servers] [--target <caminho>]` — Snyk Agent Scan (opcional).
 //
 // O agent-scan INICIA servidores MCP stdio e ENVIA configs, nomes/descrições de ferramentas e
-// conteúdo de skills para a API da Snyk. Por isso: só com --consent, com SNYK_TOKEN presente e com a
-// ferramenta instalada; qualquer ausência = NOT_RUN, sem executar nada. A saída JSON é guardada
-// crua em .sdd/reports/ — o kit não depende de campos experimentais (o schema muda entre versões);
-// o resultado usa só o exit code do modo --ci.
+// conteúdo de skills para a API da Snyk. Por isso: só com --consent e --run-mcp-servers, com SNYK_TOKEN
+// presente e com a ferramenta instalada; qualquer ausência = NOT_RUN, sem executar nada. A saída JSON
+// é guardada crua em .sdd/reports/ — o kit não depende de campos experimentais (o schema muda entre
+// versões); o resultado usa só o exit code do modo --ci.
 import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -14,15 +14,23 @@ import { redact } from '../lib/secrets.mjs';
 
 export const AGENT_SCAN = 'snyk-agent-scan@0.6.4';
 
+// Em modo --ci a própria ferramenta exige confirmar que pode iniciar cada servidor MCP stdio do alvo.
+export const RUN_MCP_FLAG = '--dangerously-run-mcp-servers';
+
 export function agentScanPlan(root, target) {
   const t = target ? resolve(root, target) : existsSync(join(root, '.mcp.json')) ? join(root, '.mcp.json') : join(root, '.claude', 'skills');
-  return { bin: 'uvx', args: [AGENT_SCAN, 'scan', t, '--json', '--ci'], target: t };
+  return { bin: 'uvx', args: [AGENT_SCAN, 'scan', t, '--json', '--ci', RUN_MCP_FLAG], target: t };
 }
 
-export function runAgentScan(root, { consent = false, target = null } = {}) {
+/**
+ * Duas confirmações distintas: --consent (enviar configs/skills à API da Snyk) e --run-mcp-servers
+ * (deixar a ferramenta executar os servidores MCP stdio do alvo — só em ambiente descartável).
+ */
+export function runAgentScan(root, { consent = false, runMcpServers = false, target = null } = {}) {
   const plan = agentScanPlan(root, target);
   const cmd = `${plan.bin} ${plan.args.join(' ')}`;
   if (!consent) return { status: 'not_run', cmd, reason: 'requer --consent: o scan inicia servidores MCP e envia configs/skills à API da Snyk (rode num container descartável, sem segredos)' };
+  if (!runMcpServers) return { status: 'not_run', cmd, reason: `requer também --run-mcp-servers: em modo --ci o agent-scan exige ${RUN_MCP_FLAG}, pois executa cada servidor MCP stdio do alvo (use só em ambiente descartável)` };
   if (!process.env.SNYK_TOKEN) return { status: 'not_run', cmd, reason: 'SNYK_TOKEN ausente (exigido pelo agent-scan)' };
   const bin = findOnPath(plan.bin);
   if (!bin) return { status: 'not_run', cmd, reason: 'uvx não instalado (https://docs.astral.sh/uv/)' };
@@ -58,8 +66,8 @@ export function lastAgentScan(root) {
 }
 
 export async function scanCommand({ positional, flags, root }) {
-  if (positional[0] !== 'agents') throw new UsageError('uso: scan agents [--consent] [--target <.mcp.json|dir de skills>]');
-  const r = runAgentScan(root, { consent: !!flags.consent, target: flags.target ?? null });
+  if (positional[0] !== 'agents') throw new UsageError('uso: scan agents [--consent] [--run-mcp-servers] [--target <.mcp.json|dir de skills>]');
+  const r = runAgentScan(root, { consent: !!flags.consent, runMcpServers: !!flags.runMcpServers, target: flags.target ?? null });
   if (flags.json) { console.log(JSON.stringify(r, null, 2)); return r.status === 'fail' ? 1 : 0; }
   if (r.status === 'not_run') console.log(`${ICON.notRun} NOT_RUN — ${r.reason}\n  comando: ${r.cmd}`);
   else console.log(`${r.status === 'pass' ? ICON.ok : ICON.error} agent-scan ${r.status.toUpperCase()} (exit ${r.exit_code}) — relatório em ${r.report}`);
