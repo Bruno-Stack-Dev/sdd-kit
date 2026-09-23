@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { listSkillDirs, validateSkill, hasEvals, strictYamlIssues, frontmatterOf } from '../skills.mjs';
 import { parseYaml } from '../yaml.mjs';
 import { findOnPath } from '../files.mjs';
+import { isModelValue, MODEL_ALIASES, EFFORT_LEVELS, resolveModel, routingPolicy } from '../models.mjs';
 
 // Ferramentas conhecidas do Claude Code (nomes aceitos em tools/disallowedTools de subagentes).
 export const KNOWN_TOOLS = new Set([
@@ -57,6 +58,8 @@ export function validateAgent(a, { skillNames }) {
   if (a.fm.permissionMode !== undefined && !PERMISSION_MODES.has(a.fm.permissionMode)) errors.push(`permissionMode inválido '${a.fm.permissionMode}'`);
   if (a.fm.permissionMode === 'bypassPermissions') errors.push('permissionMode bypassPermissions não é permitido em agentes do kit');
   if (a.fm.memory !== undefined && !MEMORY_SCOPES.has(a.fm.memory)) errors.push(`memory inválido '${a.fm.memory}' (user|project|local)`);
+  if (a.fm.model !== undefined && !isModelValue(String(a.fm.model))) errors.push(`model inválido '${a.fm.model}' (${MODEL_ALIASES.join('|')} ou ID claude-...)`);
+  if (a.fm.effort !== undefined && !EFFORT_LEVELS.includes(String(a.fm.effort))) errors.push(`effort inválido '${a.fm.effort}' (${EFFORT_LEVELS.join('|')})`);
   for (const s of toolList(a.fm.skills) ?? []) {
     if (!skillNames.active.has(s)) {
       if (skillNames.packs.has(s)) warnings.push(`skill pré-carregada '${s}' está num pack inativo (ative o pack)`);
@@ -92,6 +95,19 @@ export function checkAgents(report, p) {
   }
   report.fromIssues(G, 'agents.valid', `${agents.length} definição(ões) válidas (ferramentas, permissionMode, skills, memory)`, errors, warnings);
   report.fromIssues(G, 'agents.auditors-read-only', 'auditores (guardiões, revisor) somente leitura', auditorErrors);
+  // O frontmatter dos agentes do kit materializa a política (perfil balanced) para chamadas avulsas;
+  // divergência indica edição manual — o lugar de ajustar é agents.models na config.
+  const drift = [];
+  for (const a of agents) {
+    if (!a.fm || !routingPolicy().agents[a.base]) continue;
+    const r = resolveModel({ agent: a.base, profile: 'balanced' });
+    for (const k of ['model', 'effort']) {
+      if (a.fm[k] !== undefined && String(a.fm[k]) !== r[k]) {
+        drift.push({ path: a.file, message: `${k}: ${a.fm[k]} no frontmatter, ${r[k]} pela política (papel ${r.role}) — ajuste por agents.models na config, não no agente` });
+      }
+    }
+  }
+  report.fromIssues(G, 'agents.model-routing', 'model/effort dos agentes batem com a política de roteamento', [], drift);
 }
 
 export function checkSkills(report, p, { ownedPredicate = () => false } = {}) {

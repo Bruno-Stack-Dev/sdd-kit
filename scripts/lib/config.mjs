@@ -10,6 +10,7 @@ import { parseYaml, YamlError } from './yaml.mjs';
 import { validate } from './schema.mjs';
 import { parseLegacyConfigMd, renderConfigMd, isPlaceholder, GENERATED_MARKER } from './config-md.mjs';
 import { ENGINE_ROOT, CONFIG_SCHEMA_VERSION } from './engine.mjs';
+import { validateRouting } from './models.mjs';
 
 export const CONFIG_YAML = 'sdd.config.yaml';
 export const CONFIG_MD = 'sdd.config.md';
@@ -117,6 +118,12 @@ export function validateConfig(cfg, { root = process.cwd() } = {}) {
     if (!steps.some((s) => s?.guardian)) {
       warnings.push({ path: `/pipelines/${name}`, message: 'pipeline sem etapa de guardião (guardian: true) — nada valida a entrega antes de fechar a spec' });
     }
+  }
+  // Roteamento de modelos: overrides/papéis de agentes existentes; escolha explícita abaixo do piso avisa.
+  if (!errors.length) {
+    const r = validateRouting(cfg, agents);
+    errors.push(...r.errors);
+    warnings.push(...r.warnings);
   }
   if (cfg.commands && cfg.commands.test === null) {
     warnings.push({ path: '/commands/test', message: 'sem comando de testes (n/a): o gate de testes não tem como rodar' });

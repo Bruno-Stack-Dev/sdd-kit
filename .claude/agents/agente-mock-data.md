@@ -2,6 +2,8 @@
 name: agente-mock-data
 description: Cria dados mockados realistas, isolados para troca futura por chamadas reais.
 tools: Read, Grep, Glob, Edit, Write, Bash
+model: haiku
+effort: low
 ---
 
 # Mock Data

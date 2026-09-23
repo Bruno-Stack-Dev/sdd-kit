@@ -25,6 +25,7 @@ import { traceCommand } from './commands/trace.mjs';
 import { aiCommand } from './commands/ai.mjs';
 import { adaptersCommand } from './commands/adapters.mjs';
 import { exportContextCommand } from './commands/export-context.mjs';
+import { modelsCommand } from './commands/models.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -48,6 +49,7 @@ const COMMANDS = {
   ai: aiCommand,
   adapters: adaptersCommand,
   'export-context': exportContextCommand,
+  models: modelsCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -62,13 +64,16 @@ Comandos:
   config migrate [--force] [--keep-md]  sdd.config.md (v2) → sdd.config.yaml (v3)
   config render [--check]           gera a visão sdd.config.md a partir do YAML
   config show [--json]              imprime a config normalizada
-  event <TIPO> [--spec S] [--task T] [--agent A] [--reason R] [--evidence E] [--key K]
+  event <TIPO> [--spec S] [--task T] [--agent A] [--model M] [--effort E] [--reason R] [--evidence E] [--key K]
                                     registra um evento validado em .sdd/events.jsonl
   state show|resume|rebuild|verify|repair   estado derivado do log; retomada de sessão
   state ledger [--check]            gera o LEDGER-<slug>.md a partir do estado
   state import-ledger <arquivo>     importa um LEDGER v2 escrito à mão
   tasks list|ready|show <id>|graph  grafo de tarefas (DAG) validado
   tasks sync [--dry-run]            registra specs/tarefas no estado e reescreve checkboxes
+  models list [--profile p]         modelo e esforço de cada agente e etapa, pelo papel (policies/model-routing.json)
+  models resolve --task T | --agent A [--pipeline p --step s] [--profile p]
+                                    modelo de uma tarefa/agente, com a fonte e os sinais que pesaram
   spec next-id [--new-block]        próximo ID de spec pela config (numbering)
   spec new --slug s --title t [--pipeline p] [--new-block] [--depends A,B]
                                     cria spec + plano + tarefas (uma por etapa da pipeline)

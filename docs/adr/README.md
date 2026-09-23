@@ -30,3 +30,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0017](ADR-0017-adapters-cross-client.md) | Adapters para outros clientes: Agent Skills puro + AGENTS.md, sem simular garantias | aceito |
 | [0018](ADR-0018-export-context-sanitizado.md) | Export de contexto embutido e sanitizado; Repomix opcional com consentimento | aceito |
 | [0019](ADR-0019-ci-sem-segredos-no-pr.md) | CI determinístico sem segredos no PR; modelo e scanners em workflows manuais | aceito |
+| [0020](ADR-0020-modelo-por-papel-do-agente.md) | O kit escolhe o modelo de cada agente pelo papel; overrides na config | aceito |

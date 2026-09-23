@@ -97,6 +97,21 @@ test('round-trip: yaml → md (visão) → yaml preserva a config', () => {
   assert.deepEqual(back, cfg);
 });
 
+test('round-trip: model/effort por etapa e agents.models sobrevivem à visão md', () => {
+  const cfg = normalizeConfig(validConfig({
+    pipelines: { frontend: [
+      { id: 'contratos', name: 'Contratos', agent: 'agente-arquiteto-contratos', model: 'deep' },
+      { id: 'store', name: 'Store', agent: 'agente-frontend', effort: 'low' },
+      { id: 'guardiao', name: 'Guardião', agent: 'agente-spec-guardian', guardian: true, model: 'claude-opus-5-5', effort: 'max' },
+    ] },
+    agents: { models: { profile: 'economy', overrides: { 'agente-backend': { model: 'opus', effort: 'high' } } } },
+  }));
+  const md = renderConfigMd(cfg);
+  assert.match(md, /\| Guardião \| Modelo \| Esforço \|/);
+  assert.deepEqual(normalizeConfig(parseLegacyConfigMd(md)), cfg);
+  assert.doesNotMatch(renderConfigMd(normalizeConfig(validConfig())), /Modelo/, 'sem model/effort a tabela não muda');
+});
+
 test('migração do exemplo v2 preserva seções e marca placeholders', () => {
   const md = readFileSync(join(KIT_ROOT, 'tests', 'fixtures', 'legacy-config', 'sdd.config.v2-example.md'), 'utf8');
   const cfg = parseLegacyConfigMd(md);

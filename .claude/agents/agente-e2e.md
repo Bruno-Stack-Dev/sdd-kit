@@ -2,6 +2,8 @@
 name: agente-e2e
 description: Escreve testes e2e de navegador para os fluxos reais do app (rotas, menu, telas).
 tools: Read, Grep, Glob, Edit, Write, Bash, Skill
+model: sonnet
+effort: medium
 ---
 
 # E2E

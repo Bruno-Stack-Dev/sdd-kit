@@ -6,6 +6,7 @@ import { appendEvent, EventRejected, computeState, writeState, verifyState, repa
 import { loadProject, resumeSummary, renderLedger, parseLegacyLedger, LEDGER_MARKER } from '../lib/project.mjs';
 import { resolveTaskId } from '../lib/specs.mjs';
 import { slugId } from '../lib/config-md.mjs';
+import { isModelValue, MODEL_ALIASES, EFFORT_LEVELS } from '../lib/models.mjs';
 
 /** Monta o input de um evento a partir das flags da CLI. */
 export function eventInputFromFlags(type, flags, project) {
@@ -22,6 +23,14 @@ export function eventInputFromFlags(type, flags, project) {
   if (flags.command) meta.command = String(flags.command);
   if (flags.mode) meta.mode = String(flags.mode);
   if (flags.pack) meta.pack = String(flags.pack);
+  if (flags.model) {
+    if (!isModelValue(String(flags.model))) throw new UsageError(`--model inválido '${flags.model}' (${MODEL_ALIASES.join(' | ')} | claude-...)`);
+    meta.model = String(flags.model);
+  }
+  if (flags.effort) {
+    if (!EFFORT_LEVELS.includes(String(flags.effort))) throw new UsageError(`--effort inválido '${flags.effort}' (${EFFORT_LEVELS.join(' | ')})`);
+    meta.effort = String(flags.effort);
+  }
   if (flags.force) meta.force = true;
 
   let task = flags.task;

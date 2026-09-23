@@ -2,6 +2,8 @@
 name: agente-backend
 description: Implementa backend de produção — serviços, repositórios, persistência, transações e endpoints conformes ao contrato de API, na linguagem declarada na config.
 tools: Read, Grep, Glob, LSP, Edit, Write, Bash, Skill
+model: sonnet
+effort: medium
 ---
 
 # Backend

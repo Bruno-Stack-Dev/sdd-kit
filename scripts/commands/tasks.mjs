@@ -6,6 +6,7 @@ import { loadProject } from '../lib/project.mjs';
 import { readyTasks, parallelBatches, topoOrder } from '../lib/graph.mjs';
 import { resolveTaskId, STATUS_CHECKBOX, nextSpecId } from '../lib/specs.mjs';
 import { appendEvent, EventRejected } from '../lib/events.mjs';
+import { resolveTask } from '../lib/models.mjs';
 import { listTemplates, readTemplate, templatePath, choosePipeline, renderSpec, renderPlan, renderTasks } from '../lib/scaffold.mjs';
 
 export async function tasksCommand(args) {
@@ -37,12 +38,19 @@ function ready({ root, flags }) {
   const p = loadProject(root);
   const r = readyTasks(p.taskGraph, p.statusOf);
   const batch = parallelBatches(r);
-  if (flags.json) { console.log(JSON.stringify({ ready: r.map((t) => t.id), parallel_safe: batch.map((t) => t.id), errors: p.taskGraph.errors })); return p.taskGraph.errors.length ? 1 : 0; }
+  const routing = Object.fromEntries(r.map((t) => [t.id, routingSummary(p, t)]));
+  if (flags.json) { console.log(JSON.stringify({ ready: r.map((t) => t.id), parallel_safe: batch.map((t) => t.id), routing, errors: p.taskGraph.errors })); return p.taskGraph.errors.length ? 1 : 0; }
   if (p.taskGraph.errors.length) { printGraphErrors(p); console.log(`${ICON.error} grafo inválido: corrija antes de escolher tarefas`); return 1; }
   if (!r.length) console.log('nenhuma tarefa pronta');
-  for (const t of r) console.log(`${t.id.padEnd(28)} @${t.agent.padEnd(28)} ${t.title}`);
+  for (const t of r) console.log(`${t.id.padEnd(28)} @${t.agent.padEnd(28)} ${`[${routing[t.id].model}]`.padEnd(9)} ${t.title}`);
   if (batch.length > 1) console.log(`\nparalelizáveis sem conflito aparente (agentes/specs distintos): ${batch.map((t) => t.id).join(', ')}`);
   return 0;
+}
+
+/** Modelo da tarefa pela política de roteamento (`sdd models resolve --task` dá o detalhe). */
+function routingSummary(p, t) {
+  const r = resolveTask(p, t);
+  return { model: r.model, effort: r.effort, tier: r.tier, role: r.role, source: r.source.model, signals: r.signals };
 }
 
 function show({ root, positional, flags }) {
@@ -53,10 +61,12 @@ function show({ root, positional, flags }) {
   if (!matches.length) { console.log(`${ICON.error} tarefa '${id}' não encontrada`); return 1; }
   if (matches.length > 1) { console.log(`${ICON.warn} '${id}' é ambígua: ${matches.map((t) => t.id).join(', ')}`); return 1; }
   const t = matches[0];
-  const info = { ...t, status: p.statusOf(t.id), state: p.state.tasks[t.id] ?? null, deps_status: Object.fromEntries(t.dependsOn.map((d) => [d, p.statusOf(d)])) };
+  const info = { ...t, status: p.statusOf(t.id), state: p.state.tasks[t.id] ?? null, deps_status: Object.fromEntries(t.dependsOn.map((d) => [d, p.statusOf(d)])), routing: routingSummary(p, t) };
   if (flags.json) console.log(JSON.stringify(info, null, 2));
   else {
+    const m = info.routing;
     console.log(`${t.id} — ${t.title}\n  agente: @${t.agent}\n  status: ${info.status}\n  arquivo: ${t.file}:${t.line}`);
+    console.log(`  modelo: ${m.model}${m.effort ? ` · ${m.effort}` : ''} (papel ${m.role}, fonte ${m.source}${m.signals.length ? `, sinais: ${m.signals.join(', ')}` : ''})`);
     for (const [d, s] of Object.entries(info.deps_status)) console.log(`  depende de ${d}: ${s}`);
     if (info.state?.blocked_reason) console.log(`  bloqueio: ${info.state.blocked_reason}`);
   }

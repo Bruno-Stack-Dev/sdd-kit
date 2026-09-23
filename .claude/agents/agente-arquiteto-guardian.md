@@ -3,6 +3,8 @@ name: agente-arquiteto-guardian
 description: Verifica que o código continua fiel às decisões de arquitetura (ADRs) e aos limites entre camadas; impede que a arquitetura "derreta" com o tempo.
 tools: Read, Grep, Glob, LSP, Bash
 disallowedTools: Write, Edit, MultiEdit, NotebookEdit
+model: opus
+effort: high
 ---
 
 # Arquiteto-Guardião

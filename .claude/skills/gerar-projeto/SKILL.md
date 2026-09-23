@@ -35,6 +35,8 @@ Regras que a CLI e os hooks impõem (não tente contornar):
 - Specs, planos e tarefas: `sdd spec new` gera a partir das pipelines da config; depois
   `sdd tasks sync`.
 - Ordem: `sdd tasks ready`; ciclo de vida de cada tarefa com `sdd event TASK_STARTED/COMPLETED/BLOCKED`.
+- Modelo de cada tarefa: `sdd models resolve --task <ID> --json` (o kit escolhe pelo papel do
+  agente); passe o `model` ao delegar e registre `--model`/`--effort` no `TASK_STARTED`.
 - Fechamento: `GUARDIAN_APPROVED` com evidência antes de `SPEC_IMPLEMENTED`; `sdd state ledger`.
 
 ## Contrato de saída

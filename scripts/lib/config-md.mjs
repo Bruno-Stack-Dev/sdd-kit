@@ -326,6 +326,8 @@ export function parseLegacyConfigMd(md) {
           const iOut = col(['saida esperada', 'saida']);
           const iWhen = col(['quando']);
           const iGuard = col(['guardiao', 'guardiao?']);
+          const iModel = col(['modelo']);
+          const iEffort = col(['esforco']);
           const used = new Set();
           const steps = [];
           for (const row of t.rows) {
@@ -343,6 +345,10 @@ export function parseLegacyConfigMd(md) {
             if (when !== null) step.when = when;
             const guardian = iGuard >= 0 ? /^(sim|true|yes|x)$/i.test(textCell(row[iGuard] ?? '') ?? '') : /-guardian$/.test(agent);
             if (guardian) step.guardian = true;
+            for (const [k, i] of [['model', iModel], ['effort', iEffort]]) {
+              const v = i >= 0 ? codeCell(row[i] ?? '') : null;
+              if (v !== null) step[k] = v;
+            }
             steps.push(step);
           }
           if (steps.length) cfg.pipelines[name] = steps;
@@ -549,10 +555,13 @@ export function renderConfigMd(cfg, { source = 'sdd.config.yaml' } = {}) {
   L.push('A ordem que o motor segue, uma etapa por vez até o verde. `sdd spec new` gera as tarefas a partir destas etapas.', '');
   for (const [name, steps] of Object.entries(cfg.pipelines ?? {})) {
     L.push(`### Pipeline \`${name}\``, '');
+    // Modelo/Esforço só aparecem quando alguma etapa os fixa (sem eles, o kit escolhe pelo papel).
+    const routed = steps.some((s) => s.model !== undefined || s.effort !== undefined);
     const rows5 = steps.map((s, i) => [
       String(i + 1), code(s.id), text(s.name), code(`@${s.agent}`), text(s.output ?? null), text(s.when ?? null), s.guardian ? 'sim' : 'não',
+      ...(routed ? [s.model === undefined ? '' : code(s.model), s.effort === undefined ? '' : code(s.effort)] : []),
     ]);
-    L.push(table(['Ordem', 'ID', 'Camada', 'Agente', 'Saída esperada', 'Quando', 'Guardião'], rows5), '');
+    L.push(table(['Ordem', 'ID', 'Camada', 'Agente', 'Saída esperada', 'Quando', 'Guardião', ...(routed ? ['Modelo', 'Esforço'] : [])], rows5), '');
   }
 
   L.push('## 6. Regras inegociáveis (deste projeto)', '');

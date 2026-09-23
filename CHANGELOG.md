@@ -11,7 +11,26 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 
 ## [Não lançado]
 
+### Adicionado
+- **Modelo por papel do agente** (ADR-0020): `policies/model-routing.json` define papel → nível
+  (haiku/sonnet/opus + esforço) e piso; sinais do contexto (reprovação no guardião, reabertura, spec
+  grande ou crítica) sobem um nível; perfis `quality|balanced|economy`.
+- `sdd models list|resolve`; `tasks ready|show` mostram o modelo de cada tarefa (`routing` no
+  `--json`); `event --model/--effort` grava o modelo usado no `TASK_STARTED` (estado:
+  `tasks.<id>.model|effort`) e `TASK_REOPENED` passa a contar `reopened`.
+- Config: `model`/`effort` opcionais por etapa de pipeline e `agents.models` (`profile`,
+  `overrides`, `roles`); `config validate` avisa escolha explícita abaixo do piso do papel.
+- Agentes do kit ganham `model`/`effort` no frontmatter (perfil balanced); o doctor verifica
+  valores válidos e divergência com a política. `/implementar-spec`, `/implementar-tarefa` e
+  `/gerar-projeto` passam o modelo resolvido ao delegar.
+
 ### Corrigido
+- Hook `paths.generated`: o marcador `AUTO-GENERATED` só torna um arquivo "gerado" quando abre uma
+  linha de comentário no início dele (`<!--`, `#`, `//`...). Antes, qualquer ocorrência nos
+  primeiros 2 KB bastava — o próprio renderizador (`scripts/lib/config-md.mjs`, que guarda o
+  marcador numa constante) e `policies/sdd-policy.json` ficavam impossíveis de editar.
+- Visão `sdd.config.md`: colunas Modelo/Esforço na tabela da pipeline quando alguma etapa os fixa
+  (preservadas no round-trip md → yaml).
 - `sdd scan agents`: erro de execução do scanner sem achados (ex.: cota diária da versão pública do
   Agent-Scan, autenticação) passa a ser `NOT_RUN` com o motivo, não `FAIL`; `FAIL` fica para achados
   reais. O doctor mostra o motivo.

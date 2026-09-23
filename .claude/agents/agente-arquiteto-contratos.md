@@ -2,6 +2,8 @@
 name: agente-arquiteto-contratos
 description: Define e mantém os tipos e contratos compartilhados — a fonte da verdade do projeto.
 tools: Read, Grep, Glob, LSP, Edit, Write, Bash, Skill
+model: opus
+effort: high
 ---
 
 # Arquiteto de Contratos

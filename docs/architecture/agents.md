@@ -33,6 +33,35 @@ garantem essa forma; os casos comportamentais ficam em `evals/agents/agents.json
   `TASK_*`/`GUARDIAN_*` é o workflow (skill), e o `SubagentStop` impede o agente de sair com tarefa
   própria `in_progress`.
 
+## Modelo por papel
+
+O kit escolhe o modelo de cada agente pela **função** que ele cumpre, de forma determinística
+(`policies/model-routing.json`, [ADR-0020](../adr/ADR-0020-modelo-por-papel-do-agente.md)). O
+critério é o custo do erro do papel:
+
+| Papel | Agentes | Nível (balanced) | Piso |
+|-------|---------|------------------|------|
+| `audit` | spec-guardian, arquiteto-guardian | `deep` — opus · high | `deep` |
+| `design` | arquiteto-contratos | `deep` — opus · high | `standard` |
+| `build` | backend, frontend, devops, gerador-skills | `standard` — sonnet · medium | `standard` |
+| `verify` | qa-testes, e2e | `standard` — sonnet · medium | `standard` |
+| `review` | revisor-ux, acessibilidade | `standard` — sonnet · medium | `light` |
+| `support` | mock-data | `light` — haiku · low | `light` |
+
+- **Sinais do contexto** sobem um nível (no máximo +1): spec reprovada pelo guardião, tarefa
+  reaberta, spec com ≥ 10 CAs (build/verify), tags `critico`/`seguranca`. Etapa `guardian: true`
+  roda no topo.
+- **Perfil** (`agents.models.profile`): `quality` +1, `balanced`, `economy` −1 — sem furar o piso.
+- **Precedência**: `model`/`effort` da etapa > `agents.models.overrides` > política. Agente próprio
+  do projeto recebe papel por `agents.models.roles` ou por inferência (`-guardian` → audit; sem
+  escrita → review; senão build).
+- `sdd models list` mostra agentes e etapas; `sdd models resolve --task <ID>` explica uma tarefa
+  (fonte, sinais, piso). As skills passam o modelo resolvido ao delegar e registram `--model` no
+  `TASK_STARTED`.
+- O `model`/`effort` do frontmatter materializa a política no perfil `balanced` para chamadas
+  avulsas; ajuste um projeto pela config, não editando o agente (o doctor avisa a divergência). O
+  esforço não é passado por chamada: vale o do frontmatter.
+
 ## Skills pré-carregadas
 
 Nenhuma por padrão: os packs ficam inativos e pré-carregar skill inexistente é erro. Um projeto pode
