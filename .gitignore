@@ -10,13 +10,13 @@ node_modules/
 # SO
 .DS_Store
 
-# gerado por projeto, nunca versionado no kit
-sdd.config.md
+# gerado por projeto, nunca versionado no kit (ancorado na raiz: as fixtures em tests/ são versionadas)
+/sdd.config.md
 graphify-out/
 
 # config e estado de PROJETO — o repositório do kit não tem (são gerados nos projetos consumidores)
-sdd.config.yaml
-.sdd/
+/sdd.config.yaml
+/.sdd/
 
 # resultados locais de evals (o baseline em evals/baseline/ é versionado)
 evals/results/

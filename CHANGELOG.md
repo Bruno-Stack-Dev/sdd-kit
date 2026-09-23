@@ -71,6 +71,10 @@ Evolução do kit para um *control plane* governado e testável. Guia de migraç
 
 ### Corrigido
 - Lock do log de eventos no Windows: exclusão pendente (`EPERM`/`EACCES`) tratada como disputa.
+- `.gitignore` ignorava `sdd.config.yaml` em qualquer nível e escondia as configs das fixtures de
+  teste; padrões agora ancorados na raiz (achado pela regressão em cópia limpa).
+- Hash de skills/packs ignora artefatos locais (`.coverage`, `.DS_Store`), para o lock bater num
+  clone limpo.
 
 ### Segurança
 - Leitura de `.env`/chaves, edição do log de eventos e de arquivos gerados e git destrutivo

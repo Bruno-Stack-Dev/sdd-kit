@@ -132,14 +132,14 @@
       "reviewed_at": null,
       "review_notes": "Vendorizado pelo mantenedor no v2 (prefixo uiux-, paths do search.py). Commit de origem não registrado.",
       "risk_notes": "uiux-design/scripts/{cip,icon,logo}/generate.py leem .env (pasta da skill e ~/.claude) e chamam a API Gemini do Google (externa, exige GEMINI_API_KEY).",
-      "hash": "sha256:adae7802557c16a430f475f71bd14d1ec992b9e4372bce53d9e6561e2af57b36",
+      "hash": "sha256:77603ba37aa6d26d0aec471547e650f824bf14e247c56abeac434f47a001dadc",
       "skills": {
         "uiux-banner-design": "sha256:6e644d3df7d9f6204d2405584975d6f30130e89e5fdcd74f63e5d487589f9e01",
         "uiux-brand": "sha256:197f86ea8a34a94fe2b5d7093d81b1bfa00f4e1ce5ae368721c0f42e4259ec08",
         "uiux-design": "sha256:a0fb409804a972b475a2d383e8ea11cc0676b4d7c843b7e1d6c9485396295a04",
         "uiux-design-system": "sha256:a0685ceb447a0ccb534fc29b1e6b7ceb313311c4323677791373268faf232d2f",
         "uiux-slides": "sha256:e9f936ca8dd69a1077c4b992e07fe35a9bffaea2f523358039244da003e8e689",
-        "uiux-ui-styling": "sha256:77537ed64d265e043174536ec8b67381cc097e4b64ba833e38064e91fc9eab8f",
+        "uiux-ui-styling": "sha256:e3b5376c768ea838c7e606cdef111f310f7dcb3b9d0a1d7796f15d0598afa2f0",
         "uiux-ui-ux-pro-max": "sha256:d8edc7e3acc50803feec18ff208c5a0367adcc4c96830cc59fc2d2dc57f56ae8"
       },
       "risk": "high",

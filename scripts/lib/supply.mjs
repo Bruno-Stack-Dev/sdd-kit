@@ -14,7 +14,8 @@ import { scanSkillDir, summarizeFindings } from './skill-scan.mjs';
 
 export const LOCK_VERSION = 1;
 export const TRUST_LEVELS = ['core', 'vendored-reviewed', 'reviewed', 'quarantine', 'rejected'];
-const HASH_IGNORE = new Set(['node_modules', '__pycache__', '.pytest_cache', '.git', '.claude-plugin']);
+// Artefatos locais (ignorados pelo git) não entram no hash: o lock tem de bater num clone limpo.
+const HASH_IGNORE = new Set(['node_modules', '__pycache__', '.pytest_cache', '.git', '.claude-plugin', '.coverage', '.DS_Store']);
 
 /** sha256 de um diretório: caminhos relativos ordenados + conteúdo (texto com fim de linha normalizado). */
 export function hashDir(dir) {
@@ -179,7 +180,7 @@ export function activatePack(root, pack, { force = false } = {}) {
       throw new Error(`${toPosix(relative(root, to))} já existe e difere do pack (alteração local?) — use --force para sobrescrever (com backup)`);
     }
     if (existsSync(to)) backupDir(root, to, `pack-${pack}`);
-    cpSync(join(src, name), to, { recursive: true, filter: (p) => !/[\\/](__pycache__|\.pytest_cache|\.claude-plugin)([\\/]|$)/.test(p) });
+    cpSync(join(src, name), to, { recursive: true, filter: (p) => !/[\\/](__pycache__|\.pytest_cache|\.claude-plugin|\.coverage|\.DS_Store)([\\/]|$)/.test(p) });
     copied.push(name);
   }
   return { pack, copied, hash: entry.hash, trust: entry.trust };

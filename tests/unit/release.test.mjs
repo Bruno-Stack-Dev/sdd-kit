@@ -38,3 +38,12 @@ test('o bloco do README é o mesmo que o sdd init injeta no CLAUDE.md', () => {
   const body = CLAUDE_BLOCK.replace(CLAUDE_BEGIN, '').replace(CLAUDE_END, '').trim();
   assert.ok(readme.includes(body), 'README.md: o bloco "Spec-Driven Development (SDD Kit)" divergiu de CLAUDE_BLOCK (scripts/lib/install.mjs)');
 });
+
+test('nenhum arquivo de fixture é ignorado pelo git (senão some num clone limpo)', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const { walkFiles, relPosix } = await import('../../scripts/lib/files.mjs');
+  const files = walkFiles(join(KIT_ROOT, 'tests', 'fixtures'), { ignore: new Set(['node_modules', '__pycache__', '.pytest_cache', '.sdd']) }).map((f) => relPosix(KIT_ROOT, f));
+  const r = spawnSync('git', ['check-ignore', '--no-index', '--stdin'], { cwd: KIT_ROOT, input: files.join('\n'), encoding: 'utf8' });
+  if (r.error || (r.status !== 0 && r.status !== 1)) return; // sem git: nada a verificar
+  assert.deepEqual(r.stdout.split('\n').filter(Boolean), []);
+});
