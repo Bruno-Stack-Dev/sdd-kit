@@ -10,6 +10,7 @@ import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { UsageError, ICON } from '../lib/cli.mjs';
 import { findOnPath } from '../lib/files.mjs';
+import { redact } from '../lib/secrets.mjs';
 
 export const AGENT_SCAN = 'snyk-agent-scan@0.6.4';
 
@@ -31,7 +32,17 @@ export function runAgentScan(root, { consent = false, target = null } = {}) {
   mkdirSync(dir, { recursive: true });
   const file = join(dir, `agent-scan-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
   writeFileSync(file, JSON.stringify({ tool: AGENT_SCAN, target: plan.target, exit_code: r.status, ran_at: new Date().toISOString(), stdout: r.stdout, stderr: (r.stderr || '').slice(0, 20000) }, null, 2));
-  return { status: r.status === 0 ? 'pass' : 'fail', cmd, report: file, exit_code: r.status };
+  const res = { status: r.status === 0 ? 'pass' : 'fail', cmd, report: file, exit_code: r.status };
+  // Num runner descartável o relatório some com a máquina: na falha, o diagnóstico vai para a saída.
+  if (res.status === 'fail') res.diagnostic = tailOutput(r.stderr, r.stdout);
+  return res;
+}
+
+/** Fim da saída do scanner (stderr primeiro), com segredos redigidos, para diagnosticar a falha. */
+export function tailOutput(stderr, stdout, lines = 40) {
+  const pick = (t) => redact(String(t ?? '')).split(/\r?\n/).filter((l) => l.trim()).slice(-lines);
+  const err = pick(stderr);
+  return (err.length ? err : pick(stdout)).join('\n');
 }
 
 /** Último relatório salvo (para o doctor): { status, ran_at, file } ou null. */
@@ -52,5 +63,6 @@ export async function scanCommand({ positional, flags, root }) {
   if (flags.json) { console.log(JSON.stringify(r, null, 2)); return r.status === 'fail' ? 1 : 0; }
   if (r.status === 'not_run') console.log(`${ICON.notRun} NOT_RUN — ${r.reason}\n  comando: ${r.cmd}`);
   else console.log(`${r.status === 'pass' ? ICON.ok : ICON.error} agent-scan ${r.status.toUpperCase()} (exit ${r.exit_code}) — relatório em ${r.report}`);
+  if (r.diagnostic) console.log(`  saída do scanner (últimas linhas, segredos redigidos):\n${r.diagnostic.replace(/^/gm, '    ')}`);
   return r.status === 'fail' ? 1 : 0;
 }

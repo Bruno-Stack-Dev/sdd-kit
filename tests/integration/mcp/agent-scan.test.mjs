@@ -72,3 +72,22 @@ test('doctor sem nenhum scan: NOT_RUN (nunca PASS)', () => {
     assert.equal(d.checks.find((c) => c.id === 'scanner.agent-scan').status, 'not_run');
   } finally { cleanup(dir); }
 });
+
+test('falha do scanner: o diagnóstico sai na saída (runner descartável perde o relatório), com segredos redigidos', async () => {
+  const fakeToken = 'ghp_' + 'a'.repeat(36);
+  const msg = `Error: autenticacao recusada para ${fakeToken}`;
+  const files = win
+    ? { 'uvx.cmd': `@echo off\r\necho linha de progresso\r\necho ${msg} 1>&2\r\nexit /b 2\r\n` }
+    : { uvx: `#!/bin/sh\necho 'linha de progresso'\necho '${msg}' 1>&2\nexit 2\n` };
+  const bin = tempProject(files);
+  const dir = tempProject({ '.mcp.json': '{"mcpServers":{}}' });
+  try {
+    if (!win) await runChmod(join(bin, 'uvx'));
+    const r = runSdd(['scan', 'agents', '--consent', '--root', dir], { env: env(bin, true) });
+    assert.equal(r.status, 1);
+    assert.match(r.out, /agent-scan FAIL \(exit 2\)/);
+    assert.match(r.out, /autenticacao recusada/);
+    assert.match(r.out, /\[REDACTED:github-token\]/);
+    assert.doesNotMatch(r.out, new RegExp(fakeToken));
+  } finally { cleanup(bin); cleanup(dir); }
+});

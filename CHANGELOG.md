@@ -9,6 +9,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/); 
 skills.lock v1), formato do `events.jsonl`, nomes dos workflows/skills núcleo e dos agentes, e o
 formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão major.
 
+## [Não lançado]
+
+### Corrigido
+- `sdd scan agents`: na falha, imprime as últimas linhas da saída do scanner (segredos redigidos).
+  Num runner descartável do CI o relatório em `.sdd/reports/` se perdia e só restava o exit code.
+
 ## [3.0.0] — 2026-09-23
 
 Evolução do kit para um *control plane* governado e testável. Guia de migração:
