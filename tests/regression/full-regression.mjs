@@ -83,7 +83,7 @@ step('testes Python dos packs (pytest)', () => {
 
 // ------------------------------------------------------------------------------------------------
 // Simulações ponta a ponta
-step('greenfield: init (cópia) → spec new → tarefas → guardião rejeita → aprova → spec implementada', () => {
+step('greenfield: init (cópia) → spec new → tarefas → guardião rejeita → nova revisão → aprova → spec implementada', () => {
   const P = tempProject('greenfield');
   must(node([join(KIT, 'scripts', 'sdd.mjs'), 'init', '--mode', 'copy', '--root', P]), 'init');
   cpSync(join(KIT, 'tests', 'fixtures', 'greenfield-react-node'), P, { recursive: true });
@@ -107,13 +107,17 @@ step('greenfield: init (cópia) → spec new → tarefas → guardião rejeita �
   must(cli('event', 'GUARDIAN_REJECTED', '--spec', spec, '--reason', 'CA-02 sem teste'), 'GUARDIAN_REJECTED');
   const early = cli('event', 'SPEC_IMPLEMENTED', '--spec', spec);
   if (early.status === 0) throw new Error('SPEC_IMPLEMENTED aceito após rejeição');
+  // Rejeição encerra a revisão: depois da correção, nova revisão antes de aprovar.
+  const skipReview = cli('event', 'GUARDIAN_APPROVED', '--spec', spec, '--evidence', '.sdd/reports/guardian.md');
+  if (skipReview.status === 0) throw new Error('aprovação aceita sem nova revisão após rejeição');
+  must(cli('event', 'GUARDIAN_STARTED', '--spec', spec), 'GUARDIAN_STARTED (nova revisão)');
   must(cli('event', 'GUARDIAN_APPROVED', '--spec', spec, '--evidence', '.sdd/reports/guardian.md'), 'GUARDIAN_APPROVED');
   must(cli('event', 'TASK_COMPLETED', '--task', guardianTask), 'complete guardião');
   must(cli('event', 'SPEC_IMPLEMENTED', '--spec', spec), 'SPEC_IMPLEMENTED');
   must(cli('state', 'verify'), 'state verify');
   must(cli('state', 'ledger'), 'state ledger');
   const doc = JSON.parse(cli('doctor', '--fast', '--json').stdout);
-  return ok(!doc.checks.some((c) => c.status === 'fail'), `${spec}: rejeição bloqueou o fechamento; aprovação com evidência fechou; estado e ledger coerentes`);
+  return ok(!doc.checks.some((c) => c.status === 'fail'), `${spec}: rejeição bloqueou o fechamento e a aprovação direta; nova revisão com evidência fechou; estado e ledger coerentes`);
 });
 
 step('interrupção + retomada: log truncado recusa gravação, repair recupera, resume aponta a tarefa', () => {

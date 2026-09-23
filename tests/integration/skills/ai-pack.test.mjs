@@ -113,7 +113,9 @@ test('doctor avisa: produto usa IA sem o pack; pack declarado mas inativo', () =
     assert.equal(declared.status, 'warn');
     assert.match(declared.title, /ai/);
     // Sem o pack declarado, o aviso vira "o produto usa IA".
-    const cfg = readFileSync(join(dir, 'sdd.config.yaml'), 'utf8').replace(/integrations:\n\s+packs:\n\s+- ai\n/, '');
+    // Checkout com autocrlf pode trazer CRLF: normaliza antes de editar.
+    const cfg = readFileSync(join(dir, 'sdd.config.yaml'), 'utf8').split(String.fromCharCode(13)).join('').replace(/integrations:\n\s+packs:\n\s+- ai\n/, '');
+    assert.doesNotMatch(cfg, /- ai\n/, 'bloco integrations.packs removido');
     writeFile(dir, 'sdd.config.yaml', cfg);
     rep = JSON.parse(sdd(dir, 'doctor', '--json').stdout);
     const ai = rep.checks.find((c) => c.id === 'supply.ai-pack');
