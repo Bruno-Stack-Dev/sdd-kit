@@ -13,6 +13,8 @@
 //   pending|blocked|in_progress ─TASK_CANCELLED(motivo)→ cancelled
 //   completed|cancelled ─TASK_REOPENED→ pending
 //   Tarefa de agente *-guardian só conclui com a spec aprovada (GUARDIAN_APPROVED).
+//   TASK_STARTED com meta.wave (onda paralela) é recusado se o agente já tem outra tarefa em
+//   andamento; a tarefa guarda `wave` até ser reiniciada fora de uma onda.
 
 export const STATE_VERSION = 1;
 
@@ -151,6 +153,12 @@ export function applyEvent(state, ev, ctx = {}) {
       }
       const s = spec(t.spec);
       if (s && ['archived', 'implemented'].includes(s.status)) return `spec ${t.spec} está '${s.status}'`;
+      if (ev.meta?.wave) {
+        const agent = ev.agent ?? t.agent;
+        const clash = Object.entries(state.tasks).find(([id, o]) => id !== ev.task && o.status === 'in_progress' && o.agent === agent);
+        if (clash) return `@${agent} já tem ${clash[0]} em andamento: numa onda, uma tarefa por agente`;
+        t.wave = String(ev.meta.wave);
+      } else delete t.wave;
       t.status = 'in_progress';
       t.started = ev.ts;
       if (ev.agent) t.agent = ev.agent;

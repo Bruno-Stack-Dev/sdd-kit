@@ -12,6 +12,12 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 ## [Não lançado]
 
 ### Adicionado
+- **Execução em ondas** (ADR-0021): `sdd tasks wave [--spec S] [--max N]` planeja as tarefas que
+  rodam ao mesmo tempo — specs de `depende-de` implementadas, um agente por onda, guardião sozinho,
+  limite `agents.parallel.max` (padrão 3; 1 = sequencial) — cada uma com o modelo do seu papel.
+  `event TASK_STARTED --wave <id>` marca a onda; o estado recusa duas tarefas do mesmo agente numa
+  onda; o `SubagentStop` deixa o fechamento da onda com o orquestrador. `/gerar-projeto` delega a
+  onda numa única mensagem e fecha com suíte única.
 - **Modelo por papel do agente** (ADR-0020): `policies/model-routing.json` define papel → nível
   (haiku/sonnet/opus + esforço) e piso; sinais do contexto (reprovação no guardião, reabertura, spec
   grande ou crítica) sobem um nível; perfis `quality|balanced|economy`.
@@ -23,6 +29,10 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 - Agentes do kit ganham `model`/`effort` no frontmatter (perfil balanced); o doctor verifica
   valores válidos e divergência com a política. `/implementar-spec`, `/implementar-tarefa` e
   `/gerar-projeto` passam o modelo resolvido ao delegar.
+
+### Alterado
+- `tasks ready --json`: `parallel_safe` passa a ser a próxima onda (regras acima); antes era uma
+  tarefa por spec × agente, sem limite nem exclusividade do guardião.
 
 ### Corrigido
 - Hook `paths.generated`: o marcador `AUTO-GENERATED` só torna um arquivo "gerado" quando abre uma

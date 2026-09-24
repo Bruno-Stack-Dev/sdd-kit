@@ -62,6 +62,22 @@ critério é o custo do erro do papel:
   avulsas; ajuste um projeto pela config, não editando o agente (o doctor avisa a divergência). O
   esforço não é passado por chamada: vale o do frontmatter.
 
+## Execução em ondas
+
+`/gerar-projeto` roda as tarefas prontas em **ondas** que a CLI planeja (`sdd tasks wave`,
+[ADR-0021](../adr/ADR-0021-execucao-em-ondas.md)); as chamadas de subagente de uma onda saem numa
+única mensagem, cada uma com o modelo do seu papel.
+
+- **Um agente por onda**: os hooks identificam a tarefa pelo tipo do agente. O estado recusa
+  `TASK_STARTED --wave` para agente que já tem tarefa em andamento.
+- **Guardião sozinho**: papel `audit` ou etapa `guardian: true` não divide a onda, e segura as
+  seguintes enquanto revisa.
+- **Specs dependentes depois**: tarefa de spec com `depende-de` pendente espera.
+- **Limite**: `agents.parallel.max` (padrão 3; 1 = sequencial).
+- **Fechamento pelo orquestrador**: na onda, o agente não roda a suíte completa nem registra
+  eventos; o `SubagentStop` não o cobra. Depois da onda, suíte única: verde conclui tudo, vermelho
+  volta à correção em série.
+
 ## Skills pré-carregadas
 
 Nenhuma por padrão: os packs ficam inativos e pré-carregar skill inexistente é erro. Um projeto pode

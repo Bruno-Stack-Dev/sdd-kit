@@ -1,12 +1,13 @@
-// `sdd tasks <list|ready|show|graph|sync>` · `sdd spec <next-id|new>` · `sdd template <list|show|path>`
+// `sdd tasks <list|ready|wave|show|graph|sync>` · `sdd spec <next-id|new>` · `sdd template <list|show|path>`
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { UsageError, ICON, today } from '../lib/cli.mjs';
 import { loadProject } from '../lib/project.mjs';
-import { readyTasks, parallelBatches, topoOrder } from '../lib/graph.mjs';
+import { readyTasks, topoOrder } from '../lib/graph.mjs';
 import { resolveTaskId, STATUS_CHECKBOX, nextSpecId } from '../lib/specs.mjs';
 import { appendEvent, EventRejected } from '../lib/events.mjs';
 import { resolveTask } from '../lib/models.mjs';
+import { planWave } from '../lib/waves.mjs';
 import { listTemplates, readTemplate, templatePath, choosePipeline, renderSpec, renderPlan, renderTasks } from '../lib/scaffold.mjs';
 
 export async function tasksCommand(args) {
@@ -14,10 +15,11 @@ export async function tasksCommand(args) {
   switch (sub) {
     case 'list': return list(args);
     case 'ready': return ready(args);
+    case 'wave': return wave(args);
     case 'show': return show(args);
     case 'graph': return graph(args);
     case 'sync': return sync(args);
-    default: throw new UsageError(`uso: tasks <list|ready|show|graph|sync> (recebido: ${sub ?? 'nada'})`);
+    default: throw new UsageError(`uso: tasks <list|ready|wave|show|graph|sync> (recebido: ${sub ?? 'nada'})`);
   }
 }
 
@@ -37,13 +39,35 @@ function list({ root, flags }) {
 function ready({ root, flags }) {
   const p = loadProject(root);
   const r = readyTasks(p.taskGraph, p.statusOf);
-  const batch = parallelBatches(r);
+  const batch = p.taskGraph.errors.length ? [] : planWave(p).wave;
   const routing = Object.fromEntries(r.map((t) => [t.id, routingSummary(p, t)]));
   if (flags.json) { console.log(JSON.stringify({ ready: r.map((t) => t.id), parallel_safe: batch.map((t) => t.id), routing, errors: p.taskGraph.errors })); return p.taskGraph.errors.length ? 1 : 0; }
   if (p.taskGraph.errors.length) { printGraphErrors(p); console.log(`${ICON.error} grafo inválido: corrija antes de escolher tarefas`); return 1; }
   if (!r.length) console.log('nenhuma tarefa pronta');
   for (const t of r) console.log(`${t.id.padEnd(28)} @${t.agent.padEnd(28)} ${`[${routing[t.id].model}]`.padEnd(9)} ${t.title}`);
-  if (batch.length > 1) console.log(`\nparalelizáveis sem conflito aparente (agentes/specs distintos): ${batch.map((t) => t.id).join(', ')}`);
+  if (batch.length > 1) console.log(`\nparalelizáveis (próxima onda — \`tasks wave\`): ${batch.map((t) => t.id).join(', ')}`);
+  return 0;
+}
+
+/** Próxima onda: tarefas prontas que rodam ao mesmo tempo, cada uma com o modelo do seu papel. */
+function wave({ root, flags }) {
+  const p = loadProject(root);
+  if (p.taskGraph.errors.length) {
+    if (flags.json) { console.log(JSON.stringify({ errors: p.taskGraph.errors })); return 1; }
+    printGraphErrors(p);
+    console.log(`${ICON.error} grafo inválido: corrija antes de planejar a onda`);
+    return 1;
+  }
+  let plan;
+  try { plan = planWave(p, { spec: flags.spec ? String(flags.spec) : null, max: flags.max }); } catch (e) { throw new UsageError(e.message); }
+  if (flags.json) { console.log(JSON.stringify(plan, null, 2)); return 0; }
+  if (!plan.wave.length) console.log(plan.deferred.length ? 'nenhuma tarefa pode começar agora' : 'nenhuma tarefa pronta');
+  else console.log(`${plan.id} (até ${plan.max} por onda):`);
+  for (const t of plan.wave) console.log(`  ${t.id.padEnd(28)} @${t.agent.padEnd(28)} ${`${t.model}${t.effort ? ` · ${t.effort}` : ''}`.padEnd(16)} ${t.title}`);
+  if (plan.wave.length) {
+    console.log(`\nregistre: event TASK_STARTED --task <ID> --agent <agente> --model <modelo> --effort <esforço> --wave ${plan.id}`);
+  }
+  for (const d of plan.deferred) console.log(`  ${ICON.info} ${d.id} espera: ${d.reason}`);
   return 0;
 }
 

@@ -357,6 +357,19 @@
               }
             }
           }
+        },
+        "parallel": {
+          "description": "Execução em ondas (`sdd tasks wave`): quantas tarefas prontas rodam ao mesmo tempo, com no máximo uma por agente e o guardião sozinho.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "max": {
+              "description": "Tarefas por onda (1 = sequencial; padrão 3; teto 8).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 8
+            }
+          }
         }
       }
     },

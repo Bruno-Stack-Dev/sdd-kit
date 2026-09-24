@@ -64,7 +64,7 @@ principais:
 | Área | Comandos |
 |------|----------|
 | Config | `config validate · migrate · render · show` |
-| Specs e tarefas | `spec next-id · spec new` · `tasks list · ready · show · graph · sync` · `template list · show` |
+| Specs e tarefas | `spec next-id · spec new` · `tasks list · ready · wave · show · graph · sync` · `template list · show` |
 | Modelos | `models list [--profile p]` · `models resolve --task <ID>` — modelo de cada agente pelo papel |
 | Estado | `event <TIPO>` · `state show · resume · verify · rebuild · repair · ledger · import-ledger` |
 | Saúde | `doctor [--fast\|--project\|--security\|--skills\|--mcp\|--full] [--json]` · `check forbidden` |
@@ -87,6 +87,9 @@ principais:
 - **Modelo por papel**: o kit escolhe o modelo de cada agente pela função (guardiões e contratos no
   topo, implementação no padrão, dados mockados no leve) e sobe o nível quando o guardião reprova;
   perfil e overrides em `agents.models` da config ([ADR-0020](docs/adr/ADR-0020-modelo-por-papel-do-agente.md)).
+- **Execução em ondas**: tarefas prontas de agentes diferentes rodam em paralelo, planejadas pela
+  CLI (`sdd tasks wave`): um agente por onda, guardião sozinho, specs dependentes depois
+  ([ADR-0021](docs/adr/ADR-0021-execucao-em-ondas.md)).
 - **Supply chain de skills**: `skills.lock.json` com hash, licença e confiança; packs só ativam se
   batem com o lock; skills externas entram em quarentena.
 - **MCP por allowlist e perfis**, com lock de schema das ferramentas ([`docs/mcp/`](docs/mcp/)).

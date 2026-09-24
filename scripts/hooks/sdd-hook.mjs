@@ -229,7 +229,8 @@ async function subagentStop(input) {
     }
   }
   for (const [id, t] of Object.entries(state.tasks)) {
-    if (t.agent === agent && t.status === 'in_progress') reasons.push(`tarefa ${id} ainda 'in_progress': registre \`${cli} event TASK_COMPLETED --task ${id}\` (verde) ou \`TASK_BLOCKED --task ${id} --reason "..."\``);
+    // Tarefa de onda paralela: quem fecha é o orquestrador, depois da suíte única da onda.
+    if (t.agent === agent && t.status === 'in_progress' && !t.wave) reasons.push(`tarefa ${id} ainda 'in_progress': registre \`${cli} event TASK_COMPLETED --task ${id}\` (verde) ou \`TASK_BLOCKED --task ${id} --reason "..."\``);
   }
   if (reasons.length) out({ decision: 'block', reason: `SDD — antes de encerrar @${agent}:\n- ${reasons.join('\n- ')}` });
 }

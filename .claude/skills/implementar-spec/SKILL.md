@@ -18,7 +18,9 @@ Se `$ARGUMENTS` estiver vazio, **peça o ID** — não adivinhe.
 1. Localize a spec `$ARGUMENTS` (`sdd tasks list --json` filtra por spec). Sem tarefas no estado →
    `sdd tasks sync`. Grafo inválido → pare e mostre o erro.
 2. Repita até não haver tarefas pendentes da spec:
-   1. `sdd tasks ready` → escolha a próxima tarefa **desta spec**.
+   1. `sdd tasks ready` → escolha a próxima tarefa **desta spec**. Se o plano tiver ramos
+      paralelos, `sdd tasks wave --spec <SPEC> --json` devolve as que podem rodar juntas; nesse
+      caso siga o ciclo de onda do Passo 5 do GERADOR (`/gerar-projeto`).
    2. `sdd models resolve --task <SPEC>/T-NNN --json` → `model` e `effort` que o kit escolheu
       para o papel do agente (etapa da config > `agents.models` > política; sinais como reprovação
       no guardião sobem o nível). Não escolha o modelo por conta própria.
