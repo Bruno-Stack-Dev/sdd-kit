@@ -12,6 +12,11 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 ## [Não lançado]
 
 ### Adicionado
+- **Guia de uso** (`docs/guia-de-uso.md`): fluxogramas Mermaid com legenda para instalação, projeto
+  novo, projeto existente, ciclo de implementação em ondas, fechamento pelo guardião, ciclo de vida
+  da spec no estado, pipelines e agentes, retomada de sessão e guardrails, mais as tabelas de
+  comandos mais usados e de solução de problemas. O README ganhou o fluxo em Mermaid, o comparativo
+  novo × existente e a tabela "Comandos mais usados".
 - **Radar de ferramentas** (ADR-0024): skill `radar-ferramentas` (`/radar-ferramentas [foco]`),
   oferecida no fechamento do `/gerar-projeto`. Deriva lacunas dos drivers do discovery, pesquisa na
   sessão principal com evidência datada (versão, data, link, licença), compara com a opção mínima e

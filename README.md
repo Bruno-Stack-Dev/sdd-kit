@@ -11,7 +11,9 @@ continua em skills e agentes.
 - **Zero dependências no core.** Node ≥ 20, sem `npm install`. Integrações externas são opcionais,
   pedem consentimento e, ausentes, aparecem como `NOT_RUN` (nunca como aprovadas).
 
-> **Primeira vez?** Comece pelo **[`SETUP.md`](SETUP.md)**. Vindo do v2? **[`MIGRATION.md`](MIGRATION.md)**.
+> **Primeira vez?** Comece pelo **[`SETUP.md`](SETUP.md)** e veja o
+> **[guia de uso com fluxogramas](docs/guia-de-uso.md)** (projeto novo, projeto existente, ciclo de
+> implementação e comandos mais usados). Vindo do v2? **[`MIGRATION.md`](MIGRATION.md)**.
 
 ## Instalar
 
@@ -28,14 +30,44 @@ proveniência por fato e relatório OBSERVED × INTENDED × RUNTIME).
 
 ## Fluxo
 
+```mermaid
+flowchart TD
+  I["sdd init<br/>plugin ou cópia"]:::cli --> S(["/sdd-init"]):::skill
+  S --> C{"Projeto novo<br/>ou existente?"}:::decision
+  C -- novo --> D["Discovery em blocos<br/>docs, ADRs, config, brief"]:::skill
+  C -- existente --> A["Engenharia reversa<br/>docs com proveniência<br/>e divergências"]:::skill
+  D --> GS(["/gerar-skills"]):::skill
+  A --> GS
+  GS -- projeto novo --> GP(["/gerar-projeto<br/>brief → specs → código"]):::skill
+  GS -- projeto existente --> NS(["/nova-spec"]):::skill
+  NS --> IS(["/implementar-spec"]):::skill
+  GP --> AG[["@agente-* por etapa<br/>tarefas em ondas"]]:::agent
+  IS --> AG
+  AG --> G{{"testes verdes +<br/>GUARDIAN_APPROVED"}}:::gate
+  G --> OK[("spec implementada<br/>.sdd/events.jsonl")]:::artifact
+  OK -.-> ST(["/sdd-status"]):::skill
+
+  classDef skill fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#0f172a
+  classDef cli fill:#dcfce7,stroke:#16a34a,color:#0f172a
+  classDef agent fill:#ccfbf1,stroke:#0d9488,color:#0f172a
+  classDef decision fill:#f1f5f9,stroke:#475569,color:#0f172a
+  classDef artifact fill:#ede9fe,stroke:#7c3aed,color:#0f172a
+  classDef gate fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#0f172a
 ```
-brief (specs/_entrada/) ─► /gerar-projeto ─► specs + planos + tarefas (pipelines da config)
-                                     │
-             /implementar-spec ◄─────┘   tarefas em DAG, uma por etapa, cada uma com um @agente-*
-                     │
-                     ▼
-     testes verdes ─► @agente-spec-guardian ─► GUARDIAN_APPROVED (evento) ─► spec implementada
-```
+
+Azul: skills no Claude Code · verde: CLI determinística · turquesa: subagentes · roxo: estado em
+disco · vermelho: gate obrigatório. Fluxogramas detalhados e legenda completa no
+**[guia de uso](docs/guia-de-uso.md)**.
+
+| Passo | Projeto novo (greenfield) | Projeto existente (brownfield) |
+|-------|---------------------------|--------------------------------|
+| 1 | pasta vazia → `sdd init --mode plugin` | raiz do repositório → `sdd init` (do v2: `sdd upgrade` + `config migrate`) |
+| 2 | `/sdd-init` → entrevista de discovery em blocos | `/sdd-init` → engenharia reversa, somente leitura |
+| 3 | gera `specs/discovery/`, ADRs, `sdd.config.yaml`, `CLAUDE.md` e brief | gera docs com proveniência, ADRs retroativos e `AUDITORIA-DIVERGENCIAS.md` |
+| 4 | `sdd config validate` · `sdd doctor --fast` | idem + suíte de testes real verde antes de o kit assumir |
+| 5 | `/gerar-skills` | `/gerar-skills` (decida os `SECURITY_DRIFT` pendentes antes) |
+| 6 | revise o brief em `specs/_entrada/` → `/gerar-projeto` | `/nova-spec <slug>` → `/implementar-spec <SPEC-ID>` |
+| 7 | `/sdd-status` · `/nova-spec` para os próximos incrementos | `/sdd-status` · repita o passo 6 a cada incremento |
 
 Estado em `.sdd/events.jsonl` (append-only, versionado): `sdd state resume` retoma uma sessão
 interrompida; `sdd state verify` confere que nada foi editado à mão.
@@ -45,6 +77,23 @@ gate atual e prontidão de entrega; `sdd dashboard` abre um painel no terminal (
 tarefas, specs e rastreabilidade, qualidade, segurança, eventos ao vivo, MCP/LSP). Tudo derivado
 dos dados do kit, sem estimativa do modelo, e somente leitura. Sem projeto à mão:
 `sdd dashboard --demo` ([docs/dashboard.md](docs/dashboard.md)).
+
+## Comandos mais usados
+
+| Quero… | Rode |
+|--------|------|
+| ver o andamento do projeto | `/sdd-status` ou `sdd status` (`--watch` atualiza ao vivo) |
+| acompanhar os agentes em tempo real | `sdd dashboard` |
+| criar uma funcionalidade nova | `/nova-spec <slug> "<título>"` → `/implementar-spec <SPEC-ID>` |
+| fazer uma única tarefa | `/implementar-tarefa SPEC/T-NNN` |
+| saber o que dá para começar agora | `sdd tasks ready` |
+| retomar uma sessão interrompida | `sdd state resume` |
+| checar a saúde antes de um PR ou no CI | `sdd doctor --fast` · `sdd doctor --full` |
+| entender por que um comando foi bloqueado | `sdd policy check --command "<cmd>"` |
+| rodar os e2e | `/validar-e2e [filtro]` |
+
+Mais situações ("quero… → rode…") e a tabela de solução de problemas estão na
+[seção 10 do guia de uso](docs/guia-de-uso.md#10-comandos-mais-usados).
 
 ## Workflows (skills)
 
@@ -81,7 +130,7 @@ principais:
 | MCP | `mcp profiles · apply · check · pin` |
 | Projeto | `project classify` · `ai detect` · `lsp detect` · `radar inventory · check` |
 | Evals e trace | `eval run [--suite model]` · `eval export-promptfoo` · `trace show · export --otlp` |
-| Portabilidade | `adapters build <codex\|opencode\|cline\|generic>` · `export-context` |
+| Portabilidade | `adapters build <codex\|opencode\|cline\|generic>` · `adapters status` · `export-context` |
 | Instalação | `init` · `upgrade` · `version` |
 
 `sdd doctor --full` devolve `READY`, `READY_WITH_WARNINGS` ou `NOT_READY` (exit 1) — pronto para CI.
@@ -135,6 +184,8 @@ sdd-kit/
 ## Documentação
 
 - [`SETUP.md`](SETUP.md) — instalação e primeiro uso · [`MIGRATION.md`](MIGRATION.md) — v2 → v3
+- [`docs/guia-de-uso.md`](docs/guia-de-uso.md) — guia visual: fluxogramas para projeto novo e
+  existente, ciclo de implementação, ciclo de vida da spec, pipelines, comandos mais usados
 - [`docs/adr/`](docs/adr/README.md) — decisões do kit · [`CHANGELOG.md`](CHANGELOG.md)
 - [`docs/security/`](docs/security/) · [`SECURITY.md`](SECURITY.md) — modelo de ameaças e como reportar
 - [`docs/dashboard.md`](docs/dashboard.md) — `sdd status` e `sdd dashboard`: métricas, atalhos, rastreabilidade
