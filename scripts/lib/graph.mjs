@@ -116,19 +116,3 @@ export function readyTasks(graph, statusOf) {
     .filter((t) => statusOf(t.id) === 'pending' && t.dependsOn.every(done))
     .sort((a, b) => a.id.localeCompare(b.id));
 }
-
-/**
- * Grupos de tarefas prontas que podem rodar em paralelo sem conflito. Conservador: tarefas do mesmo
- * agente na mesma spec ficam em série (tendem a tocar os mesmos arquivos).
- */
-export function parallelBatches(ready) {
-  const batches = [];
-  const used = new Set();
-  for (const t of ready) {
-    const key = `${t.spec}::${t.agent}`;
-    if (used.has(key)) continue;
-    used.add(key);
-    batches.push(t);
-  }
-  return batches;
-}

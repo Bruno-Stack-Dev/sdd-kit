@@ -31,6 +31,10 @@ export function eventInputFromFlags(type, flags, project) {
     if (!EFFORT_LEVELS.includes(String(flags.effort))) throw new UsageError(`--effort inválido '${flags.effort}' (${EFFORT_LEVELS.join(' | ')})`);
     meta.effort = String(flags.effort);
   }
+  if (flags.wave) {
+    if (!/^wave-\d+$/.test(String(flags.wave))) throw new UsageError(`--wave inválido '${flags.wave}' (use o id de \`sdd tasks wave\`, ex.: wave-1)`);
+    meta.wave = String(flags.wave);
+  }
   if (flags.force) meta.force = true;
 
   let task = flags.task;

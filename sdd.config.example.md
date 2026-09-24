@@ -175,6 +175,8 @@ agents:
     profile: balanced
     overrides: {}
     roles: {}
+  parallel:
+    max: 3
 integrations:
   mcp_profile: minimal
   packs: []

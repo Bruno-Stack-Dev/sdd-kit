@@ -87,5 +87,11 @@
     "large_spec": { "shift": 1, "min_cas": 10, "roles": ["build", "verify"], "description": "spec com muitos Critérios de Aceitação exige mais contexto e raciocínio" },
     "critical_tags": { "shift": 1, "tags": ["critico", "critical", "seguranca", "security"], "description": "spec marcada como crítica ou de segurança nas `tags`" },
     "max_escalation": 1
+  },
+  "concurrency": {
+    "$comment": "Execução em ondas (`sdd tasks wave`): tarefas prontas que rodam ao mesmo tempo. Um agente por onda — os hooks identificam a tarefa pelo tipo do agente, e duas tarefas do mesmo agente em andamento seriam indistinguíveis. Papéis exclusivos rodam sozinhos: o guardião verifica e roda testes, e não pode fazer isso com outro agente escrevendo. `agents.parallel.max` da config ajusta o limite (1 = sequencial).",
+    "default_max": 3,
+    "max": 8,
+    "exclusive_roles": ["audit"]
   }
 }

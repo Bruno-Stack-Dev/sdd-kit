@@ -64,12 +64,13 @@ Comandos:
   config migrate [--force] [--keep-md]  sdd.config.md (v2) → sdd.config.yaml (v3)
   config render [--check]           gera a visão sdd.config.md a partir do YAML
   config show [--json]              imprime a config normalizada
-  event <TIPO> [--spec S] [--task T] [--agent A] [--model M] [--effort E] [--reason R] [--evidence E] [--key K]
+  event <TIPO> [--spec S] [--task T] [--agent A] [--model M] [--effort E] [--wave W] [--reason R] [--evidence E] [--key K]
                                     registra um evento validado em .sdd/events.jsonl
   state show|resume|rebuild|verify|repair   estado derivado do log; retomada de sessão
   state ledger [--check]            gera o LEDGER-<slug>.md a partir do estado
   state import-ledger <arquivo>     importa um LEDGER v2 escrito à mão
   tasks list|ready|show <id>|graph  grafo de tarefas (DAG) validado
+  tasks wave [--spec S] [--max N]   próxima onda paralela: um agente por tarefa, guardião sozinho
   tasks sync [--dry-run]            registra specs/tarefas no estado e reescreve checkboxes
   models list [--profile p]         modelo e esforço de cada agente e etapa, pelo papel (policies/model-routing.json)
   models resolve --task T | --agent A [--pipeline p --step s] [--profile p]

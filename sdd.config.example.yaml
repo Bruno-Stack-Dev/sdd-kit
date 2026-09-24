@@ -229,6 +229,8 @@ agents:
     profile: balanced                # quality (+1 nível) | balanced | economy (-1, sem furar o piso do papel)
     overrides: {}                    # ex.: agente-backend: deep · ou { model: opus, effort: high }
     roles: {}                        # papel de agentes próprios do projeto: audit|design|build|verify|review|support
+  parallel:
+    max: 3                           # tarefas por onda (`sdd tasks wave`): um agente por onda, guardião sozinho · 1 = sequencial
 # Por etapa, a pipeline aceita `model:` (light|standard|deep, opus|sonnet|haiku|inherit ou claude-...)
 # e `effort:` (low|medium|high|xhigh|max) — explícito, vence a política.
 

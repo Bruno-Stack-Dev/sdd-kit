@@ -147,6 +147,15 @@ test('SubagentStop: tarefa em andamento do agente e revisão sem veredito', () =
   } finally { cleanup(dir); }
 });
 
+test('SubagentStop: tarefa de onda paralela é fechada pelo orquestrador, não bloqueia o agente', () => {
+  const dir = greenfieldProject();
+  try {
+    runSdd(['tasks', 'sync', '--root', dir]);
+    runSdd(['event', 'TASK_STARTED', '--task', 'BIB-100/T-001', '--agent', 'agente-arquiteto-contratos', '--wave', 'wave-1', '--root', dir]);
+    assert.equal(hook('subagent-stop', { agent_type: 'agente-arquiteto-contratos' }, dir).stdout, '');
+  } finally { cleanup(dir); }
+});
+
 test('SessionEnd registra SESSION_FINISHED', () => {
   const dir = greenfieldProject();
   try {

@@ -114,12 +114,33 @@ Para cada submódulo, a partir de `sdd template list`:
 
 ---
 
-## Passo 5 — Implementar (automático, em ordem)
+## Passo 5 — Implementar (automático, em ondas)
 
-Para **cada spec, na ordem do LEDGER**, execute as **etapas da pipeline da spec**, uma a uma,
-cada uma pelo agente declarado, **até o verde antes da próxima spec**.
-Equivale a `/implementar-spec`. Escolha a próxima tarefa com `sdd tasks ready`
-(respeita dependências) e registre o ciclo de vida de cada uma:
+Execute as **etapas da pipeline de cada spec** pelo agente declarado, em **ondas** planejadas pela
+CLI. Com `agents.parallel.max: 1`, ou num cliente sem subagentes, cada onda tem uma tarefa só, e o
+fluxo fica igual ao de `/implementar-spec` (uma tarefa por vez, na ordem do LEDGER).
+
+**Ciclo de uma onda** (repita até `sdd tasks wave` não devolver tarefas):
+
+1. `sdd tasks wave --json` → `id` da onda e as tarefas, cada uma com `agent`, `model` e `effort`.
+   A CLI já aplica as regras: specs de `depende-de` implementadas, **um agente por onda**, guardião
+   **sozinho**, limite `agents.parallel.max`. Não acrescente tarefas por conta própria; as de
+   `deferred` esperam a próxima onda (o motivo vem junto).
+2. Para cada tarefa: `sdd event TASK_STARTED --task <ID> --agent <agente> --model <model>
+   --effort <effort> --wave <id>`.
+3. **Delegue todas as tarefas da onda numa única mensagem**, uma chamada de subagente por tarefa,
+   cada uma com o seu `model`, para que rodem ao mesmo tempo. Diga a cada agente que está numa onda:
+   ele implementa a sua etapa, pode rodar verificações locais (typecheck, testes dos próprios
+   arquivos), **não roda a suíte completa e não registra eventos**. O fechamento é seu.
+4. Com todos de volta, rode `commands.test` **uma vez** e registre `TEST_PASSED`/`TEST_FAILED
+   --spec <SPEC>` para cada spec da onda.
+5. Verde → `TASK_COMPLETED` de cada tarefa da onda. Vermelho → não conclua nenhuma: identifique
+   pela falha a tarefa responsável e corrija **uma de cada vez** pelo agente dela (fora de onda,
+   `TASK_STARTED` sem `--wave`), até o verde; impedimento → `TASK_BLOCKED --reason "..."` e pare.
+6. Onda de guardião (uma tarefa, papel `audit`): siga o passo 4 de `/implementar-spec` (veredito
+   com evidência); aprovado → `SPEC_IMPLEMENTED`, o que libera as specs dependentes na próxima onda.
+
+Regras de cada tarefa, dentro ou fora de onda:
 
 - modelo: `sdd models resolve --task <SPEC>/T-NNN --json` — o kit escolhe `model`/`effort` pelo
   papel do agente (guardiões e contratos no nível mais alto, implementação no padrão, dados mockados

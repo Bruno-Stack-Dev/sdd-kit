@@ -34,9 +34,11 @@ Regras que a CLI e os hooks impõem (não tente contornar):
 - IDs de spec: `sdd spec next-id` (nunca calcule à mão).
 - Specs, planos e tarefas: `sdd spec new` gera a partir das pipelines da config; depois
   `sdd tasks sync`.
-- Ordem: `sdd tasks ready`; ciclo de vida de cada tarefa com `sdd event TASK_STARTED/COMPLETED/BLOCKED`.
-- Modelo de cada tarefa: `sdd models resolve --task <ID> --json` (o kit escolhe pelo papel do
-  agente); passe o `model` ao delegar e registre `--model`/`--effort` no `TASK_STARTED`.
+- Ordem e paralelismo: `sdd tasks wave --json` planeja a próxima onda (um agente por tarefa,
+  guardião sozinho, specs dependentes só depois de implementadas). Delegue as tarefas da onda numa
+  única mensagem, cada uma com o `model` resolvido, e registre `TASK_STARTED --wave <id>`.
+- Fechamento da onda: suíte única depois de todos voltarem; verde → `TASK_COMPLETED` de cada uma;
+  vermelho → correção em série, uma tarefa por vez (Passo 5 do GERADOR).
 - Fechamento: `GUARDIAN_APPROVED` com evidência antes de `SPEC_IMPLEMENTED`; `sdd state ledger`.
 
 ## Contrato de saída
