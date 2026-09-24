@@ -12,6 +12,11 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 ## [Não lançado]
 
 ### Adicionado
+- Skill `sdd-dashboard` (`/sdd-dashboard [--demo] [--tab <tela>] [--session <id>] [--ascii]`): a TUI
+  do `sdd dashboard` não roda dentro do chat (sem TTY), então a skill confere o projeto com
+  `--once` e abre o painel numa janela de terminal do sistema (Windows, macOS ou Linux com sessão
+  gráfica). Sem janela possível, entrega o comando pronto. Aceita só argumentos da lista; somente
+  leitura.
 - **Guia de uso** (`docs/guia-de-uso.md`): fluxogramas Mermaid com legenda para instalação, projeto
   novo, projeto existente, ciclo de implementação em ondas, fechamento pelo guardião, ciclo de vida
   da spec no estado, pipelines e agentes, retomada de sessão e guardrails, mais as tabelas de
