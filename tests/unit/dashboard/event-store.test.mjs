@@ -157,3 +157,32 @@ test('texto do trace sai sem caracteres de controle (sem injeção de ANSI)', ()
   assert.ok(!n.summary.includes(ESC) && !n.summary.includes('\n'));
   assert.ok(!String(n.attrs['tool.command']).includes(ESC));
 });
+
+test('matchers assimétricos: LSP só com conclusão é ação normal; leitura não fica pendente e detecta loop', () => {
+  const ix = new ActivityIndex();
+  ix.add(normalizeTrace(rec('tool.called', { 'tool.name': 'Bash', 'tool.use_id': 'b1', 'tool.command': 'ls' })));
+  ix.add(normalizeTrace(rec('tool.completed', { 'tool.name': 'Bash', 'tool.use_id': 'b1', 'tool.command': 'ls' })));
+  ix.add(normalizeTrace(rec('tool.completed', { 'tool.name': 'LSP', 'tool.use_id': 'l1', 'lsp.operation': 'hover' })));
+  const m = autonomyMetrics(ix.autonomy);
+  assert.equal(m.actions, 2, 'Bash pareada + LSP');
+  assert.equal(ix.autonomy.unpaired, 0);
+  assert.doesNotMatch(m.source, /sem par|anterior ao tool\.called/, 'LSP sem tool.called não é trace antigo');
+  assert.match(m.source, /1 conclusão\(ões\) LSP/);
+  for (let i = 0; i < 5; i++) ix.add(normalizeTrace(rec('tool.called', { 'sdd.agent': 'agente-x', 'tool.name': 'Read', 'tool.use_id': `r${i}`, 'file.path': 'a.md' })));
+  assert.equal(ix.pending.size, 0, 'leitura nunca tem conclusão: não ocupa pending');
+  assert.equal(ix.agents.get('agente-x').maxRepeat, 5, 'leituras idênticas seguidas contam como loop');
+});
+
+test('JsonlTail: depois de truncamento, a 1ª linha do arquivo novo não é confundida com a cauda já entregue', () => {
+  const dir = tempProject({});
+  try {
+    const f = join(dir, 'log.jsonl');
+    writeFileSync(f, '{"a":1}\n{"a":2}');
+    const t = new JsonlTail(f, { acceptUnterminated: true });
+    assert.deepEqual(t.read().records.map((r) => r.a), [1, 2], 'cauda JSON válida sem \\n já entregue');
+    writeFileSync(f, '{"a":2}\n');
+    const r = t.read();
+    assert.equal(r.reset, true);
+    assert.deepEqual(r.records.map((x) => x.a), [2], 'arquivo novo relido do zero, sem perder a 1ª linha');
+  } finally { cleanup(dir); }
+});

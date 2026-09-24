@@ -181,3 +181,29 @@ test('segurança sem git: arquivo sensível/segredo local conta como médio, nã
   const local = securitySummary({ guards, secretChecks: checks, agentScan: null, config: {}, gates: {}, policy, tracked: false });
   assert.deepEqual([local.findings.critical, local.findings.medium], [0, 1]);
 });
+
+test('segurança: dependency_audit bloqueado em uma spec vence a aprovação global anterior', () => {
+  const policy = { deny: 0, ask: 0, decisions: new Ring(5) };
+  const guards = { sandbox: { status: 'INACTIVE' }, hooks: { status: 'ACTIVE' }, policy: { status: 'ACTIVE' }, trace: { status: 'ACTIVE' } };
+  const config = { engineering_gates: { dependency_audit: { enabled: true, blocking: true } } };
+  const gates = {
+    '*::dependency_audit': { gate: 'dependency_audit', spec: null, status: 'passed', ts: '2026-09-24T10:00:00.000Z', reason: null },
+    'S-110::dependency_audit': { gate: 'dependency_audit', spec: 'S-110', status: 'blocked', ts: '2026-09-24T11:00:00.000Z', reason: 'CVE' },
+  };
+  const s = securitySummary({ guards, secretChecks: null, agentScan: null, config, gates, policy });
+  const scan = s.scans.find((x) => x.id === 'dependency_audit');
+  assert.equal(scan.status, 'FAIL');
+  assert.match(scan.detail, /blocked@S-110/);
+  assert.equal(s.findings.high, 1);
+  const newer = securitySummary({ guards, secretChecks: null, agentScan: null, config, gates: { a: { ...gates['*::dependency_audit'] }, b: { gate: 'dependency_audit', spec: 'S-110', status: 'passed', ts: '2026-09-24T12:00:00.000Z' } }, policy });
+  assert.match(newer.scans.find((x) => x.id === 'dependency_audit').detail, /12:00/, 'sem bloqueio, vale a entrada mais recente');
+});
+
+test('sanitize com redactKeys: false preserva chaves que são IDs e ainda redige os valores', () => {
+  const token = `ghp_${'a'.repeat(36)}`;
+  const state = { gates: { 'S::no-secret': { gate: 'no-secret', status: 'blocked', reason: `vazou ${token}` } } };
+  assert.equal(sanitize(state).gates['S::no-secret'], '[REDACTED]', 'padrão: chave de credencial é redigida');
+  const kept = sanitize(state, { redactKeys: false }).gates['S::no-secret'];
+  assert.equal(kept.status, 'blocked');
+  assert.ok(!kept.reason.includes(token), 'o valor continua passando pelos padrões de segredo');
+});

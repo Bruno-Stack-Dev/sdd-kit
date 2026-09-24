@@ -52,6 +52,8 @@ export class JsonlTail {
     this.decoder = new StringDecoder('utf8');
     this.lineNo = 0;
     this.invalid = [];
+    // A linha sem \n já entregue era do arquivo anterior: no novo, a 1ª linha é sempre nova.
+    this.emittedPartial = null;
     this.resets++;
   }
 
@@ -177,6 +179,10 @@ const DOMAIN_ERROR = new Set(['TEST_FAILED', 'GUARDIAN_REJECTED', 'GATE_BLOCKED'
 const DOMAIN_WARN = new Set(['TASK_BLOCKED', 'TASK_REOPENED', 'TASK_CANCELLED']);
 const READ_TOOLS = new Set(['Read', 'NotebookRead', 'Grep', 'Glob']);
 const WRITE_TOOLS = new Set(['Write', 'Edit', 'MultiEdit', 'NotebookEdit']);
+// Cobertura dos matchers dos hooks (ADR-0023): leituras só passam pelo PreToolUse (tool.called, sem
+// conclusão); LSP só pelo PostToolUse (tool.completed, sem tool.called). Não há par a esperar.
+const PRE_ONLY = READ_TOOLS;
+const POST_ONLY = new Set(['LSP']);
 
 const str = (v) => (v === undefined || v === null || v === '' ? null : String(v));
 const short = (s, n = 80) => (s && s.length > n ? `${s.slice(0, n - 1)}…` : s ?? '');
@@ -324,7 +330,8 @@ export class ActivityIndex {
     this.tests = new Map();
     // Autonomia por invocação: cada chamada conta uma vez, mesmo com trace antigo (só conclusões)
     // misturado ao novo (tool.called no PreToolUse). `seen` guarda os tool_use_id já contados.
-    this.autonomy = { called: 0, completed: 0, unpaired: 0, deny: 0, ask: 0, askWithId: 0 };
+    // `postOnly`: conclusões de ferramentas que o PreToolUse não observa (LSP) — ação normal, não trace antigo.
+    this.autonomy = { called: 0, completed: 0, unpaired: 0, postOnly: 0, deny: 0, ask: 0, askWithId: 0 };
     this.seen = new Set();
     this.lastTs = null;
   }
@@ -428,7 +435,9 @@ export class ActivityIndex {
           if (!t.lastTs || e.ts > t.lastTs) t.lastTs = e.ts;
           if (e.agent) t.agents.add(e.agent);
         }
-        if (useId) {
+        // Leitura nunca tem conclusão no trace: não ocupa `pending` e o loop é detectado já na chamada.
+        if (tool && PRE_ONLY.has(tool)) { if (a) trackRepeat(a, e); }
+        else if (useId) {
           this.pending.set(useId, e.ts);
           if (this.pending.size > MAX_PENDING) this.pending.delete(this.pending.keys().next().value);
         }
@@ -439,7 +448,10 @@ export class ActivityIndex {
       case 'tool.completed':
       case 'file.modified': {
         this.autonomy.completed++;
-        if (!useId || !this.seen.has(useId)) this.autonomy.unpaired++;
+        if (!useId || !this.seen.has(useId)) {
+          if (tool && POST_ONLY.has(tool)) this.autonomy.postOnly++;
+          else this.autonomy.unpaired++;
+        }
         const failed = e.status === 'error';
         let dur = e.durationMs;
         if (dur === null && useId && this.pending.has(useId)) {
@@ -459,11 +471,7 @@ export class ActivityIndex {
         if (a) {
           a.completed++;
           if (failed) a.failures++;
-          const sig = sigOf(e);
-          if (sig === null) { a.lastSig = null; a.repeat = 0; }
-          else if (sig === a.lastSig) a.repeat++;
-          else { a.lastSig = sig; a.repeat = 1; }
-          if (a.repeat > a.maxRepeat) a.maxRepeat = a.repeat;
+          trackRepeat(a, e);
         }
         if (e.task) bump(this.tasks, e.task, () => ({ starts: 0, files: new Set(), toolCalls: 0, lastEvent: null })).toolCalls++;
         if (e.name === 'file.modified' && e.attrs['file.path']) this.touchFile(String(e.attrs['file.path']), e, 'modified');
@@ -508,6 +516,15 @@ export class ActivityIndex {
       if (e.session) this.session(e.session).files.add(path);
     }
   }
+}
+
+/** Chamadas idênticas seguidas do agente (mesma ferramenta + alvo): sinal de loop. */
+function trackRepeat(a, e) {
+  const sig = sigOf(e);
+  if (sig === null) { a.lastSig = null; a.repeat = 0; }
+  else if (sig === a.lastSig) a.repeat++;
+  else { a.lastSig = sig; a.repeat = 1; }
+  if (a.repeat > a.maxRepeat) a.maxRepeat = a.repeat;
 }
 
 function newTool() {

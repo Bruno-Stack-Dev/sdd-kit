@@ -39,8 +39,11 @@ em quê, por quê, com que permissões, e do que falta para entregar. Restriçõ
    tarefa, `file.modified` correlacionado pelo hook, teste que cita spec + requisito, ADR citado).
    O resto é `UNKNOWN`.
 5. **Incremental:** leitura dos logs por offset (tail), reducer incremental (`createReducer`, as
-   mesmas regras do `reduce`), recarga de definições só quando arquivos mudam, scans de segurança só
-   no startup e no refresh. `fs.watch` como gatilho, `stat` periódico como rede de segurança.
+   mesmas regras do `reduce`), recarga de definições só quando arquivos mudam (config, specs,
+   agentes, `.claude/settings.json`, `.mcp.json`, evals), referências nos testes reescaneadas a cada
+   30 s (só os arquivos alterados são relidos), git a cada 10 s (só redesenha se mudou), scans de
+   segurança só no startup e no refresh. `fs.watch` como gatilho, `stat` periódico como rede de
+   segurança.
 6. **TUI própria** (`tui/`): ANSI de 16 cores, tela alternativa, raw mode via
    `readline.emitKeypressEvents`, quadro inteiro por linha com "apagar até o fim da linha".
    O app é uma máquina de estado pura (`frame`/`handleKey`), testável sem TTY; `--once` imprime um

@@ -4,7 +4,8 @@
 //   security : permissões, hooks, sandbox, política, segredos
 //   skills   : skills (spec Agent Skills, atribuição) + agentes + scanner externo
 //   mcp      : configuração e governança de MCP
-//   dashboard: fontes do `sdd status`/`sdd dashboard` legíveis e snapshot gerado
+//   dashboard: fontes do `sdd status`/`sdd dashboard` legíveis e snapshot gerado (em project/full,
+//              só as fontes — o snapshot completo roda apenas neste modo)
 //   full     : tudo
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -15,7 +16,7 @@ import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupply
 import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
 import { checkMcp } from './mcp.mjs';
 import { checkEngine, isEngineRepo } from './engine.mjs';
-import { checkDashboard } from './dashboard.mjs';
+import { checkDashboard, checkDashboardSnapshot } from './dashboard.mjs';
 
 export const MODES = ['fast', 'project', 'security', 'skills', 'mcp', 'dashboard', 'full'];
 
@@ -25,7 +26,8 @@ const PLAN = {
   security: ['install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets'],
   skills: ['skills', 'supply', 'adapters', 'commands', 'agents', 'scanner'],
   mcp: ['mcp', 'agentscan'],
-  dashboard: ['dashboard'],
+  // O snapshot completo (git + varredura dos testes) só no modo próprio: --project/--full rodam em CI.
+  dashboard: ['dashboard', 'dashboard-snapshot'],
   full: ['lint', 'config', 'specs', 'tasks', 'adrs', 'state', 'forbidden', 'brownfield', 'lsp', 'agents', 'skills', 'supply', 'adapters', 'commands', 'scanner', 'install', 'permissions', 'hooks', 'sandbox', 'policy', 'secrets', 'mcp', 'agentscan', 'dashboard'],
 };
 
@@ -61,6 +63,7 @@ export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
     mcp: () => checkMcp(report, p),
     agentscan: () => checkAgentScan(report, p),
     dashboard: () => checkDashboard(report, p),
+    'dashboard-snapshot': () => checkDashboardSnapshot(report, p),
   };
   for (const s of PLAN[mode]) {
     try { await steps[s](); } catch (e) {

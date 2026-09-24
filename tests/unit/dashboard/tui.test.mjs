@@ -139,3 +139,12 @@ test('linha selecionada com cor mantém as sequências ANSI íntegras', () => {
   const frame = app.frame({ columns: 100, rows: 30 }).join('\n');
   assert.ok(!/›\[/.test(frame), 'o marcador não comeu o ESC');
 });
+
+test('inverso sobrevive aos resets dos trechos coloridos (realce cobre a linha inteira)', () => {
+  const t = createTheme({ color: true });
+  const line = t.inverse(`${t.green('ok')} resto da linha ${t.red('x')} fim`);
+  // Depois de cada reset, o inverso é religado antes do texto seguinte.
+  const parts = line.split(`${ESC}[0m`);
+  for (const p of parts.slice(1)) assert.ok(p.startsWith(`${ESC}[7m`), JSON.stringify(p));
+  assert.equal(stripAnsi(line), 'ok resto da linha x fim');
+});

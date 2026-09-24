@@ -7,7 +7,10 @@
 // Recomputação seletiva (o custo fica proporcional ao que mudou):
 //   linha nova em events.jsonl   → reducer incremental (mesmas regras do `reduce`) + índice
 //   linha nova no trace          → só o índice de atividade
-//   specs/, config, agentes      → recarrega definições, referências de teste e textos das specs
+//   specs/, config, agentes,     → recarrega definições, referências de teste e textos das specs
+//   settings, .mcp.json, evals
+//   arquivos de teste            → a cada 30 s, reescaneia as referências (só relê o que mudou)
+//   git                          → a cada 10 s; só conta como mudança se o conteúdo mudou
 //   refresh()                    → tudo, inclusive git e scans de segurança
 // O snapshot é recalculado sob demanda e só quando algo mudou. Nunca escreve no projeto.
 import { existsSync, readFileSync, statSync, readdirSync, watch as fsWatch } from 'node:fs';
@@ -30,6 +33,7 @@ import { relToRoot } from '../policy.mjs';
 const DEF_DIRS = ['features', 'architecture', 'apis', 'plans', 'tasks', 'decisions'];
 const GIT_TTL_MS = 10_000;
 const DEFS_CHECK_MS = 10_000; // fs.watch nas specs é o gatilho principal; o stat da árvore é só a rede de segurança
+const TESTS_CHECK_MS = 30_000; // referências de requisito nos testes (walk + stat da árvore de testes)
 
 export function isSddProject(root) {
   return ['sdd.config.yaml', 'sdd.config.md', '.sdd', 'specs/_gerador', 'specs/features'].some((p) => existsSync(join(root, p)));
@@ -49,26 +53,52 @@ export function createDashboardService(root, { session = null, demo = false, sca
   let cached = null;
   let lastError = null;
 
+  // Tudo o que loadDefs lê (exceto os testes, ver testsChanged): config, specs, agentes, guardrails
+  // (.claude/settings.json), MCP (.mcp.json), evals e ADRs do motor.
   function signature() {
     const parts = [];
     const add = (f) => { try { const s = statSync(f); parts.push(`${f}:${s.size}:${s.mtimeMs}`); } catch { /* ausente */ } };
     add(join(root, 'sdd.config.yaml'));
     add(join(root, 'sdd.config.md'));
+    add(join(root, '.claude', 'settings.json'));
+    add(join(root, '.mcp.json'));
     const specsDir = defs?.specsDir ?? 'specs';
-    const walk = (dir) => {
+    const walk = (dir, ext = '.md') => {
       let names;
       try { names = readdirSync(dir); } catch { return; }
       for (const n of names) {
         const f = join(dir, n);
         let s;
         try { s = statSync(f); } catch { continue; }
-        if (s.isDirectory()) walk(f);
-        else if (n.endsWith('.md')) parts.push(`${f}:${s.size}:${s.mtimeMs}`);
+        if (s.isDirectory()) walk(f, ext);
+        else if (n.endsWith(ext)) parts.push(`${f}:${s.size}:${s.mtimeMs}`);
       }
     };
     for (const d of DEF_DIRS) walk(join(root, specsDir, d));
     walk(join(root, '.claude', 'agents'));
+    walk(join(root, 'evals', 'results'), '-latest.json');
+    if (engine) walk(join(root, 'docs', 'adr'));
     return parts.join('|');
+  }
+
+  // Referências de requisito nos testes: a árvore de testes pode ser grande, então é relida num
+  // intervalo maior; o cache (mtime/size) faz com que só arquivos alterados sejam lidos de novo.
+  let withReqs = [];
+  let testRefsKey = '';
+  let lastTestsCheck = 0;
+  const refsKey = (r) => JSON.stringify([...r.refs.entries()]);
+
+  function scanTests() {
+    try { testRefs = scanTestReferences(root, defs.cfg.config, withReqs, testCache); } catch (e) { testRefs = { refs: new Map(), scanned: 0, basis: `falhou: ${e.message}`, truncated: false }; }
+    testRefsKey = refsKey(testRefs);
+    lastTestsCheck = now();
+  }
+
+  /** @returns {boolean} alguma referência mudou */
+  function testsChanged() {
+    const before = testRefsKey;
+    scanTests();
+    return testRefsKey !== before;
   }
 
   function loadDefs() {
@@ -85,8 +115,8 @@ export function createDashboardService(root, { session = null, demo = false, sca
     for (const s of defs.specs) {
       try { specTexts.set(s.file, readFileSync(join(root, s.file), 'utf8')); } catch { specTexts.set(s.file, ''); }
     }
-    const withReqs = defs.specs.filter((s) => s.id).map((s) => ({ id: s.id, requirements: parseRequirements(specTexts.get(s.file)) }));
-    try { testRefs = scanTestReferences(root, defs.cfg.config, withReqs, testCache); } catch (e) { testRefs = { refs: new Map(), scanned: 0, basis: `falhou: ${e.message}`, truncated: false }; }
+    withReqs = defs.specs.filter((s) => s.id).map((s) => ({ id: s.id, requirements: parseRequirements(specTexts.get(s.file)) }));
+    scanTests();
     defsSig = signature();
     lastDefsCheck = now();
     dirty = true;
@@ -145,9 +175,10 @@ export function createDashboardService(root, { session = null, demo = false, sca
 
   function refreshGit(force = false) {
     if (!force && git && now() - gitAt < GIT_TTL_MS) return;
+    const before = JSON.stringify(git);
     git = gitInfo(root);
     gitAt = now();
-    dirty = true;
+    if (force || JSON.stringify(git) !== before) dirty = true;
   }
 
   function init() {
@@ -168,7 +199,9 @@ export function createDashboardService(root, { session = null, demo = false, sca
       if (!dirty && cached) return cached;
       try {
         // Textos do estado (motivos, evidências, comandos) podem vir de logs anteriores ao sanitizer.
-        const project = bindState(defs, safeDeep(sanitize(reducer.state)), null);
+        // Só por valor: as chaves do estado são IDs (gate `no-secret`, pack `api-token`), não campos
+        // de credencial — redigi-las apagaria a entrada inteira (um gate bloqueado sumiria).
+        const project = bindState(defs, safeDeep(sanitize(reducer.state, { redactKeys: false })), null);
         cached = buildSnapshot({
           project,
           index,
@@ -207,13 +240,18 @@ export function createDashboardService(root, { session = null, demo = false, sca
       let changed = false;
       try {
         if (domainTail.changed() || traceTail.changed()) changed = ingest() || changed;
+        let reloaded = false;
         if (definitions || now() - lastDefsCheck >= DEFS_CHECK_MS) {
           lastDefsCheck = now();
-          if (signature() !== defsSig) { loadDefs(); changed = true; }
+          if (signature() !== defsSig) { loadDefs(); changed = true; reloaded = true; }
         }
-        const before = git;
+        // loadDefs já reescaneou os testes.
+        if (!reloaded && now() - lastTestsCheck >= TESTS_CHECK_MS && testsChanged()) { changed = true; dirty = true; }
+        // gitInfo devolve um objeto novo a cada coleta: compara o conteúdo, senão todo TTL vencido
+        // redesenharia o painel sem nada ter mudado.
+        const before = JSON.stringify(git);
         refreshGit();
-        if (git !== before) changed = true;
+        if (JSON.stringify(git) !== before) changed = true;
       } catch (e) {
         lastError = e;
         log(`poll falhou: ${e.message}`);
@@ -261,7 +299,8 @@ export function createDashboardService(root, { session = null, demo = false, sca
       tryWatch(join(root, '.sdd', 'trace'));
       tryWatch(join(root, defs?.specsDir ?? 'specs'), { recursive: true }, defsKick);
       tryWatch(join(root, '.claude', 'agents'), {}, defsKick);
-      tryWatch(root, {}, (_e, file) => { if (/^sdd\.config\.(yaml|md)$/.test(String(file ?? ''))) defsKick(); });
+      tryWatch(root, {}, (_e, file) => { if (/^(sdd\.config\.(yaml|md)|\.mcp\.json)$/.test(String(file ?? ''))) defsKick(); });
+      tryWatch(join(root, '.claude'), {}, (_e, file) => { if (String(file ?? '') === 'settings.json') defsKick(); });
       timer = setInterval(kick, intervalMs ?? settings?.refresh_ms ?? 1000);
       timer.unref?.();
       return () => {

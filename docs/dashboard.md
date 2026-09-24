@@ -38,7 +38,7 @@ TUI sem dependência) e [ADR-0023](adr/ADR-0023-trace-de-invocacoes-e-sanitizer-
 | `sdd dashboard --once [--width W --height H]` | imprime um único quadro, sem interação (CI, documentação, depuração) |
 | `sdd dashboard --demo [--interval ms]` · `sdd status --demo [--step N]` | dados **sintéticos** (ver [Demo](#modo-demo)) |
 | `sdd sessions [--json]` | sessões registradas: status, início, duração, eventos, agentes, tarefas, arquivos |
-| `sdd doctor --dashboard` | diagnóstico do dashboard (também roda em `--project` e `--full`) |
+| `sdd doctor --dashboard` | diagnóstico do dashboard; `--project` e `--full` checam só as fontes (o snapshot completo, com git e varredura dos testes, roda apenas aqui) |
 
 Opções comuns: `--ascii` (símbolos ASCII), `--no-color` (ou `NO_COLOR=1`), `--debug` (log de
 diagnóstico em `.sdd/cache/dashboard.log`, sanitizado). Saídas: `0` ok · `1` não é projeto SDD ou
@@ -186,9 +186,15 @@ dashboard passa a mostrar — nunca estima.
 ações         = invocações observadas, cada uma contada uma vez:
                 tool.called + policy.decision (deny, e ask com tool_use_id)
                 + conclusões sem par (trace gravado antes do tool.called existir)
+                + conclusões LSP (o PreToolUse não observa LSP)
 autônomas     = ações − confirmações pedidas (ask) − bloqueios (deny)
 autonomia (%) = autônomas / ações
 ```
+
+Os matchers dos hooks (ADR-0023) não são simétricos, e o dashboard sabe disso: leituras
+(`Read`/`Grep`/`Glob`) só aparecem no PreToolUse — contam como ação, o loop é detectado já na
+chamada e não há latência; LSP só aparece no PostToolUse — cada conclusão conta como ação, sem ser
+confundida com trace antigo.
 
 Autonomia **não é qualidade**: mede só quantas ações rodaram sem intervenção humana. Confirmações
 pedidas pelo próprio Claude Code (fora da política do SDD) não são observáveis.
@@ -270,7 +276,7 @@ Sem o bloco valem os defaults. Validado por `sdd config validate`.
 
 ```yaml
 dashboard:
-  refresh_ms: 1000            # stat de segurança do watcher (o fs.watch é o gatilho)
+  refresh_ms: 1000            # stat de segurança do watcher (o fs.watch é o gatilho; testes: 30 s, git: 10 s)
   progress:                   # pesos do overall (0–1; renormalizados)
     implementation: 0.45
     requirements: 0.25
@@ -307,7 +313,8 @@ dashboard:
   textos do estado vindos de logs antigos), log de diagnóstico e export OTLP: padrões de segredo
   (chaves, tokens, JWT, `Bearer`, `Basic`, senha em URL) viram `[REDACTED:<tipo>]`; campos cujo nome
   termina num termo de credencial (`authorization`, `password`, `github_token`, `DB_PASSWORD`,
-  `x-api-key`...) viram `[REDACTED]`.
+  `x-api-key`...) viram `[REDACTED]`. No estado derivado só vale a redação por valor: lá as chaves
+  são IDs (um gate `no-secret` não é credencial, e redigi-lo esconderia um bloqueio).
 - **Sem injeção no terminal**: caracteres de controle (inclusive `ESC`) de qualquer texto observado
   são removidos antes de chegar à tela ou ao JSON; quebras de linha viram espaço.
 - A decisão da política (`deny`/`ask`) é emitida **antes** do trace: nenhuma falha de
@@ -347,7 +354,7 @@ startup ~1,6 s, atualização incremental de 1 000 registros ~35 ms, quadro da T
 | `nenhum projeto SDD em ...` | rode na raiz do projeto (ou `--root`); projeto novo: `/sdd-init`; para ver a ferramenta: `--demo` |
 | Requisitos `0/N` e "sem estado estruturado" | `sdd tasks sync` nunca rodou |
 | Autonomia/ferramentas vazias | trace desligado (`observability.trace: false`) ou hooks ausentes (`sdd doctor --security`) |
-| Latência `n/d` | a chamada não tinha `tool_use_id` (cliente antigo) ou a ferramenta não passa pelo PreToolUse (LSP) |
+| Latência `n/d` | a chamada não tinha `tool_use_id` (cliente antigo) ou a ferramenta só passa por um dos hooks (LSP só no PostToolUse; leituras só no PreToolUse) |
 | Contexto `n/d` | esperado: o runtime não informa uso de contexto aos hooks |
 | Log truncado → `BLOCKED` | escrita interrompida: `sdd state repair` |
 | Símbolos quebrados no terminal | `--ascii`; cores estranhas: `--no-color` |

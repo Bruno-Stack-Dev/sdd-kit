@@ -30,6 +30,14 @@ export async function checkDashboard(report, p) {
   report.fromIssues(G, 'dashboard.config', p.cfg.config?.dashboard ? 'configuração `dashboard` válida' : 'configuração `dashboard`: defaults (docs/dashboard.md)', [], warnings);
   if (process.stdout.isTTY && process.stdin.isTTY) report.pass(G, 'dashboard.terminal', `terminal interativo (${process.stdout.columns}×${process.stdout.rows}) — \`sdd dashboard\` disponível`);
   else report.skip(G, 'dashboard.terminal', 'sem terminal interativo aqui (CI/pipe): use `sdd status` ou `sdd dashboard --once`');
+}
+
+/**
+ * Gera o snapshot de verdade (git, varredura dos testes, métricas). Só em `doctor --dashboard`:
+ * refaz o que o doctor já carregou e varre a árvore de testes — caro demais para --project/--full.
+ */
+export async function checkDashboardSnapshot(report, p) {
+  const G = 'Dashboard';
   try {
     const { createDashboardService } = await import('../dashboard/index.mjs');
     const t0 = Date.now();

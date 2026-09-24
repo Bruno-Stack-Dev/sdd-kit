@@ -42,16 +42,19 @@ export function sanitizeString(value, max = Infinity) {
 
 /**
  * Cópia sanitizada de um valor qualquer (objeto, lista, texto). Nunca lança.
+ * `redactKeys: false` desliga só a camada 2 (por nome de chave): para estruturas cujas chaves são
+ * IDs (o estado derivado indexa gates, specs e tarefas pelo nome), onde um gate `no-secret` não é
+ * credencial — os valores textuais continuam passando pela camada 1.
  * @param {unknown} value
- * @param {{ maxString?: number, maxArray?: number, maxDepth?: number }} [opts]
+ * @param {{ maxString?: number, maxArray?: number, maxDepth?: number, redactKeys?: boolean }} [opts]
  */
-export function sanitize(value, { maxString = Infinity, maxArray = Infinity, maxDepth = 8 } = {}, depth = 0) {
+export function sanitize(value, { maxString = Infinity, maxArray = Infinity, maxDepth = 8, redactKeys = true } = {}, depth = 0) {
   if (value === null || value === undefined) return value;
   if (typeof value === 'string') return sanitizeString(value, maxString);
   if (typeof value === 'number' || typeof value === 'boolean') return value;
   if (typeof value === 'bigint') return String(value);
   if (depth >= maxDepth) return '[…]';
-  const opts = { maxString, maxArray, maxDepth };
+  const opts = { maxString, maxArray, maxDepth, redactKeys };
   if (Array.isArray(value)) {
     const out = value.slice(0, maxArray).map((v) => sanitize(v, opts, depth + 1));
     if (value.length > maxArray) out.push(`[+${value.length - maxArray}]`);
@@ -60,7 +63,7 @@ export function sanitize(value, { maxString = Infinity, maxArray = Infinity, max
   if (typeof value === 'object') {
     const out = {};
     for (const [k, v] of Object.entries(value)) {
-      out[k] = isSensitiveKey(k) && (typeof v === 'string' || typeof v === 'object') && v !== null ? REDACTED : sanitize(v, opts, depth + 1);
+      out[k] = redactKeys && isSensitiveKey(k) && (typeof v === 'string' || typeof v === 'object') && v !== null ? REDACTED : sanitize(v, opts, depth + 1);
     }
     return out;
   }

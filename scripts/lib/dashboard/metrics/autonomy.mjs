@@ -6,6 +6,7 @@
 //                 + policy.decision deny, e ask com tool_use_id
 //                 + conclusões (tool.completed/file.modified) sem tool.called/decisão pareada
 //                   pelo tool_use_id — trace gravado antes do tool.called existir
+//                 + conclusões LSP (o PreToolUse não observa LSP, ADR-0023: nunca têm par)
 //   autônomas     = ações − confirmações pedidas (ask) − bloqueios (deny)
 //   autonomia (%) = autônomas / ações
 //
@@ -17,11 +18,13 @@
 export const AUTONOMY_FORMULA = 'autônomas = ações − confirmações (ask) − bloqueios (deny); % = autônomas / ações';
 
 export function autonomyMetrics(a) {
-  const actions = a.called + a.deny + a.askWithId + a.unpaired;
+  const postOnly = a.postOnly ?? 0;
+  const actions = a.called + a.deny + a.askWithId + a.unpaired + postOnly;
   const human = a.ask;
   const blocked = a.deny;
   const auto = Math.max(0, actions - human - blocked);
   const legacy = a.unpaired > 0;
+  const lsp = postOnly ? ` + ${postOnly} conclusão(ões) LSP (só PostToolUse)` : '';
   return {
     actions,
     autoApproved: auto,
@@ -29,7 +32,7 @@ export function autonomyMetrics(a) {
     policyBlocked: blocked,
     percent: actions ? Math.round((auto / actions) * 1000) / 10 : null,
     available: actions > 0,
-    source: !actions ? 'trace vazio' : a.called ? `trace: tool.called + policy.decision${legacy ? ` + ${a.unpaired} conclusão(ões) sem par (trace anterior ao tool.called)` : ''}` : 'trace: tool.completed + policy.decision (trace anterior ao tool.called)',
+    source: !actions ? 'trace vazio' : a.called || (postOnly && !legacy) ? `trace: tool.called + policy.decision${lsp}${legacy ? ` + ${a.unpaired} conclusão(ões) sem par (trace anterior ao tool.called)` : ''}` : `trace: tool.completed + policy.decision (trace anterior ao tool.called)${lsp}`,
     formula: AUTONOMY_FORMULA,
     note: 'confirmações pedidas pelo próprio Claude Code, fora da política do SDD, não são observáveis',
   };

@@ -238,6 +238,42 @@ test('gate da spec bloqueado vence a entrada global aprovada do mesmo gate', () 
   } finally { cleanup(dir); }
 });
 
+test('gate cujo nome termina em termo de credencial continua no estado e bloqueia a entrega', () => {
+  const dir = greenfieldProject();
+  try {
+    sdd(['tasks', 'sync'], dir);
+    sdd(['event', 'GATE_BLOCKED', '--gate', 'no-secret', '--spec', 'BIB-100', '--reason', 'segredo no diff'], dir);
+    const j = statusJson(dir);
+    assert.equal(j.delivery.status, 'BLOCKED');
+    assert.ok(j.delivery.reasons.some((r) => r.includes('no-secret@BIB-100')), j.delivery.reasons.join(' | '));
+    assert.equal(j.health.status, 'BLOCKED');
+  } finally { cleanup(dir); }
+});
+
+test('watch: git igual não conta como mudança; teste novo citando o requisito aparece sem refresh', () => {
+  const dir = greenfieldProject();
+  try {
+    sdd(['tasks', 'sync'], dir);
+    let t = Date.parse('2026-09-24T10:00:00.000Z');
+    const svc = createDashboardService(dir, { scan: false, now: () => t });
+    const ca01 = () => svc.getSnapshot().specs.find((s) => s.id === 'BIB-100').requirements.find((r) => r.id === 'CA-01');
+    assert.deepEqual(ca01().testRefs, []);
+    t += 11_000;
+    assert.equal(svc.poll(), false, 'TTL do git vencido, mas nada mudou: sem redesenho');
+    writeFile(dir, 'tests/bib.test.mjs', "// BIB-100\ntest('CA-01 comportamento', () => {});\n");
+    t += 31_000;
+    assert.equal(svc.poll(), true);
+    assert.deepEqual(ca01().testRefs, ['tests/bib.test.mjs']);
+  } finally { cleanup(dir); }
+});
+
+test('OTLP: inteiro vira intValue e fracionário vira doubleValue (sem truncar)', () => {
+  const out = toOtlp([{ source: 'trace', ts: '2026-09-24T10:00:00.000Z', trace_id: 'a'.repeat(32), span_id: 'b'.repeat(16), name: 'x', attrs: { n: 3, coverage: 87.5 } }]);
+  const attrs = Object.fromEntries(out.resourceSpans[0].scopeSpans[0].spans[0].attributes.map((a) => [a.key, a.value]));
+  assert.deepEqual(attrs.n, { intValue: '3' });
+  assert.deepEqual(attrs.coverage, { doubleValue: 87.5 });
+});
+
 test('demo com --step inválido não deixa diretório temporário para trás', () => {
   const before = readdirSync(tmpdir()).filter((n) => n.startsWith('sdd-demo-')).length;
   assert.equal(runSdd(['status', '--demo', '--step', 'abc']).status, 2);
@@ -283,6 +319,7 @@ test('CLI: dashboard sem TTY sugere status; --once desenha; --tab inválido é u
     assert.equal(once.stdout.trimEnd().split('\n').length, 30);
     assert.match(once.stdout, /\[1 Overview\]/);
     assert.equal(sdd(['dashboard', '--once', '--tab', 'nada'], dir).status, 2);
+    for (const bad of ['abc', '0', '50']) assert.equal(sdd(['dashboard', '--demo', '--interval', bad], dir).status, 2, `--interval ${bad}`);
   } finally { cleanup(dir); }
 });
 
@@ -316,15 +353,18 @@ test('CLI: sessions lista as sessões; status --session filtra a atividade', () 
   } finally { cleanup(dir); }
 });
 
-test('doctor --dashboard: fontes legíveis e snapshot gerado; entra no --full', () => {
+test('doctor --dashboard: fontes legíveis e snapshot gerado; --full e --project só checam as fontes', () => {
   const dir = greenfieldProject();
   try {
     const r = sdd(['doctor', '--dashboard', '--json'], dir);
     const j = JSON.parse(r.stdout);
     assert.ok(j.checks.some((c) => c.id === 'dashboard.snapshot' && c.status === 'pass'));
     assert.ok(j.checks.some((c) => c.id === 'dashboard.terminal' && c.status === 'skip'), 'sem TTY não é falha');
-    const full = JSON.parse(sdd(['doctor', '--full', '--json'], dir).stdout);
-    assert.ok(full.checks.some((c) => c.group === 'Dashboard'));
+    for (const mode of ['--full', '--project']) {
+      const m = JSON.parse(sdd(['doctor', mode, '--json'], dir).stdout);
+      assert.ok(m.checks.some((c) => c.group === 'Dashboard'), mode);
+      assert.ok(!m.checks.some((c) => c.id === 'dashboard.snapshot'), `${mode}: sem o snapshot completo (git + varredura dos testes)`);
+    }
   } finally { cleanup(dir); }
 });
 

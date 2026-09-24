@@ -29,9 +29,11 @@ export function securitySummary({ guards, secretChecks, agentScan, config, gates
   const eg = config?.engineering_gates ?? {};
   for (const [id, name] of [['dependency_audit', 'Dependency audit'], ['security_lint', 'Security lint (SAST)']]) {
     const g = eg[id];
-    const ev = Object.values(gates ?? {}).find((x) => x.gate === id);
+    // Como no pick() dos gates da spec: bloqueio em qualquer spec (ou global) prevalece; senão, o mais recente.
+    const all = Object.values(gates ?? {}).filter((x) => x.gate === id);
+    const ev = all.find((x) => x.status === 'blocked') ?? all.sort((a, b) => String(b.ts).localeCompare(String(a.ts)))[0];
     if (!g?.enabled) { scans.push({ id, name, status: 'NOT_CONFIGURED', detail: `engineering_gates.${id} desligado`, counts: false, source: 'sdd.config.yaml' }); continue; }
-    scans.push({ id, name, status: ev ? (ev.status === 'passed' ? 'PASS' : 'FAIL') : 'NOT_RUN', detail: ev ? `${ev.status} em ${ev.ts}${ev.reason ? ` — ${ev.reason}` : ''}` : `sem GATE_PASSED/GATE_BLOCKED --gate ${id}`, counts: !!ev, source: 'GATE_* (.sdd/events.jsonl)' });
+    scans.push({ id, name, status: ev ? (ev.status === 'passed' ? 'PASS' : 'FAIL') : 'NOT_RUN', detail: ev ? `${ev.status}${ev.spec ? `@${ev.spec}` : ''} em ${ev.ts}${ev.reason ? ` — ${ev.reason}` : ''}` : `sem GATE_PASSED/GATE_BLOCKED --gate ${id}`, counts: !!ev, source: 'GATE_* (.sdd/events.jsonl)' });
     if (ev?.status === 'blocked') findings.high++;
   }
   for (const g of Object.values(gates ?? {})) {

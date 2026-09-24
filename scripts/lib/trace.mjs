@@ -114,7 +114,10 @@ export function readTimeline(root, { session, spec, task, agent, traceId } = {})
 /** Converte a linha do tempo para OTLP/HTTP JSON (resourceSpans). */
 export function toOtlp(items, { serviceName = 'sdd-kit' } = {}) {
   // A mesma sanitização do trace e do dashboard: nada sai para o backend sem passar por ela.
-  const attr = (k, v) => ({ key: k, value: typeof v === 'number' ? { intValue: String(Math.trunc(v)) } : typeof v === 'boolean' ? { boolValue: v } : { stringValue: isSensitiveKey(k) ? REDACTED : sanitizeString(v, MAX_FIELD) } });
+  // Inteiro → intValue; fracionário (cobertura, % de contexto) → doubleValue; NaN/Infinity não são
+  // números válidos em nenhum dos dois e seguem como texto.
+  const num = (v) => (Number.isSafeInteger(v) ? { intValue: String(v) } : Number.isFinite(v) ? { doubleValue: v } : { stringValue: String(v) });
+  const attr = (k, v) => ({ key: k, value: typeof v === 'number' ? num(v) : typeof v === 'boolean' ? { boolValue: v } : { stringValue: isSensitiveKey(k) ? REDACTED : sanitizeString(v, MAX_FIELD) } });
   const spans = items.map((i) => {
     const t = Date.parse(i.ts);
     const start = BigInt(Number.isFinite(t) ? t : 0) * 1_000_000n;

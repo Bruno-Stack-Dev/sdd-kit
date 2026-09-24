@@ -106,6 +106,9 @@ export async function dashboardCommand(args) {
   if (!flags.demo && !isSddProject(args.root)) { console.error(`${ICON.error} ${NOT_SDD(args.root)}`); return 1; }
   const { renderOnce, runDashboard, TABS } = await import('../lib/dashboard/tui/app.mjs');
   if (flags.tab && !TABS.some((t) => t.id === flags.tab || String(TABS.indexOf(t) + 1) === String(flags.tab))) throw new UsageError(`--tab inválido '${flags.tab}' (${TABS.map((t) => t.id).join(' | ')})`);
+  // setInterval com NaN/0 vira 1 ms: a simulação inteira rodaria de uma vez.
+  const intervalMs = flags.interval !== undefined ? Number(flags.interval) : 900;
+  if (!Number.isInteger(intervalMs) || intervalMs < 100 || intervalMs > 60_000) throw new UsageError(`--interval inválido '${flags.interval}' (inteiro em ms, 100–60000)`);
   if (flags.once) {
     const w0 = Number(flags.width ?? 100), h0 = Number(flags.height ?? 40);
     if (!Number.isInteger(w0) || w0 < 20 || !Number.isInteger(h0) || h0 < 8) throw new UsageError('--width ≥ 20 e --height ≥ 8');
@@ -126,7 +129,7 @@ export async function dashboardCommand(args) {
   try {
     const svc = serviceFor(target, flags);
     // Na demo, o simulador (que grava eventos no diretório temporário) é ligado aqui, fora da TUI.
-    const demo = target.demo ? { start: (onStep) => startDemo(target.root, { intervalMs: flags.interval ? Number(flags.interval) : 900, onStep }).stop } : null;
+    const demo = target.demo ? { start: (onStep) => startDemo(target.root, { intervalMs, onStep }).stop } : null;
     return await runDashboard(svc, { tab: flags.tab, ascii: !!flags.ascii, color: colorEnabled({ flag: flags.noColor ? false : undefined }), demo });
   } finally { target.cleanup(); }
 }

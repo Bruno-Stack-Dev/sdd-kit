@@ -5,6 +5,7 @@
 
 const ESC = String.fromCharCode(27);
 const ANSI_RE = new RegExp(`${ESC}\\[[0-9;?]*[A-Za-z]`, 'g');
+const RESET = `${ESC}[0m`;
 
 export function stripAnsi(s) {
   return String(s).replace(ANSI_RE, '');
@@ -104,7 +105,9 @@ export function createTheme({ color = false, ascii = false } = {}) {
     paint,
     bold: (s) => paint('bold', s),
     dim: (s) => paint('dim', s),
-    inverse: (s) => (color ? `${ESC}[7m${s}${ESC}[27m` : s),
+    // Os trechos coloridos dentro de `s` terminam em reset (ESC[0m), que também desliga o inverso:
+    // reaplica-o depois de cada reset para o realce cobrir a linha inteira.
+    inverse: (s) => (color ? `${ESC}[7m${String(s).split(RESET).join(`${RESET}${ESC}[7m`)}${ESC}[27m` : s),
     red: (s) => paint('red', s), green: (s) => paint('green', s), yellow: (s) => paint('yellow', s), cyan: (s) => paint('cyan', s), gray: (s) => paint('gray', s), blue: (s) => paint('blue', s), magenta: (s) => paint('magenta', s),
     /** Símbolo do status (sem texto). */
     icon(status) {
