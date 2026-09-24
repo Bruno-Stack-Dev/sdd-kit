@@ -7,10 +7,8 @@
 //   dashboard: fontes do `sdd status`/`sdd dashboard` legíveis e snapshot gerado (em project/full,
 //              só as fontes — o snapshot completo roda apenas neste modo)
 //   full     : tudo
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { Report } from './report.mjs';
-import { loadProject } from '../project.mjs';
+import { loadProject, adrDirsOf } from '../project.mjs';
 import { checkLint, checkConfig, checkSpecs, checkPlansAndTasks, checkAdrs, checkState, checkForbiddenPatterns, checkCodeIntelligence, checkBrownfield } from './project.mjs';
 import { checkAgents, checkSkills, checkSkillScanner, checkCommands, checkSupplyChain, checkAgentScan, checkAdapters } from './agents-skills.mjs';
 import { checkPermissions, checkHooks, checkSandbox, checkSecrets, checkPolicyFile, checkInstall } from './security.mjs';
@@ -35,9 +33,8 @@ export async function runDoctor(root, { mode = 'full', ownedPredicate } = {}) {
   if (!MODES.includes(mode)) throw new Error(`modo desconhecido '${mode}'`);
   const report = new Report(mode);
   const p = loadProject(root);
-  const adrDirs = [`${p.specsDir}/decisions`];
+  const adrDirs = adrDirsOf(root, p.specsDir);
   const engine = isEngineRepo(root) && p.cfg.source === 'none';
-  if (existsSync(join(root, 'docs', 'adr'))) adrDirs.push('docs/adr');
   const steps = {
     lint: () => checkLint(report, p),
     config: () => (engine ? checkEngine(report, p) : checkConfig(report, p)),

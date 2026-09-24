@@ -158,6 +158,7 @@ ou `/nova-spec` para um incremento. Referência de comandos e agentes: `README.m
 | Code intelligence | `sdd lsp detect` | [`docs/architecture/code-intelligence.md`](docs/architecture/code-intelligence.md) |
 | Trace e OTLP | `sdd trace show` · `sdd trace export --otlp <url>` | [`docs/observability.md`](docs/observability.md) |
 | Pacote de contexto | `/sdd-export-context` ou `sdd export-context --dry-run` | [ADR-0018](docs/adr/ADR-0018-export-context-sanitizado.md) |
+| Radar de ferramentas | `/radar-ferramentas [foco]` · `sdd radar inventory` · `sdd radar check <nome...>` | [ADR-0024](docs/adr/ADR-0024-radar-de-ferramentas.md) |
 
 ---
 

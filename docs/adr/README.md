@@ -34,3 +34,4 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0021](ADR-0021-execucao-em-ondas.md) | Execução paralela em ondas: um agente por onda, guardião sozinho | aceito |
 | [0022](ADR-0022-dashboard-local-snapshot-unico.md) | Dashboard local somente leitura: snapshot único, métricas determinísticas, TUI sem dependência | aceito |
 | [0023](ADR-0023-trace-de-invocacoes-e-sanitizer-central.md) | Trace de invocações (`tool.called`), MCP/LSP observados e sanitizer central | aceito |
+| [0024](ADR-0024-radar-de-ferramentas.md) | Radar de ferramentas por projeto: pesquisa na sessão principal, checagem determinística, só sugestão | aceito |

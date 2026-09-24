@@ -2,7 +2,7 @@
 // imports — para o /sdd-init sugerir o pack `ai` e só os artefatos AI-* necessários.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { walkFiles } from './files.mjs';
+import { manifestDependencies } from './manifests.mjs';
 
 // categoria → sinais (nomes de pacote/módulo). Detecção, não recomendação.
 const SIGNALS = {
@@ -19,23 +19,7 @@ const SIGNALS = {
 };
 
 function manifestDeps(root) {
-  const deps = new Set();
-  const add = (n) => n && deps.add(String(n).toLowerCase().trim());
-  const readJson = (f) => { try { return JSON.parse(readFileSync(f, 'utf8')); } catch { return null; } };
-  for (const f of walkFiles(root).filter((p) => /(^|[\\/])(package\.json|pyproject\.toml|requirements[^\\/]*\.txt|Pipfile|go\.mod|Cargo\.toml)$/.test(p)).slice(0, 50)) {
-    if (f.endsWith('package.json')) {
-      const pkg = readJson(f);
-      for (const k of Object.keys({ ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) })) add(k);
-      continue;
-    }
-    const text = readFileSync(f, 'utf8');
-    for (const m of text.matchAll(/["']([A-Za-z0-9_.@/-]+?)(?:\[[^\]]*\])?\s*(?:[<>=~!^][^"']*)?["']/g)) add(m[1]);
-    for (const line of text.split(/\r?\n/)) {
-      const req = line.match(/^\s*([A-Za-z0-9_.-]+)\s*(?:[<>=~!]|$)/);
-      if (req && /requirements|Pipfile/.test(f)) add(req[1]);
-    }
-  }
-  return deps;
+  return new Set(manifestDependencies(root).flatMap((m) => m.deps));
 }
 
 export function detectAi(root) {

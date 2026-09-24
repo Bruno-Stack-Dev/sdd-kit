@@ -58,6 +58,7 @@ dos dados do kit, sem estimativa do modelo, e somente leitura. Sem projeto à m�
 | `/implementar-spec` · `/implementar-tarefa` | execução pelo grafo de tarefas, com gates e guardião |
 | `/validar-e2e` | e2e com o comando da config |
 | `/sdd-export-context` | pacote local e sanitizado do código (sem segredos) |
+| `/radar-ferramentas` | pesquisa ferramentas que ajudariam o projeto, descarta o que já está em uso/ADR/backlog (`sdd radar check`) e só sugere — adoção vira ADR |
 
 Os workflows são Agent Skills em `.claude/skills/`; os arquivos de `.claude/commands/` são aliases
 de compatibilidade v2 (remoção prevista na 4.0.0).
@@ -78,7 +79,7 @@ principais:
 | Segurança | `policy check` · `security sandbox` · `scan agents --consent --run-mcp-servers` |
 | Skills e packs | `skills verify · info · scan · add · review · lock` · `pack list · activate · deactivate` |
 | MCP | `mcp profiles · apply · check · pin` |
-| Projeto | `project classify` · `ai detect` · `lsp detect` |
+| Projeto | `project classify` · `ai detect` · `lsp detect` · `radar inventory · check` |
 | Evals e trace | `eval run [--suite model]` · `eval export-promptfoo` · `trace show · export --otlp` |
 | Portabilidade | `adapters build <codex\|opencode\|cline\|generic>` · `export-context` |
 | Instalação | `init` · `upgrade` · `version` |
@@ -153,7 +154,8 @@ comandos, regras inegociáveis, padrões proibidos e gates DESTE projeto.
 
 - Todo trabalho deriva de uma spec em `specs/`. Sem spec → `/nova-spec` antes de codar.
 - Workflows: `/sdd-init` · `/sdd-status` · `/gerar-projeto` · `/gerar-skills` · `/nova-spec` ·
-  `/implementar-spec` · `/implementar-tarefa` · `/validar-e2e` · `/sdd-export-context`.
+  `/implementar-spec` · `/implementar-tarefa` · `/validar-e2e` · `/sdd-export-context` ·
+  `/radar-ferramentas`.
 - CLI determinística (IDs, estado, tarefas, doctor): o comando exato aparece no contexto da sessão
   ("CLI determinística: ..."); no modo cópia é `node scripts/sdd.mjs`.
 - Estado do pipeline = `.sdd/events.jsonl` (grave com `sdd event ...`; nunca edite à mão).

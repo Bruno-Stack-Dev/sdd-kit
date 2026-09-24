@@ -291,7 +291,7 @@
       "trust": "core",
       "reviewed_at": "2026-09-23",
       "review_notes": "Escrito pelo mantenedor no v3 (Fase 17). Sem scripts; só instruções, templates e evals. Frameworks citados apenas como candidatos a verificar.",
-      "hash": "sha256:38ee37a65679cd4a7c7c54661979fe4c4311d43b570fd30a9a2ff3b8efcb866a",
+      "hash": "sha256:4c3627e63e7a7d763161ad6e82bc92bed46c0f33b1c7b2f0c0d5b2da9b3b95b6",
       "skills": {
         "ai-architecture-evaluator": "sha256:b9094f144a433b3fd22cf0aabe392f91d2256d9db01e5e0265a49925c8a9b447",
         "ai-discovery": "sha256:ac3fd00ea886bef0cbf32d97b60d1b4555278cf0760329b47db05fedd888fd6e",
@@ -328,7 +328,7 @@
       "license": "MIT",
       "trust": "core",
       "reviewed_at": null,
-      "hash": "sha256:8158f309f5791db79ed787c8ad3ddf7b28adb076187e17688153c2ba6e3f1bfd",
+      "hash": "sha256:38da2e1d56ac5e7b691e6f324e6ff2cca245d6ab905509b57a784d18b4283d93",
       "risk": "low",
       "scan": {
         "sdd_static": {
@@ -529,6 +529,31 @@
       "trust": "core",
       "reviewed_at": null,
       "hash": "sha256:49e1c162c4c5bf28d131457579578f21a05512eda49252edd4aaf5f8d7bf0be1",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-24",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 3
+    },
+    "radar-ferramentas": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:b0e1695c091d546c74c2ed70880b02d959aaa6bf2c80bc551df733977ee3e931",
       "risk": "low",
       "scan": {
         "sdd_static": {
