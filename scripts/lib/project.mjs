@@ -1,5 +1,7 @@
 // Visão consolidada de um projeto: config + specs + tarefas + grafo + estado.
 // Usada pela CLI, pelo doctor e pelos hooks, para que todos enxerguem o mesmo projeto.
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { loadConfig, knownAgents } from './config.mjs';
 import { loadSpecs, loadPlans, loadTasks } from './specs.mjs';
 import { buildTaskGraph, buildSpecGraph, readyTasks, topoOrder } from './graph.mjs';
@@ -8,6 +10,13 @@ import { effectiveTaskStatus, ledgerLabel, SPEC_ACTIVE } from './state.mjs';
 
 export function specsDirOf(config) {
   return String(config?.paths?.specs ?? 'specs/').replace(/\/+$/, '') || 'specs';
+}
+
+/** Diretórios de ADR: `<specs>/decisions` e, se existir, `docs/adr`. */
+export function adrDirsOf(root, specsDir) {
+  const dirs = [`${specsDir}/decisions`];
+  if (existsSync(join(root, 'docs', 'adr'))) dirs.push('docs/adr');
+  return dirs;
 }
 
 export function loadProject(root) {

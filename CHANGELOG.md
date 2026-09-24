@@ -76,6 +76,10 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
   `.claude/` — são dos scripts das skills do kit, não dependências do produto.
 
 ### Corrigido
+- A leitura de dependências (`sdd ai detect`, `sdd radar`) pegava qualquer string entre aspas: em
+  `Cargo.toml` saíam versões, nome do projeto e licença, e as crates ficavam de fora; `go.mod` e
+  Poetry não rendiam nenhuma dependência. Agora cada formato é lido pelas suas seções de
+  dependência (`scripts/lib/manifests.mjs`).
 - Hook `PreToolUse`: a decisão `deny`/`ask` da política é emitida **antes** do trace, e o resumo do
   `tool_input` passou para dentro do bloco fail-open — antes, uma falha ao carregar o trace ou um
   `tool_input` nulo fazia o hook lançar e o bloqueio se perdia (erro "ignorado" no stderr). O

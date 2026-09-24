@@ -31,7 +31,8 @@ confirmação (ADR-0005).
   - `check <nome...>` — onde cada candidato aparece, com trecho, e um status por precedência:
     `em-uso` (manifesto ou `stack`) > `em-adr` > `no-backlog` > `avaliado` (radar anterior) >
     `mencionado` (outro doc de discovery) > `novo`. A correspondência ignora caixa e separadores
-    (`llama.cpp` = `llama-cpp`) e exige fronteira de palavra.
+    nos dois sentidos (`llama.cpp` = `llama-cpp`, `nemoguardrails` = `NeMo Guardrails`), exige
+    fronteira de palavra e, contra manifestos, aceita o pacote sem o sufixo `.js` (`next.js` = `next`).
 - **Só sugestão.** A skill não instala, não edita manifestos, não cria ADR `aceito` nem muda
   config ou backlog sem decisão humana. Adotar → ADR `proposto` + item de backlog ou `/nova-spec`;
   spike, adiar e descartar ficam registrados no radar com o motivo.
@@ -57,8 +58,11 @@ confirmação (ADR-0005).
   `NÃO VERIFICADO` e o relatório diz isso.
 - `radar check` encontra ocorrências, não decisões: um nome citado como alternativa rejeitada num
   ADR aceito aparece como `em-adr`. A skill manda ler o trecho antes de descartar ou sugerir.
-- `manifestDependencies` (compartilhada com `ai detect`) deixa de contar manifestos em `.claude/`,
-  que são dos scripts das skills do kit, não do produto.
+- `manifestDependencies` (`scripts/lib/manifests.mjs`, compartilhada com `ai detect`) passa a ler
+  cada formato pelo que ele declara como dependência — seções de dependência do `pyproject`
+  (PEP 621, grupos e Poetry), `Pipfile`, `Cargo.toml` e blocos `require` do `go.mod` — em vez de
+  qualquer string entre aspas, e deixa de contar manifestos em `.claude/`, que são dos scripts das
+  skills do kit, não do produto.
 
 ## Reavaliar quando
 - Os clientes passarem a permitir web em subagentes com escopo de domínio (revisitar a ADR-0009).

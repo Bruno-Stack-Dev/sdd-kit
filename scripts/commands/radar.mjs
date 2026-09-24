@@ -21,7 +21,9 @@ function inventory(root, flags) {
   if (flags.json) { console.log(JSON.stringify(r, null, 2)); return 0; }
   const c = r.config;
   console.log(`${ICON.info} config: ${c.source}${c.project ? ` · ${[c.project.type, c.project.domain, c.project.stage].filter(Boolean).join(' · ')}` : ''}`);
-  if (c.stack) for (const [k, v] of Object.entries(c.stack)) console.log(`  stack.${k.padEnd(14)} ${typeof v === 'object' ? JSON.stringify(v) : v}`);
+  if (c.stack && typeof c.stack === 'object' && !Array.isArray(c.stack)) {
+    for (const [k, v] of Object.entries(c.stack)) console.log(`  stack.${k.padEnd(14)} ${typeof v === 'object' ? JSON.stringify(v) : v}`);
+  } else if (c.stack) console.log(`  stack          ${typeof c.stack === 'object' ? JSON.stringify(c.stack) : c.stack}`);
   if (c.packs.length) console.log(`  packs          ${c.packs.join(', ')}`);
   if (c.ai) console.log(`  ai             ${c.ai.join(', ')}`);
   console.log(`\n${ICON.info} dependências (${r.dependencies.reduce((n, m) => n + m.deps.length, 0)} em ${r.dependencies.length} manifesto(s))`);
@@ -31,7 +33,7 @@ function inventory(root, flags) {
   for (const a of r.adrs) console.log(`  ${(a.id ?? '—').padEnd(10)} ${(a.status ?? '—').padEnd(10)} ${a.title ?? a.file}`);
   console.log(`\n${ICON.info} discovery (${r.discovery.length}) · backlog: ${r.backlog ? r.backlog.file : 'ausente'}`);
   for (const d of r.discovery) console.log(`  ${d.file} (${d.status ?? '—'})`);
-  console.log(`\n${ICON.info} radares anteriores (${r.radars.length})`);
+  console.log(`\n${ICON.info} radares anteriores (${r.radars.length}) · novos radares em ${r.paths.discovery}/`);
   for (const x of r.radars) console.log(`  ${x.date}  ${x.file} (${x.status ?? '—'})`);
   return 0;
 }

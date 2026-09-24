@@ -328,7 +328,7 @@
       "license": "MIT",
       "trust": "core",
       "reviewed_at": null,
-      "hash": "sha256:ed5698d8f78a7302ebb4cab1d127a03cfd1246933aa31777239af06c089a9f07",
+      "hash": "sha256:38da2e1d56ac5e7b691e6f324e6ff2cca245d6ab905509b57a784d18b4283d93",
       "risk": "low",
       "scan": {
         "sdd_static": {
@@ -553,7 +553,7 @@
       "license": "MIT",
       "trust": "core",
       "reviewed_at": null,
-      "hash": "sha256:e6e7dd2f81e641b1ab0f102e5da017c3333bcca824b0dcbc5ec435ab23bd2796",
+      "hash": "sha256:b0e1695c091d546c74c2ed70880b02d959aaa6bf2c80bc551df733977ee3e931",
       "risk": "low",
       "scan": {
         "sdd_static": {

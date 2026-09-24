@@ -198,8 +198,8 @@ Após cada spec:
 - **Ofereça o radar de ferramentas** (não rode por conta própria): "quer que eu pesquise
   ferramentas que ajudariam este projeto? → `/radar-ferramentas [foco]`". Ele parte do discovery e
   da stack, descarta o que já está em uso, em ADR ou no backlog (`sdd radar check`) e só sugere —
-  cada adoção vira ADR `proposto` por decisão humana. Se já houver um `RADAR-*.md` recente em
-  `specs/discovery/`, cite-o em vez de oferecer de novo.
+  cada adoção vira ADR `proposto` por decisão humana. Se já houver um radar recente (`radars` em
+  `sdd radar inventory`, no diretório de discovery da config), cite-o em vez de oferecer de novo.
 
 ---
 

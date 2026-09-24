@@ -19,7 +19,8 @@ nasce `aceito` nesta skill. Método de comparação: [references/AVALIACAO-DE-FE
 ## 1. Inventário (determinístico)
 
 `sdd radar inventory --json` → stack, packs, bloco `ai:`, dependências por manifesto, ADRs (com
-status), docs de discovery, backlog e radares anteriores. Leia os docs que ele listar (`VISAO`,
+status), docs de discovery, backlog, radares anteriores e `paths` (onde gravar: `paths.discovery`,
+`paths.decisions` — seguem `paths.specs` da config; o padrão é `specs/`). Leia os docs que ele listar (`VISAO`,
 `REQUISITOS`, `ARQUITETURA`, `INFRA`, `AI-*`) — é deles que saem os drivers. Sem `sdd.config.yaml`,
 pare e sugira `/sdd-init`. Radar anterior existe? Parta dele: o que mudou desde a data dele.
 
@@ -61,15 +62,16 @@ Ocorrência não é decisão: a CLI mostra onde o nome aparece; o contexto é vo
 
 - Por lacuna: **opção mínima** (o que a stack atual ou código próprio já resolvem) + ao menos um
   candidato; critérios com pesos vindos dos drivers (referência acima).
-- `sdd template show radar` → `specs/discovery/RADAR-<AAAA-MM-DD>.md` (`status: rascunho`,
-  `doc-id` igual ao nome). Mesmo dia? Sufixo `-<foco>`.
+- `sdd template show radar` → `<paths.discovery>/RADAR-<AAAA-MM-DD>.md` (`status: rascunho`,
+  `doc-id` igual ao nome). Mesmo dia? Sufixo `-<foco>` em minúsculas, sem acento nem espaço
+  (ex.: `RADAR-2026-09-24-observabilidade.md`).
 
 ## 6. Decisão humana
 
 Apresente um resumo curto por lacuna e pergunte a decisão de cada candidato: **adotar · spike ·
 adiar · descartar**. Registre-as na tabela "Decisões" e então:
 
-- **adotar** → ADR `proposto` (`sdd template show adr` → `specs/decisions/`) com alternativas,
+- **adotar** → ADR `proposto` (`sdd template show adr` → `<paths.decisions>/`) com alternativas,
   evidência e gatilhos de reavaliação; o trabalho entra por item no `BACKLOG.md` ou `/nova-spec`.
 - **spike** → casos, métrica e critério de corte definidos antes, como tarefa própria.
 - **adiar / descartar** → motivo registrado (o próximo radar lê isto).

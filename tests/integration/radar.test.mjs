@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tempProject, cleanup, runSdd, runLint, writeFile, KIT_ROOT } from '../helpers.mjs';
-import { nameRegex } from '../../scripts/lib/radar.mjs';
+import { nameMatcher, RADAR_FILE_RE } from '../../scripts/lib/radar.mjs';
 
 const sdd = (dir, ...a) => runSdd([...a, '--root', dir]);
 const json = (dir, ...a) => {
@@ -28,13 +28,26 @@ function project() {
   });
 }
 
-test('nameRegex: sem caixa, separadores intercambiáveis e fronteira de palavra', () => {
-  assert.ok(nameRegex('llama.cpp').test('llama-cpp-python'));
-  assert.ok(nameRegex('NeMo Guardrails').test('nemoguardrails'));
-  assert.ok(nameRegex('LangGraph').test('@langchain/langgraph'));
-  assert.ok(!nameRegex('graph').test('langgraph'), 'exige fronteira');
-  assert.ok(!nameRegex('ai').test('fastapi'));
-  assert.equal(nameRegex('  '), null);
+test('nameMatcher: sem caixa, separadores opcionais nos dois sentidos e fronteira de palavra', () => {
+  const m = (name, text) => nameMatcher(name)(text);
+  assert.ok(m('llama.cpp', 'llama-cpp-python'));
+  assert.ok(m('llamacpp', 'Serving com llama.cpp'));
+  assert.ok(m('NeMo Guardrails', 'nemoguardrails'));
+  assert.ok(m('nemoguardrails', '- **F-02.1 — Guardrails com NeMo Guardrails**'), 'forma colada acha a separada');
+  assert.ok(m('LangGraph', '@langchain/langgraph'));
+  assert.ok(m('@langchain/langgraph', '@langchain/langgraph'));
+  assert.ok(!m('graph', 'langgraph'), 'exige fronteira');
+  assert.ok(!m('ai', 'fastapi'));
+  assert.ok(!m('lang graph', 'langgraphs'));
+  assert.ok(m('c++', 'backend em C++ 20') && !m('c++', 'c'), 'símbolo casa literalmente');
+  assert.equal(nameMatcher('  '), null);
+});
+
+test('RADAR_FILE_RE: sufixo de foco com maiúscula, acento e dígitos', () => {
+  for (const f of ['RADAR-2026-09-24.md', 'RADAR-2026-09-24-observabilidade.md', 'RADAR-2026-09-24-agentes-de-IA.md', 'RADAR-2026-09-24-observação_2.md']) {
+    assert.equal(f.match(RADAR_FILE_RE)?.[1], '2026-09-24', f);
+  }
+  for (const f of ['RADAR-2026-09-24-.md', 'RADAR-2026-9-24.md', 'RADAR-2026-09-24 foco.md']) assert.ok(!RADAR_FILE_RE.test(f), f);
 });
 
 test('radar inventory: stack, dependências por manifesto (sem .claude/), ADRs, discovery, backlog e radares', () => {
@@ -71,6 +84,44 @@ test('radar check: status por precedência, com arquivo e trecho', () => {
     assert.equal(by['llama.cpp'].status, 'mencionado');
     assert.equal(by.langfuse.status, 'novo');
     assert.deepEqual(by.langfuse.where, []);
+  } finally { cleanup(dir); }
+});
+
+test('radar check: crates, módulos Go, Poetry e `next.js` contam como em uso; radar com sufixo é avaliado', () => {
+  const dir = tempProject({
+    'rs/Cargo.toml': '[package]\nname = "app"\nlicense = "MIT"\n[dependencies]\nserde = "1.0"\n',
+    'go/go.mod': 'module example.com/app\n\nrequire (\n\tgithub.com/gin-gonic/gin v1.9.1\n)\n',
+    'py/pyproject.toml': '[tool.poetry.dependencies]\npython = "^3.12"\nfastapi = "^0.110"\n',
+    'web/package.json': JSON.stringify({ dependencies: { next: '^15' } }),
+    'specs/discovery/RADAR-2026-09-24-agentes-de-IA.md': doc('RADAR-2026-09-24-agentes-de-IA', 'Radar', 'langfuse: adiar'),
+  });
+  try {
+    const r = json(dir, 'radar', 'check', 'serde', 'gin', 'fastapi', 'next.js', 'langfuse', 'mit', 'app');
+    const by = Object.fromEntries(r.map((c) => [c.name, c.status]));
+    assert.deepEqual(by, { serde: 'em-uso', gin: 'em-uso', fastapi: 'em-uso', 'next.js': 'em-uso', langfuse: 'avaliado', mit: 'novo', app: 'novo' });
+    const inv = json(dir, 'radar', 'inventory');
+    assert.deepEqual(inv.radars.map((x) => x.date), ['2026-09-24']);
+    assert.deepEqual(inv.discovery, []);
+  } finally { cleanup(dir); }
+});
+
+test('radar: paths.specs da config vale para leitura e para `paths`; config fora do formato não quebra', () => {
+  const dir = tempProject({
+    'sdd.config.yaml': 'version: 3\nproject:\n  name: x\npaths:\n  specs: docs/specs/\nstack: python + fastapi\nintegrations:\n  packs: ai\n',
+    'docs/specs/discovery/RADAR-2026-08-01.md': doc('RADAR-2026-08-01', 'Radar', 'vllm'),
+    'docs/specs/decisions/ADR-001-x.md': '---\nadr-id: ADR-001\nstatus: aceito\n---\n\n# ADR-001: Serving com vLLM\n',
+  });
+  try {
+    const inv = json(dir, 'radar', 'inventory');
+    assert.deepEqual(inv.paths, { specs: 'docs/specs', discovery: 'docs/specs/discovery', decisions: 'docs/specs/decisions' });
+    assert.deepEqual(inv.radars.map((x) => x.file), ['docs/specs/discovery/RADAR-2026-08-01.md']);
+    assert.deepEqual(inv.adrs.map((a) => a.title), ['ADR-001: Serving com vLLM'], 'título cai no heading sem `titulo`');
+    assert.deepEqual(inv.config.packs, ['ai']);
+    const human = sdd(dir, 'radar', 'inventory');
+    assert.equal(human.status, 0, human.out);
+    assert.match(human.stdout, /stack\s+python \+ fastapi/);
+    assert.match(human.stdout, /novos radares em docs\/specs\/discovery\//);
+    assert.equal(json(dir, 'radar', 'check', 'vllm')[0].status, 'em-adr');
   } finally { cleanup(dir); }
 });
 
