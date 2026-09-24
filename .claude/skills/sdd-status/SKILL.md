@@ -29,5 +29,5 @@ Imprima o resumo do `status` (saúde, progresso, entrega, gate atual) e depois:
 
 Feche com: próximas tarefas prontas (com agente), bloqueios com motivo, as razões de saúde e os
 alertas do doctor. Se o estado ainda não existir (`sdd tasks sync` nunca rodou), diga isso e sugira
-rodar — sem rodar você mesmo. Para acompanhar em tempo real, sugira `sdd dashboard` (terminal
-interativo) ou `sdd status --watch`.
+rodar — sem rodar você mesmo. Para acompanhar em tempo real, sugira `/sdd-dashboard` (abre o
+`sdd dashboard` numa janela de terminal) ou `sdd status --watch`.

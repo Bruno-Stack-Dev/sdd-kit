@@ -478,7 +478,7 @@
       "license": "MIT",
       "trust": "core",
       "reviewed_at": null,
-      "hash": "sha256:d2d18d9b909acf900f67c8e3b6bcf779535a6fbdb805bde17adaaa57e329b75e",
+      "hash": "sha256:6a2eebaf4592ce714211d1d69820cc339b514cf9f423b2d2e10f331309bbb66a",
       "risk": "low",
       "scan": {
         "sdd_static": {
@@ -554,6 +554,31 @@
       "trust": "core",
       "reviewed_at": null,
       "hash": "sha256:b0e1695c091d546c74c2ed70880b02d959aaa6bf2c80bc551df733977ee3e931",
+      "risk": "low",
+      "scan": {
+        "sdd_static": {
+          "status": "pass",
+          "date": "2026-09-24",
+          "findings": {
+            "error": 0,
+            "warn": 0,
+            "info": 0
+          }
+        },
+        "external": {
+          "tool": "cisco-skill-scanner",
+          "status": "not_run",
+          "date": null
+        }
+      },
+      "evals": 3
+    },
+    "sdd-dashboard": {
+      "source": "https://github.com/Bruno-Stack-Dev/sdd-kit",
+      "license": "MIT",
+      "trust": "core",
+      "reviewed_at": null,
+      "hash": "sha256:84d96c706989f3a083714a65ea5ee82fe3ced6aa7d2a48b7c4730bcddad4b69d",
       "risk": "low",
       "scan": {
         "sdd_static": {

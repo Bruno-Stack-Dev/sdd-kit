@@ -470,6 +470,7 @@ flowchart TD
 |-------|-------------|-----------|
 | `/sdd-init` | uma vez por projeto, para adotar o kit | `[novo\|existente]` (sugestão; sempre confirma) |
 | `/sdd-status` | "como está o projeto?", "o que falta?", "por onde retomo?" | — |
+| `/sdd-dashboard` | acompanhar ao vivo: abre o `sdd dashboard` numa janela de terminal | `[--demo] [--tab <tela>]` |
 | `/gerar-projeto` | transformar um brief de `specs/_entrada/` em specs e código | — |
 | `/nova-spec` | especificar um incremento ou funcionalidade avulsa | `<slug> [título]` |
 | `/implementar-spec` | entregar uma spec de ponta a ponta até o guardião | `<SPEC-ID>` |
@@ -505,7 +506,7 @@ flowchart TD
 |--------|------|
 | começar a usar o kit num projeto | `sdd init --mode plugin` e depois `/sdd-init` |
 | ver o andamento | `/sdd-status` ou `sdd status` |
-| acompanhar ao vivo enquanto os agentes trabalham | `sdd dashboard` |
+| acompanhar ao vivo enquanto os agentes trabalham | `/sdd-dashboard` (pelo chat) ou `sdd dashboard` (no terminal) |
 | criar uma funcionalidade nova | `/nova-spec <slug> "<título>"` → `/implementar-spec <SPEC-ID>` |
 | gerar o projeto inteiro a partir de um brief | coloque o `.md` em `specs/_entrada/` → `/gerar-projeto` |
 | fazer só uma tarefa | `/implementar-tarefa SPEC/T-NNN` |

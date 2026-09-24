@@ -34,6 +34,7 @@ TUI sem dependência) e [ADR-0023](adr/ADR-0023-trace-de-invocacoes-e-sanitizer-
 | `sdd status --session <id>` | limita a atividade (trace) a uma sessão |
 | `sdd status --no-scan` | pula o secret scan (mais rápido; segurança aparece como `NOT_RUN`) |
 | `sdd dashboard` | TUI interativa em tempo real (precisa de terminal interativo) |
+| `/sdd-dashboard [args]` | pelo chat: confere com `--once` e abre o `sdd dashboard` numa janela de terminal do sistema (sem sessão gráfica, entrega o comando) |
 | `sdd dashboard --tab <tela>` | abre numa tela: `overview`, `agents`, `tasks`, `specs`, `quality`, `security`, `events`, `runtime` (ou 1–8) |
 | `sdd dashboard --once [--width W --height H]` | imprime um único quadro, sem interação (CI, documentação, depuração) |
 | `sdd dashboard --demo [--interval ms]` · `sdd status --demo [--step N]` | dados **sintéticos** (ver [Demo](#modo-demo)) |

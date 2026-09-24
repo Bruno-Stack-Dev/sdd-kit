@@ -83,7 +83,7 @@ dos dados do kit, sem estimativa do modelo, e somente leitura. Sem projeto à m�
 | Quero… | Rode |
 |--------|------|
 | ver o andamento do projeto | `/sdd-status` ou `sdd status` (`--watch` atualiza ao vivo) |
-| acompanhar os agentes em tempo real | `sdd dashboard` |
+| acompanhar os agentes em tempo real | `/sdd-dashboard` (abre uma janela de terminal) ou `sdd dashboard` |
 | criar uma funcionalidade nova | `/nova-spec <slug> "<título>"` → `/implementar-spec <SPEC-ID>` |
 | fazer uma única tarefa | `/implementar-tarefa SPEC/T-NNN` |
 | saber o que dá para começar agora | `sdd tasks ready` |
@@ -101,6 +101,7 @@ Mais situações ("quero… → rode…") e a tabela de solução de problemas e
 |-----------------|-----------|
 | `/sdd-init` | bootstrap: novo × existente, discovery ou auditoria, config, packs, MCP, sandbox |
 | `/sdd-status` | painel somente leitura: saúde, progresso e entrega calculados pela CLI (`sdd status`), specs, tarefas, bloqueios, alertas do doctor |
+| `/sdd-dashboard` | abre o `sdd dashboard` (TUI ao vivo) numa janela de terminal, já que ele não roda dentro do chat; sem janela possível, entrega o comando |
 | `/gerar-projeto` | brief → specs, planos e tarefas pelas pipelines da config |
 | `/gerar-skills` | skills sob medida do domínio a partir do discovery |
 | `/nova-spec` | spec avulsa com ID calculado pela CLI |
@@ -204,7 +205,7 @@ Este projeto usa o SDD Kit. **Antes de qualquer tarefa, leia a config do projeto
 comandos, regras inegociáveis, padrões proibidos e gates DESTE projeto.
 
 - Todo trabalho deriva de uma spec em `specs/`. Sem spec → `/nova-spec` antes de codar.
-- Workflows: `/sdd-init` · `/sdd-status` · `/gerar-projeto` · `/gerar-skills` · `/nova-spec` ·
+- Workflows: `/sdd-init` · `/sdd-status` · `/sdd-dashboard` · `/gerar-projeto` · `/gerar-skills` · `/nova-spec` ·
   `/implementar-spec` · `/implementar-tarefa` · `/validar-e2e` · `/sdd-export-context` ·
   `/radar-ferramentas`.
 - CLI determinística (IDs, estado, tarefas, doctor): o comando exato aparece no contexto da sessão
