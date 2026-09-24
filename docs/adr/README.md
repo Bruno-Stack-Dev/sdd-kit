@@ -32,3 +32,5 @@ Decisões arquiteturais **do kit** (motor, CLI, formatos, segurança). Não conf
 | [0019](ADR-0019-ci-sem-segredos-no-pr.md) | CI determinístico sem segredos no PR; modelo e scanners em workflows manuais | aceito |
 | [0020](ADR-0020-modelo-por-papel-do-agente.md) | O kit escolhe o modelo de cada agente pelo papel; overrides na config | aceito |
 | [0021](ADR-0021-execucao-em-ondas.md) | Execução paralela em ondas: um agente por onda, guardião sozinho | aceito |
+| [0022](ADR-0022-dashboard-local-snapshot-unico.md) | Dashboard local somente leitura: snapshot único, métricas determinísticas, TUI sem dependência | aceito |
+| [0023](ADR-0023-trace-de-invocacoes-e-sanitizer-central.md) | Trace de invocações (`tool.called`), MCP/LSP observados e sanitizer central | aceito |

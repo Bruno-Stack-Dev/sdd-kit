@@ -15,6 +15,9 @@ export const SECRET_PATTERNS = [
   { id: 'stripe-live-key', severity: 'error', re: /\b[rs]k_live_[0-9A-Za-z]{20,}\b/ },
   { id: 'npm-token', severity: 'error', re: /\bnpm_[A-Za-z0-9]{36}\b/ },
   { id: 'jwt', severity: 'warn', re: /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/ },
+  // Só o valor do cabeçalho é redigido: `Authorization: Bearer [REDACTED:bearer-token]`.
+  { id: 'bearer-token', severity: 'warn', re: /(?<=\bBearer\s+)[A-Za-z0-9._~+/-]{20,}=*/ },
+  { id: 'basic-auth', severity: 'warn', re: /(?<=\bAuthorization:\s*Basic\s+)[A-Za-z0-9+/]{12,}={0,2}/i },
   { id: 'connection-string-password', severity: 'warn', re: /\b[a-z][a-z0-9+.-]*:\/\/[^\s:/@]+:[^\s@/]{6,}@[^\s]+/i },
   { id: 'generic-assignment', severity: 'warn', re: /\b(?:password|passwd|secret|api[_-]?key|access[_-]?token|auth[_-]?token)\b\s*[:=]\s*["'][^"'\s]{12,}["']/i },
 ];
@@ -34,9 +37,14 @@ export function scanText(text) {
 /** Substitui trechos que parecem segredo por [REDACTED:<id>]. */
 export function redact(text) {
   let out = String(text);
-  for (const p of SECRET_PATTERNS) out = out.replace(new RegExp(p.re.source, p.re.flags.includes('g') ? p.re.flags : p.re.flags + 'g'), `[REDACTED:${p.id}]`);
+  // Nenhum padrão casa com menos de 12 caracteres: atalho para os campos curtos (a maioria no trace).
+  if (out.length < 12) return out;
+  for (const p of GLOBAL_PATTERNS) out = out.replace(p.re, p.label);
   return out;
 }
+
+// Versões globais compiladas uma vez (replace com /g não guarda estado entre chamadas).
+const GLOBAL_PATTERNS = SECRET_PATTERNS.map((p) => ({ re: new RegExp(p.re.source, p.re.flags.includes('g') ? p.re.flags : `${p.re.flags}g`), label: `[REDACTED:${p.id}]` }));
 
 // Caminhos que nunca devem ser lidos, versionados ou exportados.
 const SENSITIVE_BASENAME = [

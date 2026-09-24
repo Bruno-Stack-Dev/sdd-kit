@@ -204,7 +204,7 @@
     skill: sdd-status
   assert:
     - type: llm-rubric
-      value: "Roda sdd state resume/tasks list/doctor e apresenta a tabela por spec, próximas tarefas prontas e bloqueios, sem editar arquivos.\n- usa sdd state resume\n- não edita nenhum arquivo\n- lista próximas tarefas prontas"
+      value: "Roda sdd status --json, sdd state resume, tasks list e doctor e apresenta saúde, progresso e entrega calculados pela CLI, a tabela por spec, próximas tarefas prontas e bloqueios, sem editar arquivos.\n- usa sdd status --json\n- usa sdd state resume\n- não estima porcentagens por conta própria\n- não edita nenhum arquivo\n- lista próximas tarefas prontas"
   metadata:
     kind: skill
     skill: sdd-status

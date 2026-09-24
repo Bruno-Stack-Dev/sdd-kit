@@ -11,9 +11,13 @@ Os hooks gravam `.sdd/trace/<sessão>.jsonl` (não versionado):
 |--------|--------|
 | `session.started` / `session.finished` | início e fim da sessão |
 | `agent.spawned` / `agent.stopped` | subagente começou/terminou (com a tarefa correlacionada) |
-| `tool.completed` | Bash, Skill, Agent/Task concluídos |
+| `tool.called` | a política permitiu a chamada (PreToolUse): ferramenta, alvo resumido e `tool.use_id` |
+| `tool.completed` | Bash, Skill, Agent/Task, LSP e MCP (`mcp__*`) concluídos, com `tool.use_id` |
 | `file.modified` | Write/Edit (só o caminho) |
 | `policy.decision` | a política negou ou pediu confirmação (regra e decisão) |
+
+`tool.called` + `tool.completed` com o mesmo `tool.use_id` dão a latência; `mcp.server`/`mcp.tool`
+e `lsp.operation` identificam uso de MCP e LSP ([ADR-0023](adr/ADR-0023-trace-de-invocacoes-e-sanitizer-central.md)).
 
 Os eventos de domínio (`.sdd/events.jsonl`: `task.started`, `test.failed`, `guardian.approved`...)
 entram na mesma linha do tempo:
@@ -26,7 +30,15 @@ sdd trace show --trace <trace_id> --json
 ```
 
 **Nunca registrado:** conteúdo de arquivo, saída de ferramenta, segredos (comandos passam por
-redação e truncamento). Desligar: `observability.trace: false` no `sdd.config.yaml`.
+redação e truncamento). A mesma sanitização (`scripts/lib/sanitize.mjs`: padrões de segredo +
+campos com nome de credencial) vale para os eventos de domínio, o painel, o log de diagnóstico e o
+export OTLP. Desligar: `observability.trace: false` no `sdd.config.yaml`.
+
+## Painel local — `sdd status` e `sdd dashboard`
+
+Os mesmos dois arquivos (trace + eventos de domínio) alimentam o painel local em tempo real:
+saúde, progresso, agentes, gates, entrega, segurança, autonomia, MCP, LSP e rastreabilidade —
+sem outro sistema de eventos e sem perguntar nada ao modelo. Ver [`docs/dashboard.md`](dashboard.md).
 
 ## Nível 2 — OpenTelemetry (opcional)
 

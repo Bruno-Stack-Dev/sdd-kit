@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { validate } from './schema.mjs';
 import { reduce, applyEvent } from './state.mjs';
+import { sanitize } from './sanitize.mjs';
 import { ENGINE_ROOT } from './engine.mjs';
 
 export const SDD_DIR = '.sdd';
@@ -183,7 +184,8 @@ export function appendEvent(root, input, { ctx = {} } = {}) {
       const val = f === 'session' ? session : f === 'trace' ? (input.trace ?? session) : input[f];
       if (val !== undefined && val !== null && val !== '') ev[f] = String(val);
     }
-    if (input.meta && Object.keys(input.meta).length) ev.meta = input.meta;
+    // Motivos e evidências são texto livre: passam pelo mesmo sanitizer do trace e do dashboard.
+    if (input.meta && Object.keys(input.meta).length) ev.meta = sanitize(input.meta);
     checkMeta(ev.meta);
     const errs = validateEvent(ev);
     if (errs.length) throw new EventRejected(`evento inválido: ${errs.map((e) => `${e.path}: ${e.message}`).join('; ')}`);

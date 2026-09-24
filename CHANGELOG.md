@@ -12,6 +12,33 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 ## [Não lançado]
 
 ### Adicionado
+- **Painel local** (ADR-0022): `sdd status [--json|--verbose|--watch] [--session S]` e
+  `sdd dashboard` (TUI em tempo real, somente leitura, sem dependência nova) consomem o mesmo
+  snapshot, derivado de `.sdd/events.jsonl`, `.sdd/trace/`, specs, config, agentes e política —
+  nada é estimado pelo modelo. Métricas com fonte: progresso ponderado por dimensão (pesos em
+  `dashboard.progress`), requisitos verificados pelo guardião, saúde do projeto e de cada agente
+  por regras e limiares (`dashboard.health`), autonomia por invocação, gates por spec
+  (SPEC → CODE → TEST → GATES → GUARDIAN → DELIVERY) e prontidão de entrega. Rastreabilidade
+  "WHY?" só por vínculo explícito (o resto é `UNKNOWN`). Telas: Overview, Agents (objetivo atual,
+  ferramentas, permissões derivadas da política, linha do tempo), Tasks (grafo), Specs, Quality,
+  Security, Events (stream com filtro/busca/pausa) e Runtime (sessão, ferramentas, MCP, LSP).
+  `--once` imprime um quadro; `--demo` usa um projeto sintético isolado (`DEMO DATA`).
+- `sdd sessions [--json]`; `sdd doctor --dashboard` (também em `--project`/`--full`).
+- Contrato `schemas/status.schema.json` (`schemaVersion 1`) para `sdd status --json`.
+- `sdd event TEST_*` aceita `--suite --passed --failed --skipped --total --coverage` (gravados em
+  `meta`; lidos pelo painel).
+- Config: bloco opcional `dashboard` (pesos, limiares, janela de eventos) no schema e na visão
+  `sdd.config.md`; tarefas aceitam `pesos:` no frontmatter do arquivo de tarefas.
+- Evals determinísticas da categoria `observability` (status sem métricas inventadas, segredo como
+  achado crítico, demo marcada); teste de desempenho `tests/perf/dashboard.perf.mjs` com relatório
+  em `docs/reports/dashboard-performance.md`.
+- **Trace de invocações** (ADR-0023): o PreToolUse grava `tool.called` (com `tool.use_id`) para
+  chamadas permitidas; o PostToolUse grava `tool.use_id` e `duration_ms` quando o cliente informa.
+  Matchers passam a incluir `Glob|Skill|Agent|Task|mcp__.*` (PreToolUse) e `LSP|mcp__.*`
+  (PostToolUse), com atributos `mcp.server`, `mcp.tool` e `lsp.operation`.
+- **Sanitizer central** (`scripts/lib/sanitize.mjs`) para eventos, trace, painel, log de
+  diagnóstico e export OTLP: padrões de segredo + campos com nome de credencial; novos padrões
+  `bearer-token` e `basic-auth` (só o valor é redigido).
 - **Execução em ondas** (ADR-0021): `sdd tasks wave [--spec S] [--max N]` planeja as tarefas que
   rodam ao mesmo tempo — specs de `depende-de` implementadas, um agente por onda, guardião sozinho,
   limite `agents.parallel.max` (padrão 3; 1 = sequencial) — cada uma com o modelo do seu papel.
@@ -31,10 +58,19 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
   `/gerar-projeto` passam o modelo resolvido ao delegar.
 
 ### Alterado
+- `/sdd-status` usa `sdd status --json` como fonte da saúde, do progresso e da entrega (sem
+  estimativa própria).
+- `redact()` compila os padrões uma vez (antes, a cada chamada) — trace, export de contexto e
+  painel ficam mais rápidos.
 - `tasks ready --json`: `parallel_safe` passa a ser a próxima onda (regras acima); antes era uma
   tarefa por spec × agente, sem limite nem exclusividade do guardião.
 
 ### Corrigido
+- Hook `PreToolUse`: a decisão `deny`/`ask` da política é emitida **antes** do trace, e o resumo do
+  `tool_input` passou para dentro do bloco fail-open — antes, uma falha ao carregar o trace ou um
+  `tool_input` nulo fazia o hook lançar e o bloqueio se perdia (erro "ignorado" no stderr). O
+  `PostToolUse` também isola o trace da validação de specs.
+- `sdd trace export --otlp`: duração fracionária ou `ts` inválido não quebram mais a conversão.
 - Hook `paths.generated`: o marcador `AUTO-GENERATED` só torna um arquivo "gerado" quando abre uma
   linha de comentário no início dele (`<!--`, `#`, `//`...). Antes, qualquer ocorrência nos
   primeiros 2 KB bastava — o próprio renderizador (`scripts/lib/config-md.mjs`, que guarda o

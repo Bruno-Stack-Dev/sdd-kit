@@ -448,6 +448,142 @@
           ]
         }
       }
+    },
+    "dashboard": {
+      "description": "`sdd status` / `sdd dashboard` (somente leitura): pesos do progresso geral, limiares de saúde e UI. Tudo opcional; ver docs/dashboard.md.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "refresh_ms": {
+          "description": "Intervalo do stat de segurança do watcher (o fs.watch é o gatilho principal).",
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 60000
+        },
+        "progress": {
+          "description": "Pesos do Overall (renormalizados sobre as dimensões disponíveis).",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "implementation": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "requirements": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "tests": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "security": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "documentation": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "health": {
+          "description": "Limiares do Health Engine (projeto e agentes).",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "context_warning": {
+              "type": "number",
+              "minimum": 0
+            },
+            "context_critical": {
+              "type": "number",
+              "minimum": 0
+            },
+            "retry_warning": {
+              "type": "number",
+              "minimum": 0
+            },
+            "retry_critical": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tool_failure_warning": {
+              "type": "number",
+              "minimum": 0
+            },
+            "tool_failure_critical": {
+              "type": "number",
+              "minimum": 0
+            },
+            "policy_block_warning": {
+              "type": "number",
+              "minimum": 0
+            },
+            "policy_block_critical": {
+              "type": "number",
+              "minimum": 0
+            },
+            "loop_repeat": {
+              "type": "number",
+              "minimum": 0
+            },
+            "task_minutes_warning": {
+              "type": "number",
+              "minimum": 0
+            },
+            "stale_minutes": {
+              "type": "number",
+              "minimum": 0
+            },
+            "blocked_tasks_degraded": {
+              "type": "number",
+              "minimum": 0
+            },
+            "critical_security": {
+              "enum": [
+                "blocked",
+                "degraded"
+              ]
+            },
+            "gate_failure": {
+              "enum": [
+                "blocked",
+                "degraded"
+              ]
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "max_displayed": {
+              "type": "integer",
+              "minimum": 50,
+              "maximum": 20000
+            }
+          }
+        },
+        "ui": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "compact": {
+              "enum": [
+                "auto",
+                true,
+                false
+              ]
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {

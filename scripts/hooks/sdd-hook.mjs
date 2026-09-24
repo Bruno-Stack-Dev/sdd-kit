@@ -6,8 +6,8 @@
  *
  * Eventos: pre-tool-use · post-tool-use · session-start · session-end · stop · subagent-start · subagent-stop
  *
- * Trace local (fail-open) em .sdd/trace/<sessão>.jsonl: policy.decision, tool.completed, file.modified,
- * session.started/finished, agent.spawned/stopped — sem conteúdo, com segredos redigidos.
+ * Trace local (fail-open) em .sdd/trace/<sessão>.jsonl: tool.called, policy.decision, tool.completed,
+ * file.modified, session.started/finished, agent.spawned/stopped — sem conteúdo, com segredos redigidos.
  *
  * Princípios:
  *  - PreToolUse aplica policies/sdd-policy.json (+ endurecimento da config). Só responde deny/ask;
@@ -55,12 +55,16 @@ function tracing(root, config) {
   return isSddProject(root) && config?.observability?.trace !== false;
 }
 
-/** Grava um evento de trace; fail-open (nunca lança). */
-async function trace(root, config, input, name, attrs = {}, status = 'ok') {
+/**
+ * Grava um evento de trace; fail-open (nunca lança). `withInput`: acrescenta o resumo seguro do
+ * tool_input (sem conteúdo) — calculado aqui dentro, para que um input malformado não quebre o hook.
+ */
+async function trace(root, config, input, name, attrs = {}, status = 'ok', durationMs = null, withInput = false) {
   try {
     if (!tracing(root, config)) return;
-    const { traceEvent } = await lazy('../lib/trace.mjs');
-    traceEvent(root, { session: input.session_id, name, attrs: { 'sdd.agent': input.agent_type, ...attrs }, status });
+    const { traceEvent, summarizeToolInput } = await lazy('../lib/trace.mjs');
+    const summary = withInput ? summarizeToolInput(input.tool_name, input.tool_input ?? {}) : {};
+    traceEvent(root, { session: input.session_id, name, attrs: { 'sdd.agent': input.agent_type, ...attrs, ...summary }, status, durationMs });
   } catch { /* observabilidade é fail-open */ }
 }
 
@@ -68,8 +72,14 @@ async function trace(root, config, input, name, attrs = {}, status = 'ok') {
 async function currentTask(root, agent) {
   try {
     if (!existsSync(join(root, '.sdd', 'events.jsonl'))) return {};
-    const { computeState } = await lazy('../lib/events.mjs');
-    const { state } = computeState(root);
+    // state.json é materializado a cada append; ler o derivado evita reexecutar o log inteiro em
+    // cada chamada (LSP/MCP são frequentes). É só correlação de trace: sem ele, cai no log.
+    let state = null;
+    try { state = JSON.parse(readFileSync(join(root, '.sdd', 'state.json'), 'utf8')); } catch { /* ausente ou ilegível */ }
+    if (!state?.tasks) {
+      const { computeState } = await lazy('../lib/events.mjs');
+      state = computeState(root).state;
+    }
     const open = Object.entries(state.tasks).filter(([, t]) => t.status === 'in_progress' && (!agent || t.agent === agent));
     return open.length === 1 ? { 'sdd.task': open[0][0], 'sdd.spec': open[0][1].spec } : {};
   } catch { return {}; }
@@ -85,16 +95,21 @@ async function preToolUse(input) {
   try { config = loadConfig(root).config; } catch { /* config inválida não desliga a política núcleo */ }
   const eff = effectivePolicy(loadPolicy(), config);
   const r = evaluateToolCall(input, { root, eff });
-  if (r.decision === 'allow') return;
-  const { summarizeToolInput } = await lazy('../lib/trace.mjs');
-  await trace(root, config, input, 'policy.decision', { 'tool.name': input.tool_name, 'policy.decision': r.decision, 'policy.rule': r.rule, ...summarizeToolInput(input.tool_name, input.tool_input) }, r.decision === 'deny' ? 'error' : 'ok');
-  out({
-    hookSpecificOutput: {
-      hookEventName: 'PreToolUse',
-      permissionDecision: r.decision,
-      permissionDecisionReason: `SDD policy (${r.decision}): ${r.reason}`,
-    },
-  });
+  // A decisão sai ANTES do trace: nenhuma falha ou lentidão de observabilidade pode anular um deny/ask.
+  if (r.decision !== 'allow') {
+    out({
+      hookSpecificOutput: {
+        hookEventName: 'PreToolUse',
+        permissionDecision: r.decision,
+        permissionDecisionReason: `SDD policy (${r.decision}): ${r.reason}`,
+      },
+    });
+  }
+  // Ação permitida: tool.called (autonomia, uso de ferramenta, latência pareada com o PostToolUse
+  // pelo tool_use_id). Sem correlação de tarefa aqui — ela custaria reler o estado a cada chamada.
+  const attrs = { 'tool.name': input.tool_name, ...(input.tool_use_id ? { 'tool.use_id': String(input.tool_use_id) } : {}) };
+  if (r.decision === 'allow') await trace(root, config, input, 'tool.called', attrs, 'ok', null, true);
+  else await trace(root, config, input, 'policy.decision', { ...attrs, 'policy.decision': r.decision, 'policy.rule': r.rule }, r.decision === 'deny' ? 'error' : 'ok', null, true);
 }
 
 async function postToolUse(input) {
@@ -102,12 +117,16 @@ async function postToolUse(input) {
   if (isSddProject(root)) {
     let config = null;
     try { config = loadConfig(root).config; } catch { /* trace segue com o default */ }
-    if (tracing(root, config)) {
-      const { summarizeToolInput } = await lazy('../lib/trace.mjs');
-      const failed = input.tool_response && typeof input.tool_response === 'object' && (input.tool_response.is_error || input.tool_response.error);
-      const attrs = { 'tool.name': input.tool_name, ...summarizeToolInput(input.tool_name, input.tool_input), ...(await currentTask(root, input.agent_type)) };
-      await trace(root, config, input, ['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(input.tool_name) ? 'file.modified' : 'tool.completed', attrs, failed ? 'error' : 'ok');
-    }
+    // Trace é fail-open e não pode impedir a validação de specs logo abaixo.
+    try {
+      if (tracing(root, config)) {
+        const failed = input.tool_response && typeof input.tool_response === 'object' && (input.tool_response.is_error || input.tool_response.error);
+        const attrs = { 'tool.name': input.tool_name, ...(input.tool_use_id ? { 'tool.use_id': String(input.tool_use_id) } : {}), ...(await currentTask(root, input.agent_type)) };
+        // Duração só quando o cliente a informa; senão o dashboard pareia com o tool.called do PreToolUse.
+        const durationMs = Number.isFinite(input.duration_ms) && input.duration_ms >= 0 ? Math.round(input.duration_ms) : null;
+        await trace(root, config, input, ['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(input.tool_name) ? 'file.modified' : 'tool.completed', attrs, failed ? 'error' : 'ok', durationMs, true);
+      }
+    } catch { /* observabilidade é fail-open */ }
   }
   if (!['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(input.tool_name ?? 'Write')) return;
   const file = input.tool_input?.file_path ?? input.tool_input?.notebook_path;

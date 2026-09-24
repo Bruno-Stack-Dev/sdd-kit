@@ -56,7 +56,7 @@ export function configHash(cfg) {
   return sha(canonical(cfg));
 }
 
-function readMcpJson(root) {
+export function readMcpJson(root) {
   const file = join(root, '.mcp.json');
   if (!existsSync(file)) return { file, exists: false, cfg: { mcpServers: {} } };
   const cfg = readJson(file);

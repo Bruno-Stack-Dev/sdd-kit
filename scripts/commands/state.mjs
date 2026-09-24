@@ -36,6 +36,14 @@ export function eventInputFromFlags(type, flags, project) {
     meta.wave = String(flags.wave);
   }
   if (flags.force) meta.force = true;
+  // Resultado de teste com contagens (lidas pelo dashboard; o reducer usa só o tipo do evento).
+  if (flags.suite !== undefined) meta.suite = String(flags.suite);
+  for (const k of ['passed', 'failed', 'skipped', 'total', 'coverage']) {
+    if (flags[k] === undefined) continue;
+    const n = Number(flags[k]);
+    if (!Number.isFinite(n) || n < 0 || (k !== 'coverage' && !Number.isInteger(n)) || (k === 'coverage' && n > 100)) throw new UsageError(`--${k} inválido '${flags[k]}' (${k === 'coverage' ? '0–100' : 'inteiro ≥ 0'})`);
+    meta[k] = n;
+  }
 
   let task = flags.task;
   if (task && project) {

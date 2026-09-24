@@ -30,7 +30,8 @@ const VALUE_FLAGS = new Set([
   'pipeline', 'session', 'evidence', 'profile', 'target', 'out', 'key', 'trace', 'otlp', 'source',
   'license', 'trust', 'pack', 'include', 'exclude', 'format', 'since', 'id', 'kind', 'command',
   'meta', 'mode', 'tool', 'file', 'depends', 'ref', 'fromFile', 'suite', 'filter', 'packs', 'maxKb',
-  'model', 'effort', 'step', 'wave', 'max',
+  'model', 'effort', 'step', 'wave', 'max', 'tab', 'width', 'height', 'interval',
+  'passed', 'failed', 'skipped', 'total', 'coverage',
 ]);
 
 function camel(s) {
