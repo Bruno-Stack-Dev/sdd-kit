@@ -478,7 +478,7 @@
       "license": "MIT",
       "trust": "core",
       "reviewed_at": null,
-      "hash": "sha256:967b39c5c1f21eecd3b0aa3ace9a567e86394034bb213bc0bec08a834e4b45e3",
+      "hash": "sha256:d2d18d9b909acf900f67c8e3b6bcf779535a6fbdb805bde17adaaa57e329b75e",
       "risk": "low",
       "scan": {
         "sdd_static": {

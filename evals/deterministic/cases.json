@@ -914,6 +914,115 @@
           "equals": "fail"
         }
       ]
+    },
+    {
+      "id": "status-broken-project-degraded",
+      "category": "observability",
+      "fixture": "broken-project",
+      "run": [
+        "status",
+        "--json",
+        "--no-scan"
+      ],
+      "expect": [
+        {
+          "path": "health.status",
+          "equals": "DEGRADED"
+        },
+        {
+          "path": "delivery.status",
+          "equals": "UNKNOWN"
+        },
+        {
+          "path": "schemaVersion",
+          "equals": 1
+        }
+      ]
+    },
+    {
+      "id": "status-synced-project-no-invented-metrics",
+      "category": "observability",
+      "fixture": "python-api",
+      "setup": [
+        [
+          "tasks",
+          "sync"
+        ]
+      ],
+      "run": [
+        "status",
+        "--json",
+        "--no-scan"
+      ],
+      "expect": [
+        {
+          "path": "state.events",
+          "gte": 1
+        },
+        {
+          "path": "agents.items[name=agente-backend].context",
+          "equals": null
+        },
+        {
+          "path": "autonomy.percent",
+          "equals": null
+        },
+        {
+          "path": "requirements.verified",
+          "equals": 0
+        }
+      ]
+    },
+    {
+      "id": "status-secret-without-git-is-medium",
+      "category": "observability",
+      "fixture": "python-api",
+      "overlay": {
+        "app/settings.py": [
+          "AWS_KEY = \"",
+          "AKIA",
+          "ABCDEFGHIJKLMNOP",
+          "\"\n"
+        ]
+      },
+      "run": [
+        "status",
+        "--json"
+      ],
+      "expect": [
+        {
+          "path": "security.findings.medium",
+          "gte": 1
+        },
+        {
+          "path": "security.findings.critical",
+          "equals": 0
+        },
+        {
+          "path": "security.scans[id=secrets.content].status",
+          "equals": "FAIL"
+        }
+      ]
+    },
+    {
+      "id": "status-demo-is-marked",
+      "category": "observability",
+      "run": [
+        "status",
+        "--json",
+        "--demo",
+        "--no-scan"
+      ],
+      "expect": [
+        {
+          "path": "demo",
+          "equals": true
+        },
+        {
+          "path": "delivery.status",
+          "equals": "READY"
+        }
+      ]
     }
   ]
 }

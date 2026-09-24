@@ -4,9 +4,11 @@
     {
       "id": "status-01",
       "prompt": "Como está o projeto? O que falta?",
-      "expected_output": "Roda sdd state resume/tasks list/doctor e apresenta a tabela por spec, próximas tarefas prontas e bloqueios, sem editar arquivos.",
+      "expected_output": "Roda sdd status --json, sdd state resume, tasks list e doctor e apresenta saúde, progresso e entrega calculados pela CLI, a tabela por spec, próximas tarefas prontas e bloqueios, sem editar arquivos.",
       "expectations": [
+        "usa sdd status --json",
         "usa sdd state resume",
+        "não estima porcentagens por conta própria",
         "não edita nenhum arquivo",
         "lista próximas tarefas prontas"
       ]

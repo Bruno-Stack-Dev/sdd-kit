@@ -1,0 +1,774 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Bruno-Stack-Dev/sdd-kit/schemas/status.schema.json",
+  "title": "Saída de `sdd status --json` (schemaVersion 1)",
+  "description": "Contrato estável e machine-readable do resumo do projeto. Derivado deterministicamente de .sdd/events.jsonl, .sdd/trace/, specs/ e da config — nenhum campo é estimado; indisponível = null ou available: false. Campo novo é aditivo; renomear ou remover exige nova schemaVersion.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "demo",
+    "project",
+    "git",
+    "session",
+    "health",
+    "progress",
+    "requirements",
+    "specs",
+    "tasks",
+    "agents",
+    "quality",
+    "security",
+    "gates",
+    "delivery",
+    "autonomy",
+    "state",
+    "warnings"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "percent": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "dimension": {
+      "type": "object",
+      "required": [
+        "percent",
+        "done",
+        "total",
+        "available",
+        "source"
+      ],
+      "properties": {
+        "percent": {
+          "$ref": "#/$defs/percent"
+        },
+        "done": {
+          "type": "number",
+          "minimum": 0
+        },
+        "total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "source": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "health": {
+      "enum": [
+        "HEALTHY",
+        "ATTENTION",
+        "DEGRADED",
+        "BLOCKED",
+        "UNKNOWN"
+      ]
+    },
+    "stage": {
+      "enum": [
+        "SPEC",
+        "CODE",
+        "TEST",
+        "GATES",
+        "GUARDIAN",
+        "DELIVERY"
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "demo": {
+      "type": "boolean",
+      "description": "true = dados SINTÉTICOS do modo demo; nunca misturados com dados reais."
+    },
+    "project": {
+      "type": "object",
+      "required": [
+        "name",
+        "root",
+        "configSource",
+        "isSddProject"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "root": {
+          "type": "string"
+        },
+        "configSource": {
+          "enum": [
+            "yaml",
+            "md-legacy",
+            "none"
+          ]
+        },
+        "isSddProject": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "git": {
+      "type": "object",
+      "required": [
+        "available"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "branch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "head": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dirty": {
+          "type": "boolean"
+        },
+        "changedFiles": {
+          "$ref": "#/$defs/count"
+        },
+        "ahead": {
+          "$ref": "#/$defs/count"
+        },
+        "behind": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "session": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "finished",
+            "unknown"
+          ]
+        },
+        "startedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "durationMs": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "agentsSpawned": {
+          "$ref": "#/$defs/count"
+        },
+        "tasksTouched": {
+          "$ref": "#/$defs/count"
+        },
+        "filesChanged": {
+          "$ref": "#/$defs/count"
+        },
+        "events": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "health": {
+      "type": "object",
+      "required": [
+        "status",
+        "reasons"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/health"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "level",
+              "message",
+              "source"
+            ],
+            "properties": {
+              "level": {
+                "enum": [
+                  "attention",
+                  "degraded",
+                  "blocked",
+                  "unknown"
+                ]
+              },
+              "message": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "progress": {
+      "type": "object",
+      "required": [
+        "overall",
+        "implementation",
+        "requirements",
+        "tests",
+        "security",
+        "documentation",
+        "byPipeline"
+      ],
+      "properties": {
+        "overall": {
+          "type": "object",
+          "required": [
+            "percent",
+            "formula",
+            "weights",
+            "used"
+          ],
+          "properties": {
+            "percent": {
+              "$ref": "#/$defs/percent"
+            },
+            "formula": {
+              "type": "string"
+            },
+            "weights": {
+              "type": "object"
+            },
+            "used": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "implementation": {
+          "$ref": "#/$defs/dimension"
+        },
+        "requirements": {
+          "$ref": "#/$defs/dimension"
+        },
+        "tests": {
+          "$ref": "#/$defs/dimension"
+        },
+        "security": {
+          "$ref": "#/$defs/dimension"
+        },
+        "documentation": {
+          "$ref": "#/$defs/dimension"
+        },
+        "byPipeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "percent",
+              "done",
+              "total"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "requirements": {
+      "type": "object",
+      "required": [
+        "total",
+        "verified",
+        "withTestReferences"
+      ],
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/count"
+        },
+        "verified": {
+          "$ref": "#/$defs/count"
+        },
+        "withTestReferences": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "specs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "state",
+          "currentGate",
+          "requirements",
+          "verified",
+          "tasks"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currentGate": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/stage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "requirements": {
+            "$ref": "#/$defs/count"
+          },
+          "verified": {
+            "$ref": "#/$defs/count"
+          },
+          "tasks": {
+            "type": "object",
+            "required": [
+              "total",
+              "done"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "required": [
+        "total",
+        "completed",
+        "inProgress",
+        "blocked",
+        "pending",
+        "cancelled",
+        "ready"
+      ],
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/count"
+        },
+        "completed": {
+          "$ref": "#/$defs/count"
+        },
+        "inProgress": {
+          "$ref": "#/$defs/count"
+        },
+        "blocked": {
+          "$ref": "#/$defs/count"
+        },
+        "pending": {
+          "$ref": "#/$defs/count"
+        },
+        "cancelled": {
+          "$ref": "#/$defs/count"
+        },
+        "ready": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "agents": {
+      "type": "object",
+      "required": [
+        "total",
+        "active",
+        "items"
+      ],
+      "properties": {
+        "total": {
+          "$ref": "#/$defs/count"
+        },
+        "active": {
+          "$ref": "#/$defs/count"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "status",
+              "health",
+              "role",
+              "model",
+              "currentTask",
+              "context"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "working",
+                  "assigned",
+                  "ready",
+                  "waiting",
+                  "blocked",
+                  "idle"
+                ]
+              },
+              "health": {
+                "$ref": "#/$defs/health"
+              },
+              "role": {
+                "type": "string"
+              },
+              "model": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "currentTask": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "context": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "description": "null = o runtime não informou uso de contexto (nunca é estimado)."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "quality": {
+      "type": "object",
+      "required": [
+        "specsWithTests",
+        "specsPassing",
+        "specsFailing",
+        "totals",
+        "suites",
+        "evals",
+        "failedChecks"
+      ],
+      "properties": {
+        "specsWithTests": {
+          "$ref": "#/$defs/count"
+        },
+        "specsPassing": {
+          "$ref": "#/$defs/count"
+        },
+        "specsFailing": {
+          "$ref": "#/$defs/count"
+        },
+        "totals": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "partialSuites": {
+          "$ref": "#/$defs/count",
+          "description": "suítes com contagem incompleta (fora de totals)"
+        },
+        "suites": {
+          "type": "array"
+        },
+        "evals": {
+          "type": "array"
+        },
+        "failedChecks": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "required": [
+        "sandbox",
+        "hooks",
+        "policyEngine",
+        "trace",
+        "findings",
+        "policyBlocks",
+        "policyAsks",
+        "scans"
+      ],
+      "properties": {
+        "sandbox": {
+          "type": "string"
+        },
+        "hooks": {
+          "type": "string"
+        },
+        "policyEngine": {
+          "type": "string"
+        },
+        "trace": {
+          "type": "string"
+        },
+        "findings": {
+          "type": "object",
+          "required": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ],
+          "properties": {
+            "critical": {
+              "$ref": "#/$defs/count"
+            },
+            "high": {
+              "$ref": "#/$defs/count"
+            },
+            "medium": {
+              "$ref": "#/$defs/count"
+            },
+            "low": {
+              "$ref": "#/$defs/count"
+            }
+          },
+          "additionalProperties": false
+        },
+        "policyBlocks": {
+          "$ref": "#/$defs/count"
+        },
+        "policyAsks": {
+          "$ref": "#/$defs/count"
+        },
+        "scans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "status"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "gates": {
+      "type": "object",
+      "required": [
+        "current",
+        "pipeline"
+      ],
+      "properties": {
+        "current": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "stage": {
+              "$ref": "#/$defs/stage"
+            },
+            "spec": {
+              "type": "string"
+            }
+          }
+        },
+        "pipeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "status"
+            ],
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/stage"
+              },
+              "status": {
+                "enum": [
+                  "passed",
+                  "running",
+                  "pending",
+                  "blocked",
+                  "failed",
+                  "skipped"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "delivery": {
+      "type": "object",
+      "required": [
+        "status",
+        "reasons",
+        "checks"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "READY",
+            "NOT_READY",
+            "BLOCKED",
+            "UNKNOWN"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checks": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": false
+    },
+    "autonomy": {
+      "type": "object",
+      "required": [
+        "actions",
+        "autoApproved",
+        "humanApprovals",
+        "policyBlocked",
+        "percent",
+        "formula",
+        "source"
+      ],
+      "properties": {
+        "actions": {
+          "$ref": "#/$defs/count"
+        },
+        "autoApproved": {
+          "$ref": "#/$defs/count"
+        },
+        "humanApprovals": {
+          "$ref": "#/$defs/count"
+        },
+        "policyBlocked": {
+          "$ref": "#/$defs/count"
+        },
+        "percent": {
+          "$ref": "#/$defs/percent"
+        },
+        "formula": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "events",
+        "anomalies",
+        "truncatedTail",
+        "invalidLines",
+        "observedEvents"
+      ],
+      "properties": {
+        "events": {
+          "$ref": "#/$defs/count"
+        },
+        "anomalies": {
+          "$ref": "#/$defs/count"
+        },
+        "truncatedTail": {
+          "type": "boolean"
+        },
+        "invalidLines": {
+          "$ref": "#/$defs/count"
+        },
+        "observedEvents": {
+          "$ref": "#/$defs/count"
+        }
+      },
+      "additionalProperties": false
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -314,21 +314,37 @@ export function applyEvent(state, ev, ctx = {}) {
  * estado e ficam registrados em `anomalies`/`duplicates` para o doctor.
  */
 export function reduce(events, ctx = {}, validateFn = null) {
+  const r = createReducer(ctx, validateFn);
+  for (const ev of events) r.push(ev);
+  return r.state;
+}
+
+/**
+ * Reducer incremental: o mesmo `reduce`, evento a evento. Quem acompanha o log em tempo real (o
+ * dashboard) aplica só as linhas novas em vez de reexecutar o log inteiro — com as mesmas regras de
+ * validação, idempotência por chave e anomalias. `push` devolve null (aplicado) ou o motivo.
+ */
+export function createReducer(ctx = {}, validateFn = null) {
   const state = emptyState();
   const keys = new Set();
-  for (const ev of events) {
-    if (validateFn) {
-      const errs = validateFn(ev);
-      if (errs.length) { state.anomalies.push({ id: ev?.id ?? null, type: ev?.type ?? null, error: errs.map((e) => `${e.path}: ${e.message}`).join('; ') }); continue; }
-    }
-    if (ev.key) {
-      if (keys.has(ev.key)) { state.duplicates++; continue; }
-    }
-    const err = applyEvent(state, ev, ctx);
-    if (err) { state.anomalies.push({ id: ev.id, type: ev.type, error: err }); continue; }
-    if (ev.key) keys.add(ev.key);
-  }
-  return state;
+  return {
+    state,
+    push(ev) {
+      if (validateFn) {
+        const errs = validateFn(ev);
+        if (errs.length) {
+          const error = errs.map((e) => `${e.path}: ${e.message}`).join('; ');
+          state.anomalies.push({ id: ev?.id ?? null, type: ev?.type ?? null, error });
+          return error;
+        }
+      }
+      if (ev.key && keys.has(ev.key)) { state.duplicates++; return 'duplicate'; }
+      const err = applyEvent(state, ev, ctx);
+      if (err) { state.anomalies.push({ id: ev.id, type: ev.type, error: err }); return err; }
+      if (ev.key) keys.add(ev.key);
+      return null;
+    },
+  };
 }
 
 // ------------------------------------------------------------------------------------------------

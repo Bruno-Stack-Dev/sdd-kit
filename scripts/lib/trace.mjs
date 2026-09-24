@@ -7,7 +7,7 @@
 import { existsSync, appendFileSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
-import { redact } from './secrets.mjs';
+import { sanitize, sanitizeString, isSensitiveKey, REDACTED } from './sanitize.mjs';
 
 export const TRACE_VERSION = 1;
 const MAX_FIELD = 300;
@@ -26,8 +26,13 @@ export function traceDir(root) {
 
 function clean(v) {
   if (v === undefined || v === null) return undefined;
-  const s = redact(String(v));
-  return s.length > MAX_FIELD ? `${s.slice(0, MAX_FIELD)}…` : s;
+  return sanitizeString(v, MAX_FIELD);
+}
+
+/** `mcp__<servidor>__<ferramenta>` → { server, tool }; null para ferramentas que não são MCP. */
+export function parseMcpTool(name) {
+  const m = /^mcp__(.+?)__(.+)$/.exec(String(name ?? ''));
+  return m ? { server: m[1], tool: m[2] } : null;
 }
 
 /** Resumo seguro do input de uma ferramenta (sem conteúdo). */
@@ -39,6 +44,11 @@ export function summarizeToolInput(tool, input = {}) {
   if (typeof input.path === 'string') out['tool.path'] = clean(input.path);
   if (input.skill) out['skill.name'] = clean(input.skill);
   if (input.subagent_type) out['agent.spawned'] = clean(input.subagent_type);
+  const mcp = parseMcpTool(tool);
+  if (mcp) { out['mcp.server'] = clean(mcp.server); out['mcp.tool'] = clean(mcp.tool); }
+  // LSP: só a operação (findReferences, goToDefinition...), nunca o conteúdo.
+  if (tool === 'LSP' && typeof input.operation === 'string') out['lsp.operation'] = clean(input.operation);
+  if (tool === 'LSP' && typeof (input.filePath ?? input.file_path) === 'string') out['file.path'] = clean(input.filePath ?? input.file_path);
   return out;
 }
 
@@ -61,7 +71,7 @@ export function traceEvent(root, { session, name, attrs = {}, status = 'ok', dur
       session: session ?? null,
       status,
       ...(durationMs !== null ? { duration_ms: durationMs } : {}),
-      attrs: Object.fromEntries(Object.entries(attrs).filter(([, v]) => v !== undefined && v !== null).map(([k, v]) => [k, typeof v === 'string' ? clean(v) : v])),
+      attrs: Object.fromEntries(Object.entries(attrs).filter(([, v]) => v !== undefined && v !== null).map(([k, v]) => [k, isSensitiveKey(k) && typeof v === 'string' ? REDACTED : typeof v === 'string' ? clean(v) : sanitize(v, { maxString: MAX_FIELD, maxArray: 20 })])),
     };
     const file = join(dir, `${String(session ?? 'sem-sessao').replace(/[^A-Za-z0-9_-]/g, '_')}.jsonl`);
     appendFileSync(file, JSON.stringify(rec) + '\n');
@@ -103,10 +113,16 @@ export function readTimeline(root, { session, spec, task, agent, traceId } = {})
 
 /** Converte a linha do tempo para OTLP/HTTP JSON (resourceSpans). */
 export function toOtlp(items, { serviceName = 'sdd-kit' } = {}) {
-  const attr = (k, v) => ({ key: k, value: typeof v === 'number' ? { intValue: String(v) } : typeof v === 'boolean' ? { boolValue: v } : { stringValue: String(v) } });
+  // A mesma sanitização do trace e do dashboard: nada sai para o backend sem passar por ela.
+  // Inteiro → intValue; fracionário (cobertura, % de contexto) → doubleValue; NaN/Infinity não são
+  // números válidos em nenhum dos dois e seguem como texto.
+  const num = (v) => (Number.isSafeInteger(v) ? { intValue: String(v) } : Number.isFinite(v) ? { doubleValue: v } : { stringValue: String(v) });
+  const attr = (k, v) => ({ key: k, value: typeof v === 'number' ? num(v) : typeof v === 'boolean' ? { boolValue: v } : { stringValue: isSensitiveKey(k) ? REDACTED : sanitizeString(v, MAX_FIELD) } });
   const spans = items.map((i) => {
-    const start = BigInt(Date.parse(i.ts)) * 1_000_000n;
-    const end = start + BigInt(Math.max(0, i.duration_ms ?? 0)) * 1_000_000n;
+    const t = Date.parse(i.ts);
+    const start = BigInt(Number.isFinite(t) ? t : 0) * 1_000_000n;
+    const dur = Number.isFinite(i.duration_ms) ? Math.max(0, Math.round(i.duration_ms)) : 0;
+    const end = start + BigInt(dur) * 1_000_000n;
     return {
       traceId: i.trace_id,
       spanId: i.span_id.padEnd(16, '0').slice(0, 16),

@@ -26,6 +26,7 @@ import { aiCommand } from './commands/ai.mjs';
 import { adaptersCommand } from './commands/adapters.mjs';
 import { exportContextCommand } from './commands/export-context.mjs';
 import { modelsCommand } from './commands/models.mjs';
+import { statusCommand, dashboardCommand, sessionsCommand } from './commands/dashboard.mjs';
 
 const COMMANDS = {
   config: configCommand,
@@ -50,6 +51,9 @@ const COMMANDS = {
   adapters: adaptersCommand,
   'export-context': exportContextCommand,
   models: modelsCommand,
+  status: statusCommand,
+  dashboard: dashboardCommand,
+  sessions: sessionsCommand,
   init: initCommand,
   upgrade: upgradeCommand,
   version: versionCommand,
@@ -65,6 +69,7 @@ Comandos:
   config render [--check]           gera a visão sdd.config.md a partir do YAML
   config show [--json]              imprime a config normalizada
   event <TIPO> [--spec S] [--task T] [--agent A] [--model M] [--effort E] [--wave W] [--reason R] [--evidence E] [--key K]
+        [--suite s --passed N --failed N --skipped N --total N --coverage P]   (contagens de TEST_*)
                                     registra um evento validado em .sdd/events.jsonl
   state show|resume|rebuild|verify|repair   estado derivado do log; retomada de sessão
   state ledger [--check]            gera o LEDGER-<slug>.md a partir do estado
@@ -79,7 +84,7 @@ Comandos:
   spec new --slug s --title t [--pipeline p] [--new-block] [--depends A,B]
                                     cria spec + plano + tarefas (uma por etapa da pipeline)
   template list | show <nome>       templates do motor (spec, plano, adr, visao, config, skill...)
-  doctor [--fast|--project|--security|--skills|--mcp|--full] [--json] [--strict] [--verbose]
+  doctor [--fast|--project|--security|--skills|--mcp|--dashboard|--full] [--json] [--strict] [--verbose]
                                     saúde do projeto; exit 1 se NOT_READY (pronto para CI)
   check forbidden [--json]          roda os padrões proibidos da config (grep de ausência)
   policy check --command "<cmd>" | --file <p> [--tool T] [--agent A]
@@ -103,6 +108,12 @@ Comandos:
                                     pacote local e sanitizado do código (sem segredos; respeita .gitignore)
   export-context --repomix --consent  alternativa opcional via Repomix (baixa do npm; Secretlint ligado)
   eval run [--suite deterministic|model] [--update-baseline]   evals (fixtures; modelo opcional)
+  status [--json] [--verbose] [--watch] [--session S] [--no-scan]
+                                    resumo determinístico: saúde, progresso, tarefas, agentes, gates, entrega
+  dashboard [--tab T] [--session S] [--ascii] [--once --width W --height H]
+                                    TUI local em tempo real (somente leitura); --once imprime um quadro
+  dashboard --demo [--interval ms] · status --demo [--step N]   dados SINTÉTICOS num diretório temporário
+  sessions [--json]                 sessões registradas (duração, eventos, agentes, tarefas, arquivos)
   trace show [--session|--spec|--task|--agent|--trace]   linha do tempo (trace local + eventos)
   trace export --otlp <url>         exporta para um backend OTLP (ex.: Phoenix), fail-open
   eval export-promptfoo             gera os testes do Promptfoo a partir das evals das skills/agentes

@@ -11,6 +11,12 @@ export function specsDirOf(config) {
 }
 
 export function loadProject(root) {
+  const { state, log } = computeState(root);
+  return bindState(loadDefinitions(root), state, log);
+}
+
+/** Só o que vem dos arquivos (config, specs, planos, tarefas, grafos, agentes) — sem o estado. */
+export function loadDefinitions(root) {
   const cfg = loadConfig(root);
   const specsDir = specsDirOf(cfg.config);
   const specs = loadSpecs(root, specsDir);
@@ -19,12 +25,16 @@ export function loadProject(root) {
   const agents = knownAgents(root);
   const taskGraph = buildTaskGraph(taskFiles, specs, agents);
   const specGraph = buildSpecGraph(specs);
-  const { state, log } = computeState(root);
+  return { root, cfg, specsDir, specs, plans, taskFiles, agents, taskGraph, specGraph };
+}
+
+/** Junta definições e estado na visão consolidada (a mesma forma de `loadProject`). */
+export function bindState(defs, state, log) {
   const statusOf = (id) => {
-    const def = taskGraph.tasks.get(id);
+    const def = defs.taskGraph.tasks.get(id);
     return def ? effectiveTaskStatus(state, def) : state.tasks[id]?.status ?? 'unknown';
   };
-  return { root, cfg, specsDir, specs, plans, taskFiles, agents, taskGraph, specGraph, state, log, statusOf };
+  return { ...defs, state, log, statusOf };
 }
 
 /** Resumo de retomada: o que estava em curso, o que está bloqueado e o que pode começar agora. */
