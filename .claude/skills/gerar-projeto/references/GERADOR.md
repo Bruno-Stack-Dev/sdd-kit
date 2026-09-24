@@ -195,6 +195,11 @@ Após cada spec:
 
 - Atualize o `CLAUDE.md`: contagem de testes, tabela de status do módulo, padrões usados.
 - Resumo final: specs entregues, total de testes, pendências humanas (se houver).
+- **Ofereça o radar de ferramentas** (não rode por conta própria): "quer que eu pesquise
+  ferramentas que ajudariam este projeto? → `/radar-ferramentas [foco]`". Ele parte do discovery e
+  da stack, descarta o que já está em uso, em ADR ou no backlog (`sdd radar check`) e só sugere —
+  cada adoção vira ADR `proposto` por decisão humana. Se já houver um `RADAR-*.md` recente em
+  `specs/discovery/`, cite-o em vez de oferecer de novo.
 
 ---
 

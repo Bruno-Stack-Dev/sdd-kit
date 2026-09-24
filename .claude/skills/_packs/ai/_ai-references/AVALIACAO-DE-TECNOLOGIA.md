@@ -1,7 +1,9 @@
 # Método de avaliação de tecnologia de IA (pack `ai`)
 
 O ecossistema de IA muda em semanas. Por isso este pack **não traz tabela de recomendação fixa**:
-ensina a decidir e exige evidência atual. Toda skill `ai-*` segue este método.
+ensina a decidir e exige evidência atual. Toda skill `ai-*` segue este método. Para ferramentas
+fora de IA, a versão genérica está na skill core `radar-ferramentas`
+(`references/AVALIACAO-DE-FERRAMENTAS.md`), que encaminha para cá as lacunas de IA.
 
 ## 1. Problema antes da tecnologia
 

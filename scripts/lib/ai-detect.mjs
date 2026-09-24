@@ -2,7 +2,7 @@
 // imports — para o /sdd-init sugerir o pack `ai` e só os artefatos AI-* necessários.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { walkFiles } from './files.mjs';
+import { walkFiles, relPosix } from './files.mjs';
 
 // categoria → sinais (nomes de pacote/módulo). Detecção, não recomendação.
 const SIGNALS = {
@@ -18,24 +18,37 @@ const SIGNALS = {
   sandbox: ['e2b', '@e2b/code-interpreter', 'e2b-code-interpreter'],
 };
 
-function manifestDeps(root) {
-  const deps = new Set();
-  const add = (n) => n && deps.add(String(n).toLowerCase().trim());
+/**
+ * Dependências declaradas, por manifesto (package.json, pyproject, requirements, Pipfile, go.mod,
+ * Cargo). `.claude/` fica de fora: os scripts das skills do kit não são dependências do produto.
+ */
+export function manifestDependencies(root) {
+  const out = [];
   const readJson = (f) => { try { return JSON.parse(readFileSync(f, 'utf8')); } catch { return null; } };
-  for (const f of walkFiles(root).filter((p) => /(^|[\\/])(package\.json|pyproject\.toml|requirements[^\\/]*\.txt|Pipfile|go\.mod|Cargo\.toml)$/.test(p)).slice(0, 50)) {
+  const manifests = walkFiles(root)
+    .filter((p) => /(^|[\\/])(package\.json|pyproject\.toml|requirements[^\\/]*\.txt|Pipfile|go\.mod|Cargo\.toml)$/.test(p))
+    .filter((p) => !relPosix(root, p).startsWith('.claude/'));
+  for (const f of manifests.slice(0, 50)) {
+    const deps = new Set();
+    const add = (n) => n && deps.add(String(n).toLowerCase().trim());
     if (f.endsWith('package.json')) {
       const pkg = readJson(f);
       for (const k of Object.keys({ ...(pkg?.dependencies ?? {}), ...(pkg?.devDependencies ?? {}) })) add(k);
-      continue;
+    } else {
+      const text = readFileSync(f, 'utf8');
+      for (const m of text.matchAll(/["']([A-Za-z0-9_.@/-]+?)(?:\[[^\]]*\])?\s*(?:[<>=~!^][^"']*)?["']/g)) add(m[1]);
+      for (const line of text.split(/\r?\n/)) {
+        const req = line.match(/^\s*([A-Za-z0-9_.-]+)\s*(?:[<>=~!]|$)/);
+        if (req && /requirements|Pipfile/.test(f)) add(req[1]);
+      }
     }
-    const text = readFileSync(f, 'utf8');
-    for (const m of text.matchAll(/["']([A-Za-z0-9_.@/-]+?)(?:\[[^\]]*\])?\s*(?:[<>=~!^][^"']*)?["']/g)) add(m[1]);
-    for (const line of text.split(/\r?\n/)) {
-      const req = line.match(/^\s*([A-Za-z0-9_.-]+)\s*(?:[<>=~!]|$)/);
-      if (req && /requirements|Pipfile/.test(f)) add(req[1]);
-    }
+    out.push({ file: relPosix(root, f), deps: [...deps].sort() });
   }
-  return deps;
+  return out;
+}
+
+function manifestDeps(root) {
+  return new Set(manifestDependencies(root).flatMap((m) => m.deps));
 }
 
 export function detectAi(root) {

@@ -56,7 +56,7 @@ test('build sem --install gera em .sdd/adapters/<alvo>/ para todos os alvos, ski
       const r = sdd(dir, 'adapters', 'build', target, '--json');
       assert.equal(r.status, 0, r.stderr);
       const out = JSON.parse(r.stdout);
-      assert.equal(out.count, 9);
+      assert.equal(out.count, 10);
       const skillsDir = join(dir, '.sdd', 'adapters', target, TARGETS[target].skills);
       for (const s of readdirSync(skillsDir).filter((n) => !n.startsWith('.') && !n.startsWith('_'))) {
         const v = validateSkill(join(skillsDir, s));
@@ -107,7 +107,7 @@ test('--packs inclui skills e apoio do pack; modo plugin (sem CLI no projeto) é
   try {
     const r = sdd(dir, 'adapters', 'build', 'generic', '--packs', 'ai', '--json');
     assert.equal(r.status, 0, r.stderr);
-    assert.equal(JSON.parse(r.stdout).count, 17);
+    assert.equal(JSON.parse(r.stdout).count, 18);
     assert.ok(existsSync(join(dir, '.sdd/adapters/generic/skills/_ai-references/AVALIACAO-DE-TECNOLOGIA.md')));
     mkdirSync(join(plugin, '.claude', 'skills', 'x'), { recursive: true });
     const p = sdd(plugin, 'adapters', 'build', 'codex');

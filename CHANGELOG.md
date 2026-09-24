@@ -12,6 +12,14 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
 ## [Não lançado]
 
 ### Adicionado
+- **Radar de ferramentas** (ADR-0024): skill `radar-ferramentas` (`/radar-ferramentas [foco]`),
+  oferecida no fechamento do `/gerar-projeto`. Deriva lacunas dos drivers do discovery, pesquisa na
+  sessão principal com evidência datada (versão, data, link, licença), compara com a opção mínima e
+  grava `specs/discovery/RADAR-<data>.md` (`template-radar.md`). Só sugere: adoção vira ADR
+  `proposto` por decisão humana; nada é instalado. Lacunas de IA seguem para o pack `ai`.
+- `sdd radar inventory [--json]` (stack, dependências, ADRs, discovery, backlog e radares
+  anteriores) e `sdd radar check <nome...> [--json]` (onde cada candidato já aparece:
+  `em-uso` · `em-adr` · `no-backlog` · `avaliado` · `mencionado` · `novo`), só leitura e sem rede.
 - **Painel local** (ADR-0022): `sdd status [--json|--verbose|--watch] [--session S]` e
   `sdd dashboard` (TUI em tempo real, somente leitura, sem dependência nova) consomem o mesmo
   snapshot, derivado de `.sdd/events.jsonl`, `.sdd/trace/`, specs, config, agentes e política —
@@ -64,6 +72,8 @@ formato de `sdd.config.yaml`. Mudança incompatível nesses pontos = versão maj
   painel ficam mais rápidos.
 - `tasks ready --json`: `parallel_safe` passa a ser a próxima onda (regras acima); antes era uma
   tarefa por spec × agente, sem limite nem exclusividade do guardião.
+- `sdd ai detect` (e o aviso `supply.ai-pack` do doctor) deixam de contar manifestos dentro de
+  `.claude/` — são dos scripts das skills do kit, não dependências do produto.
 
 ### Corrigido
 - Hook `PreToolUse`: a decisão `deny`/`ask` da política é emitida **antes** do trace, e o resumo do

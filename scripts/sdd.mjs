@@ -23,6 +23,7 @@ import { projectCommand } from './commands/project.mjs';
 import { evalCommand } from './commands/eval.mjs';
 import { traceCommand } from './commands/trace.mjs';
 import { aiCommand } from './commands/ai.mjs';
+import { radarCommand } from './commands/radar.mjs';
 import { adaptersCommand } from './commands/adapters.mjs';
 import { exportContextCommand } from './commands/export-context.mjs';
 import { modelsCommand } from './commands/models.mjs';
@@ -48,6 +49,7 @@ const COMMANDS = {
   eval: evalCommand,
   trace: traceCommand,
   ai: aiCommand,
+  radar: radarCommand,
   adapters: adaptersCommand,
   'export-context': exportContextCommand,
   models: modelsCommand,
@@ -101,6 +103,8 @@ Comandos:
                                     Snyk Agent Scan opcional (NOT_RUN sem as duas confirmações/token)
   project classify [--json]         projeto novo × existente, com evidência
   ai detect [--json]                o produto usa IA? sinais e artefatos AI-* sugeridos (pack ai)
+  radar inventory [--json]          o que o projeto já usa, decidiu (ADRs) e planejou (backlog, radares)
+  radar check <nome...> [--json]    onde cada ferramenta candidata já aparece (em-uso, em-adr, no-backlog…)
   adapters build <codex|opencode|cline|generic> [--install] [--packs a,b]
                                     exporta skills (Agent Skills puro) + AGENTS.md para outros clientes
   adapters status [--json]          adapters instalados e se estão em dia com as skills
